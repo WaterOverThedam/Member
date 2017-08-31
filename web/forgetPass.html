@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>修改密码</title>
+    <link rel="stylesheet" href="ui/layer_mobile/need/layer.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/swiper-3.4.2.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <script>
+        /*微信浏览器*/
+        function isWeiXin() {
+            var ua = window.navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        //        if(!isWeiXin()){
+        //            window.location.href = '/wxbrowser.html';
+        //        }
+    </script>
+</head>
+
+<body>
+<div class="login-container">
+    <h1>The Little Gym</h1>
+    <div class="connect">
+        <p class="animated bounceInLeft">给孩子一生的自信和成功</p>
+    </div>
+
+    <div class="loginForm" id="changeForm">
+        <div>
+            <input type="text" name="telephone" class="telephone input-control" id="change_tel"
+                   placeholder="手机"
+                   autocomplete="off"/>
+        </div>
+        <div class="reg-group">
+            <input type="text" class="reg-valnum input-control" id="change_valnum" placeholder="输入验证码"
+                   autocomplete="off"/>
+            <button class="btn-valnum" id="change-valnum" type="button">发送验证码</button>
+        </div>
+        <div>
+            <input type="password" name="password" id="change_pass" class="password input-control"
+                   placeholder="新密码"
+                   oncontextmenu="return false" onpaste="return false"
+            />
+        </div>
+    </div>
+    <div class="">
+        <a href="javascript:void(0);" id="updateMyPass">
+            <button type="button" class="register-tis">确认修改</button>
+        </a>
+    </div>
+</div>
+
+
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/swiper-3.4.2.jquery.min.js"></script>
+<script src="ui/layer_mobile/layer.js"></script>
+<script src="js/supersized.3.2.7.min.js"></script>
+<script src="js/supersized-init.js"></script>
+<script src="js/fastclick.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

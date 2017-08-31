@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: lanyueyang@01
+    url: jdbc:mysql://127.0.0.1/gym?characterEncoding=utf-8&useSSL=false
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+# jackson:
+#   default-property-inclusion: non_null
+# redis:
+#   host: 192.168.30.113
+#   port: 6379
+server:
+  context-path: /index
+
+
+
+mail_appid : 10034
+mail_appkey : 6e88cf3e26b914c70b9e57b5ebb26b21
+mail_signtype : md5
+msg_appid : 13698
+msg_appkey : 3877871b96eac711ed8a76e286df30bc
+msg_signtype : normal
+
+
+##httpclient
+#最大连接数
+http.maxTotal : 100
+#并发数
+http.defaultMaxPerRoute : 20
+#创建连接的最长时间
+http.connectTimeout: 1000
+#从连接池中获取到连接的最长时间
+http.connectionRequestTimeout: 500
+#数据传输的最长时间
+http.socketTimeout: 10000
+#提交请求前测试连接是否可用
+http.staleConnectionCheckEnabled: true
