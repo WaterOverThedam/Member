@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         id="WebApp_ID" version="3.0">
+    <display-name>TLGC</display-name>
+    <welcome-file-list>
+        <!--<welcome-file>login.html</welcome-file>-->
+        <welcome-file>index</welcome-file>
+    </welcome-file-list>
+
+
+    <!-- session为永不超时 -->
+    <session-config>
+        <session-timeout>-1</session-timeout>
+    </session-config>
+
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>webName.root</param-value>
+    </context-param>
+
+
+</web-app>
