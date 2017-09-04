@@ -22,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -88,9 +89,9 @@ public class AdminCtrl {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String adminIndex (HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
-                              @RequestParam(value = "size", defaultValue = "10") Integer size,
-                              Model model) throws Exception {
+    public String adminIndex (HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
+                                    @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                    Model model) throws Exception {
    //ToDo admin权限
         HttpSession session = request.getSession();
         Object obj = session.getAttribute("menu");
@@ -101,7 +102,7 @@ public class AdminCtrl {
             model.addAttribute("menu",obj);
         }
 
-        Sort sort = new Sort(Sort.Direction.DESC, "creatTime");
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
         Page<Activity> pages = activityDao.findAll(pageable);
         model.addAttribute("page", pages);

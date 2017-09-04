@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class ErrorCtrl {
-    @RequestMapping("/")
+    @RequestMapping("/erro")
     public String errorPage(){
-
         return "redirect:error.html";
     }
 }

@@ -1,20 +1,24 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    username: root
-    password: lanyueyang@01
-    url: jdbc:mysql://127.0.0.1/gym?characterEncoding=utf-8&useSSL=false
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
+  profiles:
+    active: dev
+
+
 # jackson:
 #   default-property-inclusion: non_null
 # redis:
 #   host: 192.168.30.113
 #   port: 6379
-server:
-  context-path: /index
+
+#server:
+#   context-path: /index
+#   error:
+#     path: /error
+
+
+#log
+logging:
+  path: d:/
+
 
 
 
@@ -28,14 +32,16 @@ msg_signtype : normal
 
 ##httpclient
 #最大连接数
-http.maxTotal : 100
+http.maxTotal : 50000
 #并发数
-http.defaultMaxPerRoute : 20
+http.defaultMaxPerRoute : 10000
 #创建连接的最长时间
-http.connectTimeout: 1000
+http.connectTimeout: 15000
 #从连接池中获取到连接的最长时间
-http.connectionRequestTimeout: 500
+http.connectionRequestTimeout: 15000
 #数据传输的最长时间
-http.socketTimeout: 10000
+http.socketTimeout: 25000
 #提交请求前测试连接是否可用
 http.staleConnectionCheckEnabled: true
+
+

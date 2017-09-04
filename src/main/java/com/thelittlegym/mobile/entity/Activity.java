@@ -1,11 +1,9 @@
 package com.thelittlegym.mobile.entity;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
