@@ -228,23 +228,11 @@ function login_ajax(telephone, password) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            if (data.result == "登录成功") {
+            if (data.success) {
                 window.location.href = "/index";
-            } else if ( data.result == "密码错误") {
+            } else {
                 layer.open({
-                    content: '密码错误'
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
-            } else if (data.result == "该用户不存在") {
-                layer.open({
-                    content: '该用户不存在'
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
-            }else{
-                layer.open({
-                    content: '登录异常，请重试'
+                    content: data.result?data.result:"登陆异常，请重试"
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });

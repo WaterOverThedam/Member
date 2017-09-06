@@ -32,13 +32,16 @@ public class LoginServiceImpl implements ILoginService {
         }
         if(user != null){
             if(user.getPassword().equals(password)){
-                returnMap.put("user", user);
+                returnMap.put("value", user);
                 returnMap.put("result", ResultEnum.LOGIN_SUCCESS.getMessage());
+                returnMap.put("success", true);
             }else{
                 returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
+                returnMap.put("success", false);
             }
         }else{
             returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST.getMessage());
+            returnMap.put("success", false);
         }
         return returnMap;
     }

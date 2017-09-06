@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,31 +47,24 @@ public class UserCtrl {
     private IPointsService pointsService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String index(HttpServletRequest request, Model model) throws Exception {
+    public String index(HttpServletRequest request,@SessionAttribute(required = false) Object show,@SessionAttribute(required = false)  Object admin,@SessionAttribute(required = false)  User user, Model model) throws Exception {
         HttpSession session = request.getSession();
         InTesting it = new InTesting();
         boolean ittest = it.isTrue(request);
-        Object objSession = session.getAttribute("user");
-        Object adminSession = session.getAttribute("admin");
-        User user;
 
-        if(!ittest && null == adminSession) {
-            String linkId = request.getParameter("linkId");
-            if (null != linkId && "1225".equals(linkId)) {
-                session.setAttribute("hide", System.currentTimeMillis() / 1000);
-                return "redirect:/index";
-            }
-            Object hideSession = session.getAttribute("hide");
-            if (null == hideSession) {
-                return "redirect:/noaccess.html";
-            }
+        String linkId = request.getParameter("linkId");
+        if (null != linkId && "1225".equals(linkId)) {
+            session.setAttribute("show", System.currentTimeMillis() / 1000);
+            return "redirect:/index";
+        }
+        if(!ittest && null == show && admin==null) {
+            return "redirect:/noaccess.html";
         }
 
-        if (objSession == null) {
+        if (user == null) {
             return "redirect:/login.html";
-        } else {
-            user = (User) objSession;
         }
+
         Object listGymSelectedSession = session.getAttribute("listGymSelectedSession");
         List<Gym> listGym = new ArrayList<Gym>();
         List<Child> listChild = new ArrayList<Child>();

@@ -106,7 +106,7 @@ public class LoginCtrl {
 
         try {
             String sqlExist = "select top 1  crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
-log.info(sqlExist);
+
             JSONArray jsonArray = oasisService.getResultJson(sqlExist);
             //是否是会员校验
             if (jsonArray == null){

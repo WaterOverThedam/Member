@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <%--<title>会员主页</title>--%>
-    <link rel="stylesheet" href="/css/sm.min.css">
-    <link rel="stylesheet" href="/css/gym.css">
-    <link rel="stylesheet" href="/css/animate.css">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>会员主页</title>
+    <link rel="stylesheet" href="/css/sm.min.css"/>
+    <link rel="stylesheet" href="/css/gym.css"/>
+    <link rel="stylesheet" href="/css/animate.css"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
 
 </head>
 <body>
 <div class="page-group">
-        <div class="page" th:each="child : ${listChild}" th:classappend="${status.index==0}?' page-current'" th:attr="data-index=${status.index}"
-             th:attr="data-name =${child.name},data-id=${child.idhz},
-             id='child'+${status.index}">
+        <div class="page" th:each="child : ${listChild}" th:classappend="${index==0}?' page-current'"
+             th:attr="data-index=${index},data-name =${child.name},data-id=${child.idhz},id='child'+${index}">
             <div class="content">
                 <div class="card">
-                    <div th:switch="${status.index}" class="card-header no-border gym-card-title">
+                    <div th:switch="${index}" class="card-header no-border gym-card-title">
                             <div th:case="0">
                                 <label class="child-name" >${child.name}</label>
-                                <a href="#child${status.index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
+                                <a th:href="'#child'+${index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
                                     <small>查询另一位宝宝</small>
                                     <i class="fa fa-angle-double-right"></i>
                                 </a>
                             </div>
                             <div th:case="*">
-                                <a href="'#child'+${status.index==0}?1:0">
+                                <a th:href="'#child'+ ${index==0?1:0}">
                                     <i class="fa fa-angle-double-left"></i>
                                     <small>查询另一位宝宝</small>
                                 </a>
@@ -71,27 +70,27 @@
                         <label>我的运动</label>
                         <i></i>
                     </div>
-                    <div th:switch="${not #lists.isEmpty(listRank[status.index])}" class="card-content">
+                    <div th:switch="${not #lists.isEmpty(listRank[${index}])}" class="card-content">
                         <!--<c:choose>-->
-                            <!--<c:when test="${not empty listRank[status.index]}">-->
+                            <!--<c:when test="${not empty listRank[index]}">-->
                                 <div th:case="true" class="card-content-inner exercise-content">
                                     <div class="row no-gutter  row-box">
                                         <div class="col-33 ">
                                             <div class="sign-first">过去三月超过全国</div>
-                                            <label class="big outpass" th:utext="${listRank[status.index]['outpass']}"></label>%会员
+                                            <label class="big outpass" th:utext="${listRank[index]['outpass']}"></label>%会员
                                         </div>
                                         <div class="col-33 c">
                                             <div class="sign-first">总共运动</div>
-                                            <label class="big mins" th:utext="${listRank[status.index]['mins']}"></label>分钟
+                                            <label class="big mins" th:utext="${listRank[index]['mins']}"></label>分钟
                                         </div>
                                         <div class="col-33">
                                             <div class="sign-first">全国会员中排第</div>
-                                            <label class="big ranking" th:utext="${listRank[status.index]['ranking']}"></label>名<i
+                                            <label class="big ranking" th:utext="${listRank[index]['ranking']}"></label>名<i
                                                 class="fa fa-angle-double-right"></i></div>
                                     </div>
                                     <div class="exercise-text">
-                                        <p><label class="big tian" th:utext="${listRank[status.index]['tian']}"></label>天您已加入小小运动馆</p>
-                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(listRank[status.index]['times_per_week'],1,2})">
+                                        <p><label class="big tian" th:utext="${listRank[index]['tian']}"></label>天您已加入小小运动馆</p>
+                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(listRank[index]['times_per_week'],1,2})">
                                         </label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
                                         </p>
                                     </div>
@@ -107,7 +106,7 @@
                 <div class="card">
                     <div class="card-header gym-card-title">
                         <a class="gym-select"
-                           th:attr="data-id=${listGymSelectedSession[status.index].gym['gymId']}"><span class="gym-name" th:text="${listGymSelectedSession[status.index].gym['gymName']}"></span>
+                           th:attr="data-id=${listGymSelectedSession[index].gym['gymId']}"><span class="gym-name" th:text="${listGymSelectedSession[index].gym['gymName']}"></span>
                                 <i th:if="${listGym.size() > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
                                 <span th:if="${listGym.size() > 1}" class="badge badge-tip">切换中心</span>
                         </a>
@@ -116,11 +115,11 @@
                         <div>
                             <div class="gym-datepicker">
                                 <i class="fa fa-angle-double-left beginDate-i"></i>
-                                <input type="text" readonly class="beginDate"
-                                       value="${listGymSelectedSession[status.index]['beginDate']}"
+                                <input type="text" th:readonly="true" class="beginDate"
+                                       value="${listGymSelectedSession[index]['beginDate']}"
                                        /> -
-                                <input type="text" readonly class="endDate"
-                                       value="${listGymSelectedSession[status.index]['endDate']}"
+                                <input type="text" th:readonly="true" class="endDate"
+                                       value="${listGymSelectedSession[index]['endDate']}"
                                        data-toggle="date"/>
                                 <i class="fa fa-angle-double-right endDate-i"></i>
                             </div>
@@ -145,8 +144,8 @@
                                     class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
                                 <div class="swiper-wrapper">
                                     <div class="swiper-slide swiper-slide-active">
-                                        <ul th:switch="${not #lists.isEmpty(listGymClassAll[status.index])}" class="details_list">
-                                            <li th:case="true" th:each="gymClass : ${listGymClassAll[status.index]}" class="row no-gutter">
+                                        <ul th:switch="${not #lists.isEmpty(listGymClassAll[index])}" class="details_list">
+                                            <li th:case="true" th:each="gymClass : ${listGymClassAll[index]}" class="row no-gutter">
                                                 <span th:text="${#calendars.format(gymClass['date'],'yyyy.MM.dd'}" class="col-20  date"></span>
                                                 <span th:text="${gymClass['time']}" class="col-20  time"></span>
                                                 <span th:text="${gymClass['course']}" class="col-20  class"></span>
@@ -165,7 +164,7 @@
             </div>
         </div>
 </div>
-<input type="hidden" value = "${in3000==true}？1" id="in3000"、>
+<input type="hidden" value = "${in3000==true}？1" id="in3000"/>
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
 <script src="/js/swiper-3.4.2.jquery.min.js"></script>
