@@ -1,17 +1,5 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 汁
-  Date: 2017/3/25
-  Time: 19:00
-  To change this template use File | Settings | File Templates.
---%>
-
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,30 +15,27 @@
 </head>
 <body>
 <div class="page-group">
-    <c:forEach items="${listChild}" var="child" varStatus="status">
-        <div class="page <c:if test="${status.index==0}">page-current</c:if>" data-index="${status.index}"
-             data-name =${child['name']}  data-id="${child['idhz']}"
-             id="child${status.index}">
+        <div class="page" th:each="child : ${listChild}" th:classappend="${status.index==0}?' page-current'" th:attr="data-index=${status.index}"
+             th:attr="data-name =${child.name},data-id=${child.idhz},
+             id='child'+${status.index}">
             <div class="content">
                 <div class="card">
-                    <div class="card-header no-border gym-card-title">
-                        <c:choose>
-                            <c:when test="${status.index==0}">
-                                <label class="child-name">${child['name']} </label>
-                                <c:if test="${listChild.size() > 1}">
-                                    <a href="#child${status.index==0?1:0}">
-                                        <small>查询另一位宝宝</small>
-                                        <i class="fa fa-angle-double-right"></i></a>
-                                </c:if>
-                            </c:when>
-                            <c:otherwise>
-                                <a href="#child${status.index==0?1:0}">
+                    <div th:switch="${status.index}" class="card-header no-border gym-card-title">
+                            <div th:case="0">
+                                <label class="child-name" >${child.name}</label>
+                                <a href="#child${status.index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
+                                    <small>查询另一位宝宝</small>
+                                    <i class="fa fa-angle-double-right"></i>
+                                </a>
+                            </div>
+                            <div th:case="*">
+                                <a href="'#child'+${status.index==0}?1:0">
                                     <i class="fa fa-angle-double-left"></i>
                                     <small>查询另一位宝宝</small>
                                 </a>
-                                <label>${child['name']} </label>
-                            </c:otherwise>
-                        </c:choose>
+                                <label>${child.name}</label>
+                            </div>
+
                     </div>
                 </div>
                 <div class="card">
@@ -61,21 +46,22 @@
                                 <img src="${fn:toLowerCase(sessionScope.user.head_src)}" onerror="this.src='/images/member/head.png'"/>
                             </div>
                             <a class="header-text external"
-                               href="/index/myinfo?idhz=${child['idhz']}&name=${child['name']}&age=${child['age']}">
+                               href="@{/index/myinfo(idhz=${child.idhz},name=${child.name},age=${child.age}">
                                 <div class="header-p">
-                                    <p>年龄：${child['age']}</p>
-                                    <p>剩余课时：${child['rest']}节课</p>
-                                    <p>最后有效期：${child['dtend']}</p>
+                                    <p th:text="'年龄：'+${child['age']}"></p>
+                                    <p th:text="'剩余课时：'+${child['rest']}+'节课'"> </p>
+                                    <p th:text="'最后有效期：'+ ${child['dtend']}"></p>
                                 </div>
                                 <div class="header-row-right">
                                     <i class="fa fa-angle-right fa-3x "></i>
                                 </div>
                             </a>
                         </div>
-                            <%--<div class="inform">--%>
-                            <%--<div class="inform-title">活动通知：</div>--%>
-                            <%--<div class="activity-info">植树节活动|4月1号全面涨价</div>--%>
-                            <%--</div>--%>
+
+                            <!--<%&#45;&#45;<div class="inform">&#45;&#45;%>-->
+                            <!--<%&#45;&#45;<div class="inform-title">活动通知：</div>&#45;&#45;%>-->
+                            <!--<%&#45;&#45;<div class="activity-info">植树节活动|4月1号全面涨价</div>&#45;&#45;%>-->
+
                         <i></i>
                     </div>
                 </div>
@@ -85,50 +71,45 @@
                         <label>我的运动</label>
                         <i></i>
                     </div>
-                    <div class="card-content">
-                        <c:choose>
-                            <c:when test="${not empty listRank[status.index]}">
-                                <div class="card-content-inner exercise-content">
+                    <div th:switch="${not #lists.isEmpty(listRank[status.index])}" class="card-content">
+                        <!--<c:choose>-->
+                            <!--<c:when test="${not empty listRank[status.index]}">-->
+                                <div th:case="true" class="card-content-inner exercise-content">
                                     <div class="row no-gutter  row-box">
                                         <div class="col-33 ">
                                             <div class="sign-first">过去三月超过全国</div>
-                                            <label class="big outpass">${listRank[status.index]['outpass']}</label>%会员
+                                            <label class="big outpass" th:utext="${listRank[status.index]['outpass']}"></label>%会员
                                         </div>
                                         <div class="col-33 c">
                                             <div class="sign-first">总共运动</div>
-                                            <label class="big mins">${listRank[status.index]['mins']}</label>分钟
+                                            <label class="big mins" th:utext="${listRank[status.index]['mins']}"></label>分钟
                                         </div>
                                         <div class="col-33">
                                             <div class="sign-first">全国会员中排第</div>
-                                            <label class="big ranking">${listRank[status.index]['ranking']}</label>名<i
+                                            <label class="big ranking" th:utext="${listRank[status.index]['ranking']}"></label>名<i
                                                 class="fa fa-angle-double-right"></i></div>
                                     </div>
                                     <div class="exercise-text">
-                                        <p><label class="big tian">${listRank[status.index]['tian']}</label>天您已加入小小运动馆</p>
-                                        <p><label class="big times_per_week"><fmt:formatNumber
-                                                value="${listRank[status.index]['times_per_week']}"
-                                                pattern="0.0"/></label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
+                                        <p><label class="big tian" th:utext="${listRank[status.index]['tian']}"></label>天您已加入小小运动馆</p>
+                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(listRank[status.index]['times_per_week'],1,2})">
+                                        </label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
                                         </p>
                                     </div>
                                 </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="card-content-inner">
+
+                                <div th:case="*" class="card-content-inner">
                                     <p class="text-center">暂时还没有排名</p>
                                 </div>
-                            </c:otherwise>
-                        </c:choose>
+
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header gym-card-title">
                         <a class="gym-select"
-                           data-id="${listGymSelectedSession[status.index].gym['gymId']}"><span class="gym-name">${listGymSelectedSession[status.index].gym['gymName']}</span>
-                            <c:if test="${listGym.size() > 1}">
-                                <i class="fa fa-angle-down" aria-hidden="true"></i>
-                                <span class="badge badge-tip">切换中心</span>
-                            </c:if>
+                           th:attr="data-id=${listGymSelectedSession[status.index].gym['gymId']}"><span class="gym-name" th:text="${listGymSelectedSession[status.index].gym['gymName']}"></span>
+                                <i th:if="${listGym.size() > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
+                                <span th:if="${listGym.size() > 1}" class="badge badge-tip">切换中心</span>
                         </a>
                     </div>
                     <div class="card-content-inner">
@@ -164,26 +145,16 @@
                                     class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
                                 <div class="swiper-wrapper">
                                     <div class="swiper-slide swiper-slide-active">
-                                        <ul class="details_list">
-                                            <c:choose>
-                                                <c:when test="${not empty listGymClassAll[status.index]}">
-                                                    <c:forEach items="${listGymClassAll[status.index]}" var="gymClass">
-                                                        <li class="row no-gutter">
-                                                <span class="col-20  date"><fmt:formatDate value="${gymClass['date']}"
-                                                                                           pattern="yyyy.MM.dd"/></span>
-                                                            <span class="col-20  time">${gymClass['time']}</span>
-                                                            <span class="col-20  class">${gymClass['course']}</span>
-                                                        <span class="col-20  state <c:if test="${gymClass['kq'] == '尚未开课'}"> text-danger</c:if>">
-                                                                ${gymClass['kq']}</span>
-                                                            <a onclick="toTopic(${gymClass['course']})"><span
-                                                                    class="col-20 details">课程亮点</span></a>
-                                                        </li>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <p class="text-center">没有查询到课程</p>
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <ul th:switch="${not #lists.isEmpty(listGymClassAll[status.index])}" class="details_list">
+                                            <li th:case="true" th:each="gymClass : ${listGymClassAll[status.index]}" class="row no-gutter">
+                                                <span th:text="${#calendars.format(gymClass['date'],'yyyy.MM.dd'}" class="col-20  date"></span>
+                                                <span th:text="${gymClass['time']}" class="col-20  time"></span>
+                                                <span th:text="${gymClass['course']}" class="col-20  class"></span>
+                                                <span th:text="${gymClass['kq']}" class="col-20 state " th:classappend="${gymClass['kq'] == '尚未开课'}? 'text-danger'">
+                                                </span>
+                                                <a onclick="'toTopic('+${gymClass['course']}+')'"><span class="col-20 details">课程亮点</span></a>
+                                             </li>
+                                             <p  th:case="*" class="text-center">没有查询到课程</p>
                                         </ul>
                                     </div>
                                 </div>
@@ -192,17 +163,16 @@
                     </div>
                 </div>
             </div>
-
         </div>
-    </c:forEach>
 </div>
-<input type="hidden" value = "<c:if test="${in3000==true}">1</c:if>" id="in3000">
+<input type="hidden" value = "${in3000==true}？1" id="in3000"、>
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
 <script src="/js/swiper-3.4.2.jquery.min.js"></script>
 <script type='text/javascript' src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-<script>
 
+<script>
+    /*<![CDATA[*/
     /*全局孩子标识*/
     var PAGE_ID = $(".page-current").attr("id") ? $(".page-current").attr("id") : 'child1';
     var CHILD_ID = $("#" + PAGE_ID).data("id");
@@ -416,26 +386,26 @@
         var gymId = "";
         var gymName = "";
 
-        <c:forEach items="${sessionScope.listGym}" var="mygym">
-        gymName = "${mygym['gymName']}";
-        gymId = "${mygym['gymId']}";
-        var button_json = {
-            text: gymName,
-            disabled: selectedGymId == gymId,
-            id: gymId,
-            onClick: function () {
-                if (!this.disabled) {
-                    gym_change(this.text, this.id);
+        var message = [[${sessionScope.listGym}]];
+        $.each(message,function(index,mygym) {
+            gymName = "${mygym['gymName']}";
+            gymId = "${mygym['gymId']}";
+            var button_json = {
+                text: gymName,
+                disabled: selectedGymId == gymId,
+                id: gymId,
+                onClick: function () {
+                    if (!this.disabled) {
+                        gym_change(this.text, this.id);
+                    }
                 }
-            }
-        };
+            };
+            buttons1.push(button_json);
+        }
 
-        buttons1.push(button_json);
-        </c:forEach>
         var groups = [buttons1, buttons2];
         $.actions(groups);
     });
-
 
 
     function gym_change(gymName, gymId) {
@@ -485,10 +455,8 @@
             $("#in3000").val("");
         }
 
-
-
     $.init();
-
+    /*]]>*/
 </script>
 </body>
 

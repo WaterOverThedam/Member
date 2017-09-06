@@ -170,6 +170,7 @@ public class UserCtrl {
                     if (classArray != null) {
                         listGymClass = JSONObject.parseArray(classArray.toString(), GymClass.class);
                     }
+
                     listChild.add(child);
                     listRank.add(rank);
                     listGymSelected.add(gymSelected);

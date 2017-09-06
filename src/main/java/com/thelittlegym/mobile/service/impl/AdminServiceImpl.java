@@ -20,20 +20,8 @@ public class AdminServiceImpl implements IAdminService {
     private AdminDao adminDao;
 
     @Override
-    public Map<String, Object> login(String username, String password) {
-        HashMap<String,Object> returnMap = new HashMap<String,Object>();
-        Admin admin = adminDao.findOneByUsername(username);
-        if (null != admin){
-            if(password.equals(admin.getPassword())){
-                returnMap.put("value", admin);
-                returnMap.put("result", ResultEnum.LOGIN_SUCCESS);
-            }else{
-                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD);
-            }
-        }else{
-            returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST);
-        }
-        return returnMap;
+    public Admin login(String username, String password) {
+        return adminDao.findOneByUsername(username);
     }
 
 }

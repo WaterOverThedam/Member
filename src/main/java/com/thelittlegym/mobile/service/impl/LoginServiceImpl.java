@@ -32,13 +32,13 @@ public class LoginServiceImpl implements ILoginService {
         }
         if(user != null){
             if(user.getPassword().equals(password)){
-                returnMap.put("value", user);
-                returnMap.put("result", ResultEnum.LOGIN_SUCCESS);
+                returnMap.put("user", user);
+                returnMap.put("result", ResultEnum.LOGIN_SUCCESS.getMessage());
             }else{
-                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD);
+                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
             }
         }else{
-            returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST);
+            returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST.getMessage());
         }
         return returnMap;
     }
@@ -46,11 +46,13 @@ public class LoginServiceImpl implements ILoginService {
     @Override
     public Map<String, Object> register(String username, String password,String email,Integer idFamily)  {
         Map<String,Object> returnMap = new HashMap<String,Object>();
-        User user = userDao.findOneByUsername(username);
-        if(user != null){
-            returnMap.put("result", ResultEnum.REGISTER_USER_EXIST);
+        User res = userDao.findOneByUsername(username);
+        if(res != null){
+            returnMap.put("result", ResultEnum.REGISTER_USER_EXIST.getMessage());
+            returnMap.put("success", false);
             return returnMap;
         }else{
+            User user = new User();
             user.setUsername(username);
             user.setPassword(password);
             user.setTel(username);
@@ -58,9 +60,15 @@ public class LoginServiceImpl implements ILoginService {
             user.setIdFamily(idFamily);
             user.setCreateTime(new Date());
             user.setIsDelete(false);
-            userDao.save(user);
-            returnMap.put("value", user);
-            returnMap.put("result", ResultEnum.REGISTER_SUCCESS);
+            User value = userDao.save(user);
+            if (value==null){
+                returnMap.put("result",ResultEnum.REGISTER_EXCEPTION.getMessage());
+                returnMap.put("success", false);
+            }else {
+                returnMap.put("user", value);
+                returnMap.put("result", ResultEnum.REGISTER_SUCCESS.getMessage());
+                returnMap.put("success", true);
+            }
             return returnMap;
         }
     }

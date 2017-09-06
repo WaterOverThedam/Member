@@ -1,29 +1,11 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hibernate
-  Date: 2017/5/12
-  Time: 14:09
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>后台</title>
-    <link rel="stylesheet" href="/ui/semantic/semantic.min.css">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head th:substituteby="/admin/common_admin :: head">
 </head>
 
 <body>
-<%@ include file="template_slider.jsp" %>
+<div th:substituteby="/admin/common_admin :: menu"/>
+
 <div class="pusher">
     <div class="ui masthead  segment">
         <div class="ui container">
@@ -70,30 +52,7 @@
         </div>
     </div>
 </div>
-<%--<!-- modal -->--%>
-<%--<div class="ui modal">--%>
-<%--<i class="close icon"></i>--%>
-<%--<div class="header">--%>
-<%--反馈详情--%>
-<%--</div>--%>
-<%--<div class="image content">--%>
 
-<%--<div class="description">--%>
-<%--<div class="ui header"></div>--%>
-<%--<p></p>--%>
-<%--<p></p>--%>
-<%--</div>--%>
-<%--</div>--%>
-<%--<div class="actions">--%>
-<%--<div class="ui black deny button">--%>
-<%--Nope--%>
-<%--</div>--%>
-<%--<div class="ui positive right labeled icon button">--%>
-<%--Yep, that's me--%>
-<%--<i class="checkmark icon"></i>--%>
-<%--</div>--%>
-<%--</div>--%>
-<%--</div>--%>
 <script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
 <script>
@@ -101,9 +60,7 @@
         $(".ui.sidebar").sidebar('toggle');
     })
 
-    //    $(".feedback-details").on('click',function () {
-    //        $('.ui.modal').modal('show');
-    //    })
+
 
 </script>
 </body>

@@ -1,13 +1,12 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>手机会员后台</title>
-    <link rel="stylesheet" href="/ui/semantic/semantic.min.css">
+    <link rel="stylesheet" href="/ui/semantic/semantic.min.css"/>
     <style>
         body {
             background-color: #DADADA;
@@ -41,7 +40,7 @@
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
-                        <input id="password" type="password" name="password" placeholder="输入密码">
+                        <input id="password" type="password" name="password" placeholder="输入密码"/>
                     </div>
                 </div>
                 <div class="ui error message"></div>
@@ -53,7 +52,8 @@
 
 <script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
-<script>
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
     function valForm() {
         var flag = false;
         var errmessage = '<ul class="list" >';
@@ -87,22 +87,28 @@
         this.password = password;
         $.ajax({
             type:'POST',
-            url:'/admin/valLogin',
+            url:'/admin/Login',
             data:{
                 'username':this.username,'password':this.password
             },
             contentType:"application/x-www-form-urlencoded",
             dataType: "json",
             success:function (data) {
-                if (data.success == true && data.message == '登录成功'){
-                    window.location.href = '/admin/activity.html';
-                }else{
-//                    alert(allFields)
-                    $(".ui.error.message").text(data.message);
-                    $(".ui.error.message").fadeIn();
+                var tip;
+                if(data){
+                    //alert(data.result)
+                    if (data.result=="登陆成功"){
+                        tip = "loading...";
+                        window.location.href = '/admin/index';
+                    }else{
+                        tip = data.result;
+                    }
+                    $(".ui.error.message").text(tip);
+                    $(".ui.error.message").fadeIn()
                 }
             }})
     }
+    /*]]>*/
 
 
 </script>

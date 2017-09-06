@@ -3,6 +3,7 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.lly835.bestpay.rest.type.Post;
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
@@ -54,61 +55,58 @@ public class AdminCtrl {
     @Autowired
     private IUserService userService;
 
-    @RequestMapping(value="/login",method = RequestMethod.GET)
+    @GetMapping(value="/login")
     public String adminToLogin(HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        Admin admin = new Admin();
-        if (sessionObj != null){
-            return "/admin";
-        }else{
+
             return "/admin/login";
-        }
+
     }
 
-    @RequestMapping(value="/valLogin",method = RequestMethod.POST)
+    @PostMapping(value="/Login")
     @ResponseBody
-    public Map<String,Object> adminLogin(HttpServletRequest request, String username, String password) throws Exception {
+    public Map<String,Object>  adminLogin(HttpServletRequest request, String username,String password) throws Exception {
         Map<String,Object> returnMap = new HashMap<String,Object>();
         try {
-            Map<String ,Object> map =  adminService.login( username, password);
-            Object object = map.get("value");
-            if (object != null) {
-                Admin admin = (Admin) object;
+            Admin  admin=  adminService.login( username, password);
+            if (admin != null) {
                 HttpSession session = request.getSession();
                 session.setAttribute("admin", admin);
+                returnMap.put("admin", admin);
+                returnMap.put("result",ResultEnum.LOGIN_SUCCESS.getMessage());
+
+            }else {
+                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
             }
-            returnMap.put("value", object);
-            returnMap.put("message",ResultEnum.LOGIN_SUCCESS);
+
         }catch (Exception e){
-            returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD);
+            returnMap.put("result", ResultEnum.LOGIN_EXCEPTION.getMessage());
             log.error(e.getMessage());
         }
 
         return returnMap;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = {"","/index"}, method = RequestMethod.GET)
     public String adminIndex (HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
-                                    @RequestParam(value = "size", defaultValue = "10") Integer size,
-                                    Model model) throws Exception {
-   //ToDo admin权限
+                              @RequestParam(value = "size", defaultValue = "10") Integer size,
+                              Model model) throws Exception {
+        //ToDo admin权限
         HttpSession session = request.getSession();
-        Object obj = session.getAttribute("menu");
-        if (obj==null) {
-            model.addAttribute("menu", menuEnum.ACTIVITY);
-            session.setAttribute("menu", menuEnum.ACTIVITY);
-        }else{
-            model.addAttribute("menu",obj);
+        Object admin = session.getAttribute("admin");
+        if(admin==null){
+            return "redirect:/admin/login";
         }
 
+        Object obj = session.getAttribute("menu");
+        if (obj==null) {
+            session.setAttribute("menu", menuEnum.ACTIVITY);
+        }
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
         Page<Activity> pages = activityDao.findAll(pageable);
         model.addAttribute("page", pages);
         return "/admin/index";
     }
-
     @RequestMapping(value = "/{menu}.html", method = RequestMethod.GET)
     public String adminIndex(@PathVariable("menu") String menu, HttpServletRequest request ,
                              @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
@@ -120,17 +118,15 @@ public class AdminCtrl {
             return "/admin/login";
         }
 
-
-        model.addAttribute("menu", menuEnum.getMenu(menu));
         session.setAttribute("menu", menuEnum.getMenu(menu));
 
-        Sort sort = new Sort(Sort.Direction.DESC, "creatTime");
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
 
         switch (menu){
             case "activity":
                 Page<Activity> activityPages = activityDao.findAll(pageable);
-                model.addAttribute("pages", activityPages);
+                model.addAttribute("page", activityPages);
                 break;
             case "theme":
                 Page<Theme> themePages = themeDao.findAll(pageable);
@@ -144,16 +140,61 @@ public class AdminCtrl {
     @RequestMapping(value = "/add/{menu}", method = RequestMethod.GET)
     public String activityToAdd(@PathVariable("menu") String menu, HttpServletRequest request, Model model) throws Exception {
         HttpSession session = request.getSession();
+        //TODO
         Object sessionObj = session.getAttribute("admin");
         if (sessionObj == null){
             return "/admin/login";
         }
-        //System.out.println(menu);
         return "/admin/" + menu + "Add";
-        //return  "/admin/activityAdd";
     }
 
-    @RequestMapping(value = "/addTo/{menu}")
+    @RequestMapping(value = "/activityAdd")
+    @ResponseBody
+    public HashMap Add(HttpServletRequest request, MultipartFile file) throws Exception {
+        String gym = request.getParameter("gym");
+        Activity activity= new Activity();
+
+        HashMap<String, Object> returnMap = new HashMap<String, Object>();
+        try {
+            // 获取图片原始文件名
+            String originalFilename = file.getOriginalFilename();
+            //System.out.println(originalFilename);
+            // 文件名使用当前时间
+            String name = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+            // 获取上传图片的扩展名(jpg/png/...)
+            String extension = FilenameUtils.getExtension(originalFilename);
+
+            // 图片上传的相对路径（因为相对路径放到页面上就可以显示图片）
+            String path = "/upload/activity/" + gym + "/"  +name + "." + extension.toUpperCase();
+
+            // 图片上传的绝对路径
+            String url = request.getSession().getServletContext().getRealPath("") + path;
+
+            String urlHttp = "/upload/activity/" + gym + "/" + name + "." + "jpg";
+            File dir = new File(url);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // 上传图片
+            file.transferTo(new File(url));
+
+            returnMap.put("success", true);
+            returnMap.put("path", path);
+            activityDao.save(activity);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnMap.put("success", false);
+            returnMap.put("message", "请重新登录后再试");
+        }
+
+        return returnMap;
+    }
+
+
+
+    @RequestMapping(value = "/themeAdd")
     @ResponseBody
     public HashMap Add(HttpServletRequest request, MultipartFile videoFile, @PathVariable String menu) throws Exception {
         String name=request.getParameter("name");
@@ -165,9 +206,7 @@ public class AdminCtrl {
         try {
             // 获取图片原始文件名
             String originalFilename = videoFile.getOriginalFilename();
-            //System.out.println(originalFilename);
-            // 文件名使用当前时间
-//            String name = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+
             // 获取上传图片的扩展名(jpg/png/...)
             String extension = FilenameUtils.getExtension(originalFilename);
 
@@ -189,7 +228,6 @@ public class AdminCtrl {
             returnMap.put("success", true);
             returnMap.put("path", path);
 
-            saveUtil.save(menu,request,returnMap);
         } catch (Exception e) {
             e.printStackTrace();
             returnMap.put("success", false);
@@ -198,6 +236,9 @@ public class AdminCtrl {
 
         return returnMap;
     }
+
+
+
 
     @RequestMapping(value = "/edit/{menu}", method = RequestMethod.GET)
     public String activityToEdit(@PathVariable("menu") String menu, HttpServletRequest request, Model model, Integer id) throws Exception {
@@ -234,10 +275,12 @@ public class AdminCtrl {
                 activity.setStrength(strength);
                 activity.setCreateTime(new Date());
                 activity.setGyms("上海环球中心");
+                /*
                 if (!banner.isEmpty()){
                     delFile(request.getSession().getServletContext().getRealPath("") + activity.getBannerSrc());
                     activity.setBannerSrc(uploadFile(request, banner, "/upload/admin/activity/banner/"));
                 }
+                */
                 activityDao.save(activity);
             }
         }
@@ -263,6 +306,7 @@ public class AdminCtrl {
         activityDao.save(activity);
         return "redirect:/admin";
     }
+
 
     @RequestMapping(value = "/simulation", method = RequestMethod.GET)
     public String simulation(HttpServletRequest request, Model model) throws Exception {
@@ -349,9 +393,11 @@ public class AdminCtrl {
     }
 
 
+
+
     @RequestMapping(value="/feedback",method = RequestMethod.GET)
-    public String feedback(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
-                           @RequestParam(value = "size", defaultValue = "10") Integer size,
+    public String feedback(HttpServletRequest request,@RequestParam(value = "page", defaultValue = "0",required = false) Integer pageNow,
+                           @RequestParam(value = "size", defaultValue = "7",required = false) Integer size,
                            Model model) throws Exception {
         HttpSession session = request.getSession();
         Object sessionObj = session.getAttribute("admin");
@@ -370,16 +416,16 @@ public class AdminCtrl {
 //                type = typeObj.toString();
 //            }
 //        }
+       log.info(pageNow.toString());
 //        session.setAttribute("selectedFeedback",type);
 //        session.setAttribute("selectedFeedback",type);
-        Sort sort = new Sort(Sort.Direction.DESC, "creatTime");
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
-        Page<Activity> feedbackPages = activityDao.findAll(pageable);
-        Long handledCount = feedbackService.handledCount(true);
+        Page<Feedback> feedbackPages = feedbackService.findAllByHandled(1,pageable);
         model.addAttribute("page", feedbackPages);
-        model.addAttribute("handledCount",handledCount);
         return "/admin/feedback";
     }
+
 
     @RequestMapping(value="/feedbackView",method = RequestMethod.POST)
     @ResponseBody
@@ -388,7 +434,10 @@ public class AdminCtrl {
         if (null != id && id.matches("[0-9]+")){
             fid = Integer.parseInt(id);
         }
+        log.info(id);
+
         Feedback feedback = feedbackService.findOne(fid);
+        log.info(feedback.toString());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         String name = "".equals(feedback.getName()) ? "匿名":feedback.getName();
         JSONObject jsonObject = (JSONObject) JSONObject.toJSON(feedback);
@@ -434,47 +483,7 @@ public class AdminCtrl {
         model.addAttribute("page",userPage);
         return "/admin/actUser";
     }
-    /*
-        工具类
-     */
-    //删除指定文件
-    public boolean delFile(String filePath){
-        boolean flag = false;
-        File file = new File(filePath);
-        if (file.exists()){
-            file.delete();
-            flag = true;
-        }
-        return flag;
-    }
 
 
 
-    public String uploadFile(HttpServletRequest request, MultipartFile file, String headPath) throws IOException {
-        // 获取图片原始文件名
-        String originalFilename = file.getOriginalFilename();
-
-//             文件名使用当前时间
-        String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        // 获取上传图片的扩展名(jpg/png/...)
-        String extension = FilenameUtils.getExtension(originalFilename);
-
-        // 图片上传的相对路径（因为相对路径放到页面上就可以显示图片）
-        String path = headPath + fileName +"." + extension.toUpperCase();
-//        String originalPath = headPath + fileName + "Original" + "." + extension;
-        // 图片上传的绝对路径
-        String url = request.getSession().getServletContext().getRealPath("") + path;
-//        String originalUrl = request.getSession().getServletContext().getRealPath("") + originalPath;
-        File dir = new File(url);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        // 上传图片
-        file.transferTo(new File(url));
-
-        //压缩
-        Thumbnails.of(url).size(960, 700).toFile(url);
-        return path;
-    }
 }

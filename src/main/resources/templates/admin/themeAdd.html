@@ -1,27 +1,13 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hibernate
-  Date: 2017/5/17
-  Time: 13:22
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>手机会员后台</title>
-    <link rel="stylesheet" href="/ui/semantic/semantic.min.css">
-
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head th:substituteby="/admin/common_admin :: head">
 </head>
 
+
 <body>
-<!--先静态吧就酱 -->
-<%@ include file="template_slider.jsp" %>
+<div th:substituteby="/admin/common_admin :: menu">
+</div>
+
 <div class="pusher">
     <div class="ui masthead  segment">
         <div class="ui container">

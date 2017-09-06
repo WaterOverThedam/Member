@@ -167,7 +167,7 @@ function time(o) {
     }
 }
 
-$("#reg_tel").on('input', function () {
+$("#reg_tel").on('input change', function () {
     var reg_tel = $("#reg_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(reg_tel))) {
         this.focus();
@@ -177,7 +177,7 @@ $("#reg_tel").on('input', function () {
 })
 
 //修改密码
-$("#change_tel").on('input',function () {
+$("#change_tel").on('input change',function () {
     var change_tel = $("#change_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(change_tel))) {
         this.focus();
@@ -228,15 +228,15 @@ function login_ajax(telephone, password) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            if (data.success == true && data.message == "登录成功") {
+            if (data.result == "登录成功") {
                 window.location.href = "/index";
-            } else if (data.success == false && data.message == "密码错误") {
+            } else if ( data.result == "密码错误") {
                 layer.open({
                     content: '密码错误'
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });
-            } else if (data.success == false && data.message == "该用户不存在!") {
+            } else if (data.result == "该用户不存在") {
                 layer.open({
                     content: '该用户不存在'
                     , skin: 'msg'
@@ -266,7 +266,7 @@ function regsister_ajax(username, valnum, password, email) {
         dataType: "json",
         success: function (data) {
             console.log(data);
-            if (data.success == true && data.message == "注册成功") {
+            if (data.success == true && data.result == "注册成功") {
                 layer.open({
                     content: '注册成功'
                     , skin: 'msg'

@@ -48,55 +48,65 @@ public class LoginCtrl {
     private IFeedbackService feedbackService;
     @Autowired
     private OasisService oasisService;
+
+
     @RequestMapping(value = "/tologin", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> login(HttpServletRequest request, String username, String password) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
 
-        try {
-            Map<String, Object> map = loginService.login(username, password);
-            //获取user实体
-            Object object = map.get("value");
-            if (object != null) {
-                User user = (User) object;
-                HttpSession session = request.getSession(true);
-                Object objSession = session.getAttribute("user");
-                //重复登录清空之前session所有attr
-                if ( null != objSession ){
-                    Enumeration<String> em = session.getAttributeNames();
-                    while (em.hasMoreElements()) {
-                        String sessionStr = em.nextElement();
-                        if (!"admin".equals(sessionStr)){
-                            session.removeAttribute(sessionStr);
-                        }
+        Map<String, Object> map = loginService.login(username, password);
+        //获取user实体
+        Object object = map.get("value");
+        if (object != null) {
+            User user = (User) object;
+            HttpSession session = request.getSession(true);
+            Object objSession = session.getAttribute("user");
+            //重复登录清空之前session所有attr
+            if ( null != objSession ){
+                Enumeration<String> em = session.getAttributeNames();
+                while (em.hasMoreElements()) {
+                    String sessionStr = em.nextElement();
+                    if (!"admin".equals(sessionStr)){
+                        session.removeAttribute(sessionStr);
                     }
                 }
-                session.setAttribute("user", user);
             }
-            returnMap.put("value", object);
-            returnMap.put("message", map.get("message"));
-            returnMap.put("success", map.get("success"));
-        } catch (Exception e) {
-            returnMap.put("message", "异常：登录失败!");
-            returnMap.put("success", false);
-            e.printStackTrace();
+            session.setAttribute("user", user);
         }
-        return returnMap;
+        return map;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> register(HttpServletRequest request, String username, String valnum, String password, String email) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
-        Map valNumMap = new HashMap();
-
-//        Map<String,String> existMap = new HashMap<String,String>();
-        String sqlExist = "select top 1  crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
-//        existMap.put("sql1", sqlExist);
 
         HttpSession session = request.getSession();
+        Map<String, Object> returnMap = new HashMap<String, Object>();
+        Map valNumMap = new HashMap();
+        //验证码校验
+        if (session.getAttribute("valNumMap") != null) {
+            valNumMap = (HashMap) session.getAttribute("valNumMap");
+            if (valNumMap.get("valNum").equals(valnum) == false) {
+                returnMap.put("message", "验证码错误!");
+                returnMap.put("success", false);
+                return returnMap;
+            }
+            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+            if (minsPass > 30) {
+                returnMap.put("message", "验证码已过期!");
+                returnMap.put("success", false);
+                return returnMap;
+            }
+        } else {
+            returnMap.put("message", "验证码错误!");
+            returnMap.put("success", false);
+            return returnMap;
+        }
+
 
         try {
+            String sqlExist = "select top 1  crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
+log.info(sqlExist);
             JSONArray jsonArray = oasisService.getResultJson(sqlExist);
             //是否是会员校验
             if (jsonArray == null){
@@ -108,39 +118,17 @@ public class LoginCtrl {
             JSONObject familyObj = jsonArray.getJSONObject(0);
             Family family = JSONObject.toJavaObject(familyObj,Family.class);
 
-            //验证码校验
-            if (session.getAttribute("valNumMap") != null) {
-                valNumMap = (HashMap) session.getAttribute("valNumMap");
-                if (valNumMap.get("valNum").equals(valnum) == false) {
-                    returnMap.put("message", "验证码错误!");
-                    returnMap.put("success", false);
-                    return returnMap;
-                }
-                long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-                if (minsPass > 30) {
-                    returnMap.put("message", "验证码已过期!");
-                    returnMap.put("success", false);
-                    return returnMap;
-                }
-            } else {
-                returnMap.put("message", "验证码错误!");
-                returnMap.put("success", false);
-                return returnMap;
-            }
+            log.info(family.toString());
 
             Map<String, Object> map = loginService.register(username, password,email,family.getId());
-            //获取user实体
-            Object object = map.get("value");
-            if (object != null) {
-                User user = (User) object;
-
-                session.setAttribute("user", user);
+            if((boolean) map.get("success")){
+                returnMap.put("user",map.get("user"));
+                session.setAttribute("user",map.get("user"));
             }
-            returnMap.put("value", object);
-            returnMap.put("message", map.get("message"));
+            returnMap.put("result", map.get("result"));
             returnMap.put("success", map.get("success"));
         } catch (Exception e) {
-            returnMap.put("message", "异常：注册失败!");
+            returnMap.put("message", ResultEnum.REGISTER_EXCEPTION.getMessage());
             returnMap.put("success", false);
             e.printStackTrace();
         }
@@ -212,7 +200,7 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/validateNum", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> validateNum(HttpServletRequest request, String tel, String timestamp) {
+    public Map<String, Object> validateNum(HttpServletRequest request, String tel) {
         Map<String, Object> returnMap = new HashMap<String, Object>();
         Map valnumMap = new HashMap();
         String valnum = getRandomStr(1000, 9999);

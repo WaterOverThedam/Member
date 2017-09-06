@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: dev
+  devtools:
+    restart:
+      enabled: true
+
 
 
 # jackson:
@@ -18,6 +22,7 @@ spring:
 #log
 logging:
   path: d:/
+  level: trace
 
 
 
