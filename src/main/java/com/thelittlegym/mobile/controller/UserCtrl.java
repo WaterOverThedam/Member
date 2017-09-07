@@ -48,29 +48,24 @@ public class UserCtrl {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(HttpServletRequest request, Model model) throws Exception {
         HttpSession session = request.getSession();
+        Object show = session.getAttribute("show");
         InTesting it = new InTesting();
         boolean ittest = it.isTrue(request);
-        Object objSession = session.getAttribute("user");
         Object adminSession = session.getAttribute("admin");
-        User user;
-
-        if(!ittest && null == adminSession) {
-            String linkId = request.getParameter("linkId");
+        Object userSession = session.getAttribute("user");
+        String linkId = request.getParameter("linkId");
+        if (show==null && !ittest && null == adminSession){
             if (null != linkId && "1225".equals(linkId)) {
-                session.setAttribute("hide", System.currentTimeMillis() / 1000);
+                session.setAttribute("show", System.currentTimeMillis() / 1000);
                 return "redirect:/index";
-            }
-            Object hideSession = session.getAttribute("hide");
-            if (null == hideSession) {
+            }else{
                 return "redirect:/noaccess.html";
             }
-        }
-
-        if (objSession == null) {
+        }else if(userSession==null){
             return "redirect:/login.html";
-        } else {
-            user = (User) objSession;
         }
+        //System.out.println(userSession.toString());
+        User user = (User) userSession;
         Object listGymSelectedSession = session.getAttribute("listGymSelectedSession");
         List<Gym> listGym = new ArrayList<Gym>();
         List<Child> listChild = new ArrayList<Child>();
@@ -86,7 +81,6 @@ public class UserCtrl {
         }
 
         Integer idFamily = user.getIdFamily();
-
         //孩子
         String   sqlUser = "declare @rest float=0,@dtend varchar(10)='';select @rest =sum(kss),@dtend =convert(varchar(10),max(dtend),120) from(select top 6 crmzdy_81739422 kss,ht.crmzdy_81733324 dtend from crm_zdytable_238592_25111_238592_view zx join crm_zdytable_238592_25115_238592_view bmksb on zx.crmzdy_81611091_id= " + idFamily +" and bmksb.crmzdy_81756836_id=zx.id " +
                 " and bmksb.crmzdy_81733119='销售'  and bmksb.crmzdy_81739422/*rest*/>0 join crm_zdytable_238592_23796_238592_view ht on ht.id " +
