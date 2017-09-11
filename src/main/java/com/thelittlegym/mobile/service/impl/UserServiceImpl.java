@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -27,6 +28,11 @@ public class UserServiceImpl implements IUserService {
     private UserDao userDao;
     @Autowired
     private CouponDao couponDao;
+
+    @Override
+    public List<User> getUserList() {
+        return userDao.findAll();
+    }
 
     @Override
     public Page<User> getUserPageList(Pageable pageable) {

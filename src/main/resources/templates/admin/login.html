@@ -77,10 +77,17 @@
     }
 
     $("#login").on('click',function () {
+        login()
+    })
+    $("body").on('keydown',function () {
+        if (event.keyCode == "13") {login();}
+    })
+    
+    function login() {
         if(valForm()){
             ajax_login($("#username").val(),$("#password").val());
         }
-    })
+    }
 
     function ajax_login(username,password){
         this.username = username;

@@ -25,30 +25,28 @@
 
             </div>
             <div class="ui segment">
-                <c:if test="${not empty page.list}">
-                    <div class="ui ordered list">
-                        <c:forEach items="${page.list}" var="u">
-                            <div class="item">
+
+                    <div th:if="${not #lists.isEmpty(page.content)}" class="ui ordered list">
+                            <div class="item" th:each="u : ${page.content}">
                                 <div class="right floated content">
-                                    <div class="ui button">${u.createTime}</div>
+                                    <div class="ui button" th:text="${u.createTime}"></div>
                                 </div>
-                                <img class="ui avatar image" src="${u.head_src}">
+                                <img class="ui avatar image" th:src="${u.head_src}" />
                                 <div class="content">
-                                    <a class="header">${u.tel}</a>
+                                    <a class="header" th:text="${u.tel}"></a>
                                 </div>
                             </div>
-                        </c:forEach>
                     </div>
-                </c:if>
+
             </div>
             <div class="ui segment right aligned ">
                 <div class="ui buttons">
                     <a href="/admin/actUser?page=${page.current-1}"
-                       class="ui <c:if test="${page.current<= 1}">disabled</c:if> left labeled icon button"><i
+                       class="left labeled icon button" th:classappend="${page.number &lt;= 1}? 'disabled'"><i
                             class="left arrow icon"></i> 上一页 </a>
-                    <a class="ui blue active button"></i> ${page.current}</a>
+                    <a class="ui blue active button" th:text="${page.number}"></i> </a>
                     <a href="/admin/actUser?page=${page.current+1}"
-                       class="ui <c:if test="${page.current+1> page.total}">disabled</c:if> right labeled icon button"><i
+                       class="ui right labeled icon button" th:classappend="${page.number+1 &gt; page.totalPages}? 'disabled'"><i
                             class="right arrow icon"></i> 下一页 </a>
                 </div>
             </div>

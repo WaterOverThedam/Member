@@ -25,5 +25,8 @@ public class User {
     private String head_src;
     @Column(name="id_family")
     private Integer idFamily;
+    private String gym;
+    private String city;
+    private String addr;
 
 }

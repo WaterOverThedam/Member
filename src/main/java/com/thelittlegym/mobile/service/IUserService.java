@@ -6,12 +6,14 @@ import com.thelittlegym.mobile.enums.ResultEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by hibernate on 2017/3/21.
  */
 public interface IUserService {
+    public List<User> getUserList();
     //获取用户分页列表
     public Page<User> getUserPageList(Pageable pageable);
 

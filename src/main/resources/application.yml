@@ -3,7 +3,7 @@ spring:
     active: dev
   devtools:
     restart:
-      enabled: true
+      enabled: false
 
 
 
@@ -20,9 +20,6 @@ spring:
 
 
 #log
-logging:
-  path: d:/
-  level: trace
 
 
 
@@ -48,5 +45,10 @@ http.connectionRequestTimeout: 15000
 http.socketTimeout: 25000
 #提交请求前测试连接是否可用
 http.staleConnectionCheckEnabled: true
+server:
+  session:
+    timeout: -1
+
+upload-path: D:\files
 
 

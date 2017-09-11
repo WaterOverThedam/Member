@@ -8,5 +8,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+logging:
+  path: d:/
+  level: trace
+  config: classpath:logback-spring-dev.xml
 server:
   port: 88

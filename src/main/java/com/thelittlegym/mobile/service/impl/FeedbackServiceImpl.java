@@ -23,8 +23,8 @@ public class FeedbackServiceImpl implements IFeedbackService {
     private FeedbackDao feedBackDao;
 
     @Override
-    public void save(Feedback feedback) {
-            feedBackDao.save(feedback);
+    public Feedback save(Feedback feedback) {
+        return  feedBackDao.save(feedback);
     }
 
     @Override

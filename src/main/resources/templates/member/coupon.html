@@ -1,26 +1,16 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 汁
-  Date: 2017/4/5
-  Time: 20:16
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>我的优惠</title>
-    <link rel="stylesheet" href="/css/sm.min.css">
-    <link rel="stylesheet" href="/css/gym.css">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/sm.min.css"/>
+    <link rel="stylesheet" href="/css/gym.css"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
 </head>
 
 <body>
@@ -39,85 +29,66 @@
                 <div class="tabs">
                     <div id="coupon_1" class="tab">
                         <!-- 我的优惠券 -->
-                        <div class="card">
+                        <div  th:switch="${not #maps.isEmpty(coupon) and coupon.success}"  class="card">
                             <div class="card-header no-border no-padding ">
-                                <c:choose>
-                                    <c:when test="${not empty coupon && coupon.success == true}">
-                                        <div class="coupon-box">
-                                            <c:choose>
-                                                <c:when test="${coupon['value']['used']==false}">
-                                                    <a href="javascript:;" class="coupon" data-value="1"
-                                                       data-type="${coupon['value']['type']}"> <img
-                                                            src="/images/member/coupon_unused.png">
+                                        <div th:case="true" class="coupon-box">
+                                                    <a th:if="${not coupon.value.used}" href="javascript:void(0);" class="coupon" data-value="1"
+                                                       th:attr="data-type=${coupon['value']['type']}"> <img
+                                                            src="/images/member/coupon_unused.png"/>
                                                     </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a href="javascript:;" class="coupon" data-value="0"><img
-                                                            src="/images/member/coupon_used.png"> </a>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </c:when>
 
-                                    <c:otherwise>
-                                        <div class="coupon-box">
+                                                    <a th:if="${coupon.value.used}" href="javascript:void(0);" class="coupon" data-value="0"><img
+                                                            src="/images/member/coupon_used.png"/> </a>
+                                        </div>
+
+                                        <div th:case="false" class="coupon-box">
                                             <div class="no-coupon text-center">
                                                 <img src="/images/member/no_coupon.png"/>
                                                 <p>您目前没有优惠券可用</p>
                                             </div>
                                         </div>
-                                    </c:otherwise>
-                                </c:choose>
+
                             </div>
-                            <c:if test="${not empty coupon && coupon.success == true}">
-                            <div class="card-footer">
+
+                            <div case="true" class="card-footer">
                                 <i></i>
                                 <div> <span
                                         class="fa fa-question-circle coupon-rule open-popup" data-value="1"
                                         data-popup=".popup-coupon-rule">&nbsp;优惠券说明</span></div>
                             </div>
-                            </c:if>
+
                         </div>
                     </div>
                     <div id="coupon_2" class="tab  active">
                         <!-- 我的兑换券 -->
-                        <div class="card">
-                            <div class="card-header no-border no-padding ">
-                                <c:choose>
-                                    <c:when test="${not empty coupon2 }">
-                                        <div class="coupon-box">
-                                            <c:choose>
-                                                <c:when test="${coupon2['value']['used']==false}">
-                                                    <a href="javascript:;" class="coupon" data-value="1"
-                                                       data-type="${coupon2['value']['type']}"><img
-                                                            src="/images/member/coupon_2_unused.jpg">
+                        <div th:switch="${not #maps.isEmpty(coupon2)}" class="card">
+                                <div class="card-header no-border no-padding ">
+                                        <div th:case="true" class="coupon-box">
+                                                    <a th:if="${not coupon2['value']['used']}"  href="javascript:;" class="coupon" data-value="1"
+                                                       th:attr="data-type=${coupon2['value']['type']}"><img
+                                                            src="/images/member/coupon_2_unused.jpg"/>
                                                     </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a href="javascript:;" class="coupon" data-value="0"><img
-                                                            src="/images/member/coupon_2_used.jpg"> </a>
-                                                </c:otherwise>
-                                            </c:choose>
+
+                                                    <a th:if="${coupon2.value.used}" href="javascript:;" class="coupon" data-value="0"><img
+                                                            src="/images/member/coupon_2_used.jpg"/> </a>
                                         </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="coupon-box">
+
+                                        <div th:case="false" class="coupon-box">
                                             <div class="no-coupon text-center">
                                                 <img src="/images/member/no_coupon.png"/>
                                                 <p>您目前没有兑换券可用</p>
                                             </div>
                                         </div>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                            <c:if test="${not empty coupon2 }">
-                                <div class="card-footer">
+
+                                </div>
+
+                                <div case="*" class="card-footer">
                                     <i></i>
                                     <div> <span
                                             class="fa fa-question-circle coupon-rule open-popup" data-value="2"
                                             data-popup=".popup-coupon2-rule">&nbsp;兑换券说明</span></div>
                                 </div>
-                            </c:if>
+
                         </div>
                     </div>
                 </div>
@@ -125,22 +96,24 @@
         </div>
     </div>
 </div>
-<%--<div class="popup popup-coupon-rule">--%>
+<!--<%&#45;&#45;<div class="popup popup-coupon-rule">&#45;&#45;%>-->
 
-<%--<div class="content">--%>
-<%--<h1 class="title">活动规则</h1>--%>
-<%--<div class="content-block">--%>
-<%--<p>1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>--%>
-<%--<p>2、此券不与其他优惠共享</p>--%>
-<%--<p>3、不支持兑换现金</p>--%>
-<%--<p><a href="javascript:;" class="close-popup">关闭</a></p>--%>
-<%--</div>--%>
-<%--</div>--%>
-<%--</div>--%>
+<!--<%&#45;&#45;<div class="content">&#45;&#45;%>-->
+<!--<%&#45;&#45;<h1 class="title">活动规则</h1>&#45;&#45;%>-->
+<!--<%&#45;&#45;<div class="content-block">&#45;&#45;%>-->
+<!--<%&#45;&#45;<p>1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>&#45;&#45;%>-->
+<!--<%&#45;&#45;<p>2、此券不与其他优惠共享</p>&#45;&#45;%>-->
+<!--<%&#45;&#45;<p>3、不支持兑换现金</p>&#45;&#45;%>-->
+<!--<%&#45;&#45;<p><a href="javascript:;" class="close-popup">关闭</a></p>&#45;&#45;%>-->
+<!--<%&#45;&#45;</div>&#45;&#45;%>-->
+<!--<%&#45;&#45;</div>&#45;&#45;%>-->
+<!--<%&#45;&#45;</div>&#45;&#45;%>-->
 
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
-<script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
     $(".coupon").on('click', function () {
         if ($(this).data("value") == "0") {
             return;
@@ -226,7 +199,10 @@
         return true;
     }
     $.init();
+
+    /*]]>*/
 </script>
+
 </body>
 
 </html>

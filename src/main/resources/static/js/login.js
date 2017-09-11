@@ -167,7 +167,7 @@ function time(o) {
     }
 }
 
-$("#reg_tel").on('input change', function () {
+$("#reg_tel").on('change', function () {
     var reg_tel = $("#reg_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(reg_tel))) {
         this.focus();
@@ -177,7 +177,7 @@ $("#reg_tel").on('input change', function () {
 })
 
 //修改密码
-$("#change_tel").on('input change',function () {
+$("#change_tel").on('change',function () {
     var change_tel = $("#change_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(change_tel))) {
         this.focus();
@@ -223,7 +223,7 @@ function login_ajax(telephone, password) {
     this.password = $.md5(password);
     $.ajax({
         type: "POST",
-        url: "/login/tologin",
+        url: "/login/login",
         data: {"username": this.username, "password": this.password},
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
@@ -283,7 +283,6 @@ function exist_ajax(telephone) {
         data: {"telephone": telephone},
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
-
         success: function (data) {
             console.log(data);
             if (data.success == false) {
@@ -297,7 +296,6 @@ function exist_ajax(telephone) {
                                 , content: $("#feedback").val()
                                 , anim: 'up'
                             });
-                            $("#contactTel").val($("#reg_tel").val());
                             layer.close(index);
                         }
                     });
@@ -347,14 +345,20 @@ function feedback_ajax(Franchisee,feedbackName, details, contactTel) {
         url: "/login/feedback",
         data: {"Franchisee": Franchisee,"name":feedbackName, "details": details, "contactTel": contactTel},
         contentType: "application/x-www-form-urlencoded",
-        dataType: "json",
         success: function (data) {
-            layer.open({
+            var Index = layer.open({
                 content: '我们已收到您的反馈'
                 , skin: 'msg'
-                , time: 2 //2秒后自动关闭
+                , time: 3 //2秒后自动关闭
             });
-            // location.reload();
+            setTimeout(function () {
+                location.reload()
+            },5000)
+
+        },
+        error: function(xhr, type,error){
+            console.log(error)
+
         }
     })
 }
@@ -431,4 +435,3 @@ function checkInput(regx, ele, ph, phErr) {
     }
 }
 
-   
