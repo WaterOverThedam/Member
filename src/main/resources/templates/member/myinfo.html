@@ -1,27 +1,16 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 汁
-  Date: 2017/4/5
-  Time: 20:16
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>宝宝信息</title>
-    <link rel="stylesheet" href="/css/sm.min.css">
-    <link rel="stylesheet" href="/css/gym.css">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <script src="/js/gym.js"></script>
+    <link rel="stylesheet" href="/css/sm.min.css"/>
+    <link rel="stylesheet" href="/css/gym.css"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
     <style>
         /* 阿里巴巴 矢量图引用*/
         @font-face {
@@ -65,31 +54,33 @@
                 <div class="card-header">
                     <div class="facebook-avatar">
                         <a class="open-avatar" data-popup="popup popup-avatar">
-                            <img id="avatar" src="${fn:toLowerCase(sessionScope.user.head_src)}"
+                            <img id="avatar" th:src="${#strings.toLowerCase(session.user.head_src)}"
                                  onerror="this.src='/images/member/head.png'"/>
                         </a>
                         <div class="gym-myinfo-info">
-                            <p class="avatar-name">${childObj['name']}</p>
-                            <p class="avatar-detail">年龄：${childObj['age']}</p>
+                            <p class="avatar-name" th:text="${childObj['name']}"></p>
+                            <p class="avatar-detail" th:text="'年龄：'+ ${childObj['age']}"></p>
                         </div>
                     </div>
                     <a href="/exit" class="button">退出登录</a>
                 </div>
 
-                <div class="card-content">
+                <div class="card-content" >
                     <div class="card-content-inner" id="contract" data-value="0">
                         <div class="row">
                             <div class="col-33 ">
-                                <div class="list-icon"><a class="external" href="/coupon"><i class="iconfont">&#xe665;</i>
-                                    <div class="list-icon-title">我的优惠</div>
-                                </a>
+                                <div class="list-icon">
+                                    <a class="external" href="/coupon"><i class="iconfont">&#xe665;</i>
+                                       <div class="list-icon-title">我的优惠</div>
+                                    </a>
                                 </div>
-
                             </div>
                             <div class="col-33 ">
-                                <div class="list-icon"><a id="view" href="javascript:;"><i class="iconfont">&#xe60a;</i>
-                                    <div class="list-icon-title">我的所有合同</div>
-                                </a></div>
+                                <div class="list-icon">
+                                    <a id="view" href="javascript:;"><i class="iconfont">&#xe60a;</i>
+                                      <div class="list-icon-title">我的所有合同</div>
+                                    </a>
+                                </div>
 
                             </div>
                             <div class="col-33 ">
@@ -99,78 +90,69 @@
 
                             </div>
                         </div>
-                        <c:choose>
-                            <c:when test="${not empty listContract}">
-                                <div class="row row-box-9 f">
-                                    <div class="col-33">
-                                        <label  id="c_regDate">${listContract[0]['报名日期']}</label>
-                                        <div>报名日期</div>
-                                    </div>
-                                    <div class="col-33 c">
-                                        <label id="c_validity">${listContract[0]['有效期']}</label>
-                                        <div>有效期</div>
-                                    </div>
-                                    <div class="col-33">
-                                        <label id="c_give">
-                                            <c:choose>
-                                                <c:when test="${listContract[0]['赠课'] == ''}">无</c:when>
-                                                <c:otherwise>
-                                                    ${listContract[0]['赠课']}
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </label>
-                                        <div>赠课</div>
-                                    </div>
+
+                        <div th:if="${not #lists.isEmpty(listContract)}"  class="row row-box-9 f">
+                           <div class="col-33">
+                              <label  id="c_regDate" th:text="${listContract[0]['报名日期']}"></label>
+                              <div>报名日期</div>
+                           </div>
+                           <div class="col-33 c">
+                              <label id="c_validity" th:text="${listContract[0]['有效期']}"></label>
+                              <div>有效期</div>
+                           </div>
+                           <div class="col-33">
+                              <label id="c_give" th:text="${listContract[0]['赠课']}?:'无'">
+                              </label>
+                              <div>赠课</div>
+                           </div>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(listContract)}" class="row row-box-9">
+                            <div class="col-33">
+                                <label id="c_regPeriods" th:text="${listContract[0]['报名课时数']}+'节'"> </label>
+                                <div >报名课时数</div>
+                            </div>
+                            <div class="col-33 c">
+                                <label id="c_residuePeriods" th:text="${listContract[0]['剩余课时数']}+'节'"></label>
+                                <div>剩余课时数</div>
+                            </div>
+                            <div class="col-33">
+                                <label id="c_score" th:text="${listContract[0]['积分']}"></label>
+                                <div >积分</div>
+                            </div>
+                        </div>
+                        <!--<%&#45;&#45;<div class="row row-box-9">&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div class="col-33">&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<label id="c_actKss">${listContract[0]['活动扣课数']}节 </label>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div >活动扣课数</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div class="col-33 c">&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<label id="c_totalLeave">${listContract[0]['累计请假数']}节</label>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div>累计请假数</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div class="col-33">&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<label id="c_class">${listContract[0]['课程']}</label>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;<div >课程</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;</div>&#45;&#45;%>-->
+                        <!--<%&#45;&#45;</div>&#45;&#45;%>-->
+                        <div th:if="${not #lists.isEmpty(listContract)}" class="list-block gym-list">
+                           <ul>
+                            <!-- 反馈 -->
+                             <li class="item-content  open-popup" data-popup=".popup-feedback">
+                                <div class="item-media">
+                                    <i class="fa fa-meh-o fa-2x" aria-hidden="true"></i>
                                 </div>
-                                <div class="row row-box-9">
-                                    <div class="col-33">
-                                        <label id="c_regPeriods">${listContract[0]['报名课时数']}节 </label>
-                                        <div >报名课时数</div>
-                                    </div>
-                                    <div class="col-33 c">
-                                        <label id="c_residuePeriods">${listContract[0]['剩余课时数']}节</label>
-                                        <div>剩余课时数</div>
-                                    </div>
-                                    <div class="col-33">
-                                        <label id="c_score">${listContract[0]['积分']}</label>
-                                        <div >积分</div>
-                                    </div>
+                                <div class="item-inner">
+                                    <div class="item-title">数据有问题？点击此处向我们反馈</div>
+                                    <div class="item-after"><i
+                                            class="fa fa-angle-double-right fa-2x"
+                                            aria-hidden="true"></i></div>
                                 </div>
-                                <%--<div class="row row-box-9">--%>
-                                    <%--<div class="col-33">--%>
-                                        <%--<label id="c_actKss">${listContract[0]['活动扣课数']}节 </label>--%>
-                                        <%--<div >活动扣课数</div>--%>
-                                    <%--</div>--%>
-                                    <%--<div class="col-33 c">--%>
-                                        <%--<label id="c_totalLeave">${listContract[0]['累计请假数']}节</label>--%>
-                                        <%--<div>累计请假数</div>--%>
-                                    <%--</div>--%>
-                                    <%--<div class="col-33">--%>
-                                        <%--<label id="c_class">${listContract[0]['课程']}</label>--%>
-                                        <%--<div >课程</div>--%>
-                                    <%--</div>--%>
-                                <%--</div>--%>
-                                <div class="list-block gym-list">
-                                    <ul>
-                                        <!-- 反馈 -->
-                                        <li class="item-content  open-popup" data-popup=".popup-feedback">
-                                            <div class="item-media">
-                                                <i class="fa fa-meh-o fa-2x" aria-hidden="true"></i>
-                                            </div>
-                                            <div class="item-inner">
-                                                <div class="item-title">数据有问题？点击此处向我们反馈</div>
-                                                <div class="item-after"><i
-                                                        class="fa fa-angle-double-right fa-2x"
-                                                        aria-hidden="true"></i></div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <p class="color-danger text-center">没有找到有效期内的合同~</p>
-                            </c:otherwise>
-                        </c:choose>
+                             </li>
+                           </ul>
+                        </div>
+
+                        <p th:if="${#lists.isEmpty(listContract)}" class="color-danger text-center">没有找到有效期内的合同</p>
+
                     </div>
                 </div>
             </div>
@@ -187,37 +169,31 @@
         </div>
 
     </div>
-    <div class="page" id="page_contract">
-        <div class="content">
-            <div class="list-block media-list">
-                <ul>
-                    <c:choose>
-                        <c:when test="${not empty listContract}">
-                            <c:forEach items="${listContract}" var="contract">
-                                <li>
-                                    <a href="#" class="item-link item-content">
-                                        <div class="item-media"><img
-                                                src="http://gqianniu.alicdn.com/bao/uploaded/i4//tfscom/i3/TB10LfcHFXXXXXKXpXXXXXXXXXX_!!0-item_pic.jpg_250x250q60.jpg"
-                                                style='width: 4rem;'></div>
-                                        <div class="item-inner">
-                                            <div class="item-title-row">
-                                                <div class="item-title">${listContract[0]['报名日期']}</div>
-                                            </div>
-                                            <div class="item-subtitle">标题</div>
-                                            <div class="item-text">此处是文本内容...</div>
-                                        </div>
-                                    </a>
-                                </li>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <p class="color-danger text-center">没有找到有效期内的合同~</p>
-                        </c:otherwise>
-                    </c:choose>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <!---->
+    <!--<div class="page" id="page_contract">-->
+        <!--<div class="content">-->
+            <!--<div class="list-block media-list">-->
+                <!--<ul th:switch="${not #lists.isEmpty(listContract)}">-->
+                                <!--<li case="true" th:each="contract : ${listContract}">-->
+                                    <!--<a href="#" class="item-link item-content">-->
+                                        <!--<div class="item-media"><img-->
+                                                <!--src="http://gqianniu.alicdn.com/bao/uploaded/i4//tfscom/i3/TB10LfcHFXXXXXKXpXXXXXXXXXX_!!0-item_pic.jpg_250x250q60.jpg"-->
+                                                <!--style='width: 4rem;'/></div>-->
+                                        <!--<div class="item-inner">-->
+                                            <!--<div class="item-title-row">-->
+                                                <!--<div class="item-title" th:text="${contract.报名日期}."></div>-->
+                                            <!--</div>-->
+                                            <!--<div class="item-subtitle">标题</div>-->
+                                            <!--<div class="item-text">此处是文本内容...</div>-->
+                                        <!--</div>-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                            <!--<p  case="*" class="color-danger text-center">没有找到有效期内的合同</p>-->
+
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 </div>
 
 <!-- Avatar Popup -->
@@ -225,12 +201,14 @@
     <form id="uploadForm" enctype="multipart/form-data">
         <div class="card facebook-card no-border">
             <div class="card-content">
-                <img src="${sessionScope.user.head_src}" id="pre_avatar" class="pre-avatar">
+                <img th:src="${session.user.head_src}" id="pre_avatar" class="pre-avatar"/>
             </div>
         </div>
         <div class="content-block">
-            <p><a href="javascript:;" class="button  button-big file"><input type="file" name="file" id="avatarFile"
-                                                                             accept="image/jpg,image/png,image/jpeg">更换头像</a>
+            <p>
+               <a href="javascript:;" class="button  button-big file">
+                <input type="file" name="file" id="avatarFile"  accept="image/jpg,image/png,image/jpeg"/>更换头像
+               </a>
             </p>
             <p><a href="javascript:;" class="button  button-big" id="updateAvatar">确定</a></p>
             <p><a href="javascript:;" class="button  button-danger button-big close-popup" id="cancelUpdate">取消</a></p>
@@ -253,7 +231,7 @@
                         <div class="item-inner">
                             <div class="item-title label">姓名</div>
                             <div class="item-input">
-                                <input type="text" id="feedback_name">
+                                <input type="text" id="feedback_name"/>
                             </div>
                         </div>
                     </div>
@@ -263,7 +241,7 @@
                         <div class="item-inner">
                             <div class="item-title label">中心</div>
                             <div class="item-input">
-                                <input type="text" id="feedback_fs" value="${listGymSelectedSession[0].gym['gymName']}">
+                                <input type="text" id="feedback_fs" th:value="${session.gymSelected.gym.gymName}"/>
                             </div>
                         </div>
                     </div>
@@ -273,7 +251,7 @@
                         <div class="item-inner">
                             <div class="item-title label">手机</div>
                             <div class="item-input">
-                                <input type="text" id="feedback_tel" placeholder="手机" value="${sessionScope.user.tel}">
+                                <input type="text" id="feedback_tel" placeholder="手机" th:value="${session.user.tel}"/>
                             </div>
                         </div>
                     </div>
@@ -286,7 +264,7 @@
                                 <select id="feedback_type">
                                     <option value="剩余课时数">剩余课时数</option>
                                     <option value="报名课时数">报名课时数</option>
-                                    <%--<option value="活动扣课数">活动扣课数</option>--%>
+                                    <!--<%&#45;&#45;<option value="活动扣课数">活动扣课数</option>&#45;&#45;%>-->
                                 </select>
                             </div>
                         </div>
@@ -322,15 +300,40 @@
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
 
-<script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
     $("#feedback_sub").on('click', function () {
         var feedbackName = $('#feedback_name').val();
         var feedFs = $('#feedback_fs').val();
         var feedTel = $('#feedback_tel').val();
         var feedDetails = $('#feedback_details').val();
         var type = $('#feedback_type').val();
-        ajax_feedback(feedFs, feedbackName, feedDetails, feedTel, type);
+        if (valForm(feedbackName,feedTel)){
+            ajax_feedback(feedFs, feedbackName, feedDetails, feedTel, type);
+        }
     })
+
+    function valForm(feedbackName,feedTel) {
+        if (feedbackName == ""){
+            itemMessage += '<li>' + '必须输入姓名名'  +  '</li>';
+        }
+        if (feedTel == ""){
+            itemMessage += '<li>' + '必须输入手机号'  +  '</li>';
+        }
+        if (itemMessage == ''){
+            flag = true;
+        }
+        errmessage += itemMessage;
+        errmessage += '</ul>';
+        if (!flag){
+             $.toast(errmessage)
+        }
+        return flag;
+    }
+
+
+
 
     $(document).on('open', '.popup-feedback', function () {
         $('#feedback_details').val("");
@@ -420,9 +423,7 @@
 
     //全局
     var jsonArrayContract = '';
-    <c:if test="${not empty listContract}">
-    jsonArrayContract = ${listContract};
-    </c:if>
+    jsonArrayContract = [[${listContract}]];
 
     $('#view').on('click', function () {
         var selectedContractId = $("#contract").attr("data-value");
@@ -487,14 +488,24 @@
                 "type": type
             },
             contentType: "application/x-www-form-urlencoded",
-            dataType: "json",
+            dataType: "string",
             success: function (data) {
-                $.toast('已提交，谢谢你的反馈');
-                $.closeModal('.popup-feedback');
+                if (res = result(data)){
+                    if(res.code){
+                        $.toast('已提交，谢谢你的反馈');
+                        $.closeModal('.popup-feedback');
+                        return;
+                    }
+                }
+                $.toast('提交失败');
+            },
+            error: function(xhr, type,error){
+                $.toast('提交失败');
             }
         })
     }
     $.init();
+    /*]]>*/
 </script>
 </body>
 

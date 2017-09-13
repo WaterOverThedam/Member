@@ -29,9 +29,13 @@ public class OasisService {
         try {
             httpResultUser = httpService.doPost(POST_URL, hashMap);
             JSONObject jsonResult = JSONObject.parseObject(httpResultUser.getData());
+//            System.out.print("1b");
+//            System.out.println(jsonResult.toJSONString());
             if (jsonResult != null) {
                 if (jsonResult.getString("resultCode").equals("100") && jsonResult.getInteger("totalRecord") > 0) {
                     jsonArray = jsonResult.getJSONArray("list");
+//                    System.out.print("2b");
+//                    System.out.println(jsonArray.toJSONString());
                 }
             }
 

@@ -1,5 +1,6 @@
 package com.thelittlegym.mobile.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.OasisService;
@@ -21,10 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -50,13 +48,14 @@ public class LoginCtrl {
     private OasisService oasisService;
 
 
-    @RequestMapping(value = "/tologin", method = RequestMethod.POST)
+    @PostMapping("/login")
     @ResponseBody
     public Map<String, Object> login(HttpServletRequest request, String username, String password) {
 
         Map<String, Object> map = loginService.login(username, password);
         //获取user实体
-        Object object = map.get("value");
+        Object object = map.get("user");
+
         if (object != null) {
             User user = (User) object;
             HttpSession session = request.getSession(true);
@@ -105,8 +104,8 @@ public class LoginCtrl {
 
 
         try {
-            String sqlExist = "select top 1  crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
-log.info(sqlExist);
+            String sqlExist = "select top 1 crmzdy_81778300 gym,crmzdy_81486367 city,crmzdy_80610671 addr,crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
+
             JSONArray jsonArray = oasisService.getResultJson(sqlExist);
             //是否是会员校验
             if (jsonArray == null){
@@ -118,9 +117,9 @@ log.info(sqlExist);
             JSONObject familyObj = jsonArray.getJSONObject(0);
             Family family = JSONObject.toJavaObject(familyObj,Family.class);
 
-            log.info(family.toString());
+            //log.info(family.toString());
 
-            Map<String, Object> map = loginService.register(username, password,email,family.getId());
+            Map<String, Object> map = loginService.register(username, password,email,family);
             if((boolean) map.get("success")){
                 returnMap.put("user",map.get("user"));
                 session.setAttribute("user",map.get("user"));
@@ -266,7 +265,7 @@ log.info(sqlExist);
         try {
             if (userService.isReged(telephone) ){
                 returnMap.put("success",false);
-                returnMap.put("message","该号码已注册，请直接登录");
+                returnMap.put("message","该号码已注册，请返回直接登录");
                 return returnMap;
             }
         } catch (Exception e) {
@@ -308,8 +307,8 @@ log.info(sqlExist);
 
     @RequestMapping(value = "/feedback", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> feedback(String Franchisee,String name,String details,String contactTel,String type) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public  String feedback(String Franchisee,String name,String details,String contactTel,String type) {
+        String result;
         Feedback feedback = new Feedback();
         try {
             if( null == type || "".equals(type)){
@@ -321,16 +320,18 @@ log.info(sqlExist);
             feedback.setName(name);
             feedback.setDetails(details);
             feedback.setType(type);
-            feedbackService.save(feedback);
-            returnMap.put("success",true);
-            returnMap.put("message","反馈成功");
+            Feedback res = feedbackService.save(feedback);
+            if (res!=null) {
+                result = ResultEnum.FEEDBACK_SUCCESS.toJson();
+            }else {
+                result = ResultEnum.FEEDBACK_FAILURE.toJson();
+            }
         } catch (Exception e) {
-            returnMap.put("success",false);
-            returnMap.put("message","反馈失败");
+            log.info(e.getMessage());
+            result = ResultEnum.FEEDBACK_FAILURE.toJson();
         }
-        return returnMap;
+        return result;
     }
-
 
 
     /*

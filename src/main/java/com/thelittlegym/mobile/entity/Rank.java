@@ -2,6 +2,8 @@ package com.thelittlegym.mobile.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by hibernate on 2017/5/8.
  */
@@ -13,5 +15,4 @@ public class Rank {
     private String times;
     private String tian;
     private String times_per_week;
-
 }

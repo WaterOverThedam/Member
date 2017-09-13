@@ -1,0 +1,21 @@
+{
+  "趣味小虫_1": {
+    "title": "家庭作业",
+    "subtitle": "HomeWork",
+    "dtBegin": "2017-08-28",
+    "dtEnd": "2017-09-03",
+    "weekNum": "01",
+    "poster": "/upload/video/funnyBug/poster.png",
+    "videoSrc": "/upload/video/funnyBug/趣味小虫_01.mp4"
+  },
+  "趣味小虫_2": {
+    "title": "家庭作业",
+    "subtitle": "HomeWork",
+    "dtStart": "",
+    "dtEnd": "",
+    "weekNum": "02",
+    "poster": "/upload/video/funnyBug/poster.png",
+    "videoSrc": "/upload/video/funnyBug/趣味小虫_02.mp4"
+  }
+
+}

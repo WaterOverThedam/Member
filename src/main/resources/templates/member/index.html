@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <%--<title>会员主页</title>--%>
-    <link rel="stylesheet" href="/css/sm.min.css">
-    <link rel="stylesheet" href="/css/gym.css">
-    <link rel="stylesheet" href="/css/animate.css">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>会员主页</title>
+    <link rel="stylesheet" href="/css/sm.min.css"/>
+    <link rel="stylesheet" href="/css/gym.css"/>
+    <link rel="stylesheet" href="/css/animate.css"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
 
 </head>
 <body>
 <div class="page-group">
-        <div class="page" th:each="child : ${listChild}" th:classappend="${status.index==0}?' page-current'" th:attr="data-index=${status.index}"
-             th:attr="data-name =${child.name},data-id=${child.idhz},
-             id='child'+${status.index}">
+        <div class="page" th:each="child,childStat : ${listChild}" th:classappend="${childStat.index==0}?' page-current'"
+             th:attr="data-index = ${childStat.index},data-name =${child.name},data-id=${child.idhz},id='child'+${childStat.index}">
             <div class="content">
                 <div class="card">
-                    <div th:switch="${status.index}" class="card-header no-border gym-card-title">
-                            <div th:case="0">
-                                <label class="child-name" >${child.name}</label>
-                                <a href="#child${status.index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
+                    <div th:switch="${childStat.index}" class="card-header no-border gym-card-title">
+
+                                <label th:case="0" class="child-name" th:text="${child.name}"></label>
+                                <a th:case="0" th:href="'#child'+${childStat.index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
                                     <small>查询另一位宝宝</small>
                                     <i class="fa fa-angle-double-right"></i>
                                 </a>
-                            </div>
-                            <div th:case="*">
-                                <a href="'#child'+${status.index==0}?1:0">
+
+                                <a th:href="'#child'+ ${childStat.index==0?1:0}">
                                     <i class="fa fa-angle-double-left"></i>
                                     <small>查询另一位宝宝</small>
                                 </a>
-                                <label>${child.name}</label>
-                            </div>
+                                <label th:case="*" th:text="${child.name}"></label>
 
                     </div>
                 </div>
@@ -43,10 +40,10 @@
                         <i></i>
                         <div class="gym-header">
                             <div class="header-img">
-                                <img src="${fn:toLowerCase(sessionScope.user.head_src)}" onerror="this.src='/images/member/head.png'"/>
+                                <img th:src="${session.user.head_src}" onerror="this.src='/images/member/head.png'"/>
                             </div>
                             <a class="header-text external"
-                               href="@{/index/myinfo(idhz=${child.idhz},name=${child.name},age=${child.age}">
+                               th:href="@{/index/myinfo(idhz=${child.idhz},name=${child.name},age=${child.age})}">
                                 <div class="header-p">
                                     <p th:text="'年龄：'+${child['age']}"></p>
                                     <p th:text="'剩余课时：'+${child['rest']}+'节课'"> </p>
@@ -71,27 +68,27 @@
                         <label>我的运动</label>
                         <i></i>
                     </div>
-                    <div th:switch="${not #lists.isEmpty(listRank[status.index])}" class="card-content">
+                    <div th:switch="${child.ranking.all!=null}" class="card-content">
                         <!--<c:choose>-->
-                            <!--<c:when test="${not empty listRank[status.index]}">-->
+                            <!--<c:when test="${not empty listRank[index]}">-->
                                 <div th:case="true" class="card-content-inner exercise-content">
                                     <div class="row no-gutter  row-box">
                                         <div class="col-33 ">
                                             <div class="sign-first">过去三月超过全国</div>
-                                            <label class="big outpass" th:utext="${listRank[status.index]['outpass']}"></label>%会员
+                                            <label class="big outpass" th:utext="${child.ranking.last3.outpass}"></label>%会员
                                         </div>
                                         <div class="col-33 c">
                                             <div class="sign-first">总共运动</div>
-                                            <label class="big mins" th:utext="${listRank[status.index]['mins']}"></label>分钟
+                                            <label class="big mins" th:utext="${child.ranking.all.mins}"></label>分钟
                                         </div>
                                         <div class="col-33">
                                             <div class="sign-first">全国会员中排第</div>
-                                            <label class="big ranking" th:utext="${listRank[status.index]['ranking']}"></label>名<i
+                                            <label class="big ranking" th:utext="${child.ranking.all.ranking}"></label>名<i
                                                 class="fa fa-angle-double-right"></i></div>
                                     </div>
                                     <div class="exercise-text">
-                                        <p><label class="big tian" th:utext="${listRank[status.index]['tian']}"></label>天您已加入小小运动馆</p>
-                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(listRank[status.index]['times_per_week'],1,2})">
+                                        <p><label class="big tian" th:utext="${child.ranking.all.tian}"></label>天您已加入小小运动馆</p>
+                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(child.ranking.all.times_per_week,1,2)}">
                                         </label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
                                         </p>
                                     </div>
@@ -107,20 +104,20 @@
                 <div class="card">
                     <div class="card-header gym-card-title">
                         <a class="gym-select"
-                           th:attr="data-id=${listGymSelectedSession[status.index].gym['gymId']}"><span class="gym-name" th:text="${listGymSelectedSession[status.index].gym['gymName']}"></span>
-                                <i th:if="${listGym.size() > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
-                                <span th:if="${listGym.size() > 1}" class="badge badge-tip">切换中心</span>
+                           th:attr="data-id=${session.gymSelected.gym.gymId}"><span class="gym-name" th:text="${session.gymSelected.gym.gymName}"></span>
+                                <i th:if="${#lists.size(session.listGym) > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
+                                <span th:if="${session.listGym.size() > 1}" class="badge badge-tip">切换中心</span>
                         </a>
                     </div>
                     <div class="card-content-inner">
                         <div>
                             <div class="gym-datepicker">
                                 <i class="fa fa-angle-double-left beginDate-i"></i>
-                                <input type="text" readonly class="beginDate"
-                                       value="${listGymSelectedSession[status.index]['beginDate']}"
+                                <input type="text" th:readonly="true" class="beginDate"
+                                       th:value="${session.gymSelected.beginDate}"
                                        /> -
-                                <input type="text" readonly class="endDate"
-                                       value="${listGymSelectedSession[status.index]['endDate']}"
+                                <input type="text" th:readonly="true" class="endDate"
+                                       th:value="${session.gymSelected.endDate}"
                                        data-toggle="date"/>
                                 <i class="fa fa-angle-double-right endDate-i"></i>
                             </div>
@@ -145,14 +142,14 @@
                                     class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
                                 <div class="swiper-wrapper">
                                     <div class="swiper-slide swiper-slide-active">
-                                        <ul th:switch="${not #lists.isEmpty(listGymClassAll[status.index])}" class="details_list">
-                                            <li th:case="true" th:each="gymClass : ${listGymClassAll[status.index]}" class="row no-gutter">
-                                                <span th:text="${#calendars.format(gymClass['date'],'yyyy.MM.dd'}" class="col-20  date"></span>
-                                                <span th:text="${gymClass['time']}" class="col-20  time"></span>
-                                                <span th:text="${gymClass['course']}" class="col-20  class"></span>
-                                                <span th:text="${gymClass['kq']}" class="col-20 state " th:classappend="${gymClass['kq'] == '尚未开课'}? 'text-danger'">
+                                        <ul th:switch="${not #lists.isEmpty(child.gymClasses)}" class="details_list">
+                                            <li th:case="true" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
+                                                <span th:text="${#calendars.format(gymClass.date,'yyyy.MM.dd')}" class="col-20  date"></span>
+                                                <span th:text="${gymClass.time}" class="col-20  time"></span>
+                                                <span th:text="${gymClass.course}" class="col-20  class"></span>
+                                                <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
                                                 </span>
-                                                <a onclick="'toTopic('+${gymClass['course']}+')'"><span class="col-20 details">课程亮点</span></a>
+                                                <a onclick="'toTopic('+${gymClass.course}+')'"><span class="col-20 details">课程亮点</span></a>
                                              </li>
                                              <p  th:case="*" class="text-center">没有查询到课程</p>
                                         </ul>
@@ -165,13 +162,13 @@
             </div>
         </div>
 </div>
-<input type="hidden" value = "${in3000==true}？1" id="in3000"、>
+<input type="hidden"  value = "${in3000==true}？1" id="in3000"/>
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
 <script src="/js/swiper-3.4.2.jquery.min.js"></script>
 <script type='text/javascript' src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 
-<script>
+<script th:inline="javascript">
     /*<![CDATA[*/
     /*全局孩子标识*/
     var PAGE_ID = $(".page-current").attr("id") ? $(".page-current").attr("id") : 'child1';
@@ -187,9 +184,9 @@
     wx.config({
         debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: 'wxc82d50af409223ad', // 必填，公众号的唯一标识
-        timestamp: '${weixinMap['timestamp']}', // 必填，生成签名的时间戳
-        nonceStr: '${weixinMap['nonceStr']}', // 必填，生成签名的随机串
-        signature: '${weixinMap['signature']}',// 必填，签名，见附录1
+        timestamp: [[${not #maps.isEmpty(weixinMap)? weixinMap.timestamp:''}]] , // 必填，生成签名的时间戳
+        nonceStr: [[${not #maps.isEmpty(weixinMap)? weixinMap.nonceStr:''}]], // 必填，生成签名的随机串
+        signature: [[${not #maps.isEmpty(weixinMap)? weixinMap.signature:''}]],// 必填，签名，见附录1
         jsApiList: ['onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','hideMenuItems'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
     });
     wx.ready(function(){
@@ -383,13 +380,13 @@
                 bg: 'danger'
             }
         ];
+
         var gymId = "";
         var gymName = "";
-
-        var message = [[${sessionScope.listGym}]];
+        var message = [[${session.listGym}]];
         $.each(message,function(index,mygym) {
-            gymName = "${mygym['gymName']}";
-            gymId = "${mygym['gymId']}";
+            gymName = mygym.gymName;
+            gymId = mygym.gymId;
             var button_json = {
                 text: gymName,
                 disabled: selectedGymId == gymId,
@@ -401,8 +398,7 @@
                 }
             };
             buttons1.push(button_json);
-        }
-
+        });
         var groups = [buttons1, buttons2];
         $.actions(groups);
     });

@@ -12,5 +12,8 @@ public class Family {
     private String tel;
     private String childname;
     private String zx;
+    private String gym;
+    private String city;
+    private String addr;
 
 }

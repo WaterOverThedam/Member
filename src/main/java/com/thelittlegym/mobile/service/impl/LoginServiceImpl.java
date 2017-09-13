@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.UserDao;
+import com.thelittlegym.mobile.entity.Family;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.service.ILoginService;
@@ -34,17 +35,21 @@ public class LoginServiceImpl implements ILoginService {
             if(user.getPassword().equals(password)){
                 returnMap.put("user", user);
                 returnMap.put("result", ResultEnum.LOGIN_SUCCESS.getMessage());
+                returnMap.put("success", true);
             }else{
                 returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
+                returnMap.put("success", false);
             }
         }else{
-            returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST.getMessage());
+            returnMap.put("user", ResultEnum.LOGIN_USER_NO_EXIST.getMessage());
+            returnMap.put("success", false);
         }
+
         return returnMap;
     }
 
     @Override
-    public Map<String, Object> register(String username, String password,String email,Integer idFamily)  {
+    public Map<String, Object> register(String username, String password,String email,Family family)  {
         Map<String,Object> returnMap = new HashMap<String,Object>();
         User res = userDao.findOneByUsername(username);
         if(res != null){
@@ -57,7 +62,10 @@ public class LoginServiceImpl implements ILoginService {
             user.setPassword(password);
             user.setTel(username);
             user.setEmail(email);
-            user.setIdFamily(idFamily);
+            user.setIdFamily(family.getId());
+            user.setGym(family.getGym());
+            user.setCity(family.getCity());
+            user.setAddr(family.getAddr());
             user.setCreateTime(new Date());
             user.setIsDelete(false);
             User value = userDao.save(user);
