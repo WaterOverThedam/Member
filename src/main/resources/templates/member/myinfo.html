@@ -394,7 +394,7 @@
                 $.showIndicator();
             },
             success: function (data) {
-                if (data.success == true) {
+                if (!data.code) {
                     $.toast("上传成功");
                     location.reload();
                 }

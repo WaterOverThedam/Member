@@ -228,7 +228,7 @@ function login_ajax(telephone, password) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            if (data.success) {
+            if (!data.code) {
                 window.location.href = "/index";
             } else {
                 layer.open({

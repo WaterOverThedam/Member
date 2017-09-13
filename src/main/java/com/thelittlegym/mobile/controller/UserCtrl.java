@@ -7,9 +7,12 @@ import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.common.WeixinService;
 import com.thelittlegym.mobile.entity.*;
+import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.IPointsService;
 import com.thelittlegym.mobile.service.IUserService;
 import com.thelittlegym.mobile.service.impl.CouponServiceImpl;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.test.InTesting;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -54,7 +57,7 @@ public class UserCtrl {
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String index(HttpServletRequest request,@SessionAttribute("user") User user, Model model) throws Exception {
+    public String index(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user, Model model) throws Exception {
         try {
             HttpSession session = request.getSession();
             Object show = session.getAttribute("show");
@@ -197,13 +200,9 @@ public class UserCtrl {
 
 
     @RequestMapping(value = "/myinfo", method = RequestMethod.GET)
-    public String myinfo(HttpServletRequest request, String idhz, String name, String age, Model model) throws Exception {
+    public String myinfo(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name, String age, Model model) throws Exception {
         try {
-
-            HttpSession session = request.getSession();
-            Object objSession = session.getAttribute("user");
-            User user = (User) objSession;
-
+ 
             //我的信息
             Integer idFamily = user.getIdFamily();
             String tel = user.getTel();
@@ -269,18 +268,7 @@ public class UserCtrl {
     //头像上传
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> getAttend(HttpServletRequest request, MultipartFile file) {
-        HashMap<String, Object> returnMap = new HashMap<String, Object>();
-        HttpSession session = request.getSession();
-        Object objSession = session.getAttribute("user");
-        User user = null;
-        if (objSession != null) {
-            user = (User) objSession;
-        } else {
-            returnMap.put("success", false);
-            returnMap.put("message", "请重新登录后再试");
-            return returnMap;
-        }
+    public Result getAttend(HttpServletRequest request,@SessionAttribute("user") User user, MultipartFile file) {
         String tel = user.getTel();
         try {
             // 获取图片原始文件名
@@ -314,15 +302,13 @@ public class UserCtrl {
             Thumbnails.of(originalUrl).size(200, 200).outputFormat("jpg").toFile(urlNoExtension);
             user.setHead_src(urlHttp);
             userService.updateUser(user);
-            session.setAttribute("user", user);
-            returnMap.put("success", true);
-            returnMap.put("message", urlHttp);
+            HttpSession session = request.getSession();
+            session.setAttribute("user",user);
+
+            return ResultUtil.success(ResultEnum.UPLOAD_SUCCESS.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            returnMap.put("success", false);
-            returnMap.put("message", "请重新登录后再试");
+            throw new MyException(ResultEnum.UPLOAD_TRY_LATER);
         }
-        return returnMap;
     }
 
     /*
