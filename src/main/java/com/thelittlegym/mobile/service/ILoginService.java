@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service;
 
 import com.thelittlegym.mobile.entity.Family;
+import com.thelittlegym.mobile.entity.Result;
 
 import java.util.Map;
 
@@ -9,10 +10,10 @@ import java.util.Map;
  */
 public interface ILoginService {
     //登录
-    public Map<String,Object> login(String username, String password);
+    public Result login(String username, String password);
 
     //注册
-    public Map<String,Object> register(String username, String password, String email,Family family);
+    public Result register(String username, String password, String email,Family family);
 
     //管理员模拟登录
     public Map<String,Object> login(String username);

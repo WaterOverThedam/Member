@@ -58,8 +58,8 @@
                                  onerror="this.src='/images/member/head.png'"/>
                         </a>
                         <div class="gym-myinfo-info">
-                            <p class="avatar-name" th:text="${childObj['name']}"></p>
-                            <p class="avatar-detail" th:text="'年龄：'+ ${childObj['age']}"></p>
+                            <p class="avatar-name" th:text="${child.name}"></p>
+                            <p class="avatar-detail" th:text="'年龄：'+ ${child.age}"></p>
                         </div>
                     </div>
                     <a href="/exit" class="button">退出登录</a>
@@ -309,28 +309,10 @@
         var feedTel = $('#feedback_tel').val();
         var feedDetails = $('#feedback_details').val();
         var type = $('#feedback_type').val();
-        if (valForm(feedbackName,feedTel)){
-            ajax_feedback(feedFs, feedbackName, feedDetails, feedTel, type);
-        }
+        ajax_feedback(feedFs, feedbackName, feedDetails, feedTel, type);
+
     })
 
-    function valForm(feedbackName,feedTel) {
-        if (feedbackName == ""){
-            itemMessage += '<li>' + '必须输入姓名名'  +  '</li>';
-        }
-        if (feedTel == ""){
-            itemMessage += '<li>' + '必须输入手机号'  +  '</li>';
-        }
-        if (itemMessage == ''){
-            flag = true;
-        }
-        errmessage += itemMessage;
-        errmessage += '</ul>';
-        if (!flag){
-             $.toast(errmessage)
-        }
-        return flag;
-    }
 
 
 
@@ -491,15 +473,18 @@
             dataType: "string",
             success: function (data) {
                 if (res = result(data)){
-                    if(res.code){
+                    if(!res.code){
                         $.toast('已提交，谢谢你的反馈');
                         $.closeModal('.popup-feedback');
                         return;
                     }
+                    $.toast(res.msg);
+                    return;
                 }
                 $.toast('提交失败');
             },
             error: function(xhr, type,error){
+                console.log(error);
                 $.toast('提交失败');
             }
         })

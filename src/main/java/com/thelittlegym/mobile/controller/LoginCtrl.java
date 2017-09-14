@@ -4,14 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.OasisService;
-import com.thelittlegym.mobile.entity.Activity;
-import com.thelittlegym.mobile.entity.Family;
-import com.thelittlegym.mobile.entity.Feedback;
-import com.thelittlegym.mobile.entity.User;
+import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.IFeedbackService;
 import com.thelittlegym.mobile.service.ILoginService;
 import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.msg.config.AppConfig;
 import com.thelittlegym.mobile.utils.msg.lib.MESSAGEXsend;
 import com.thelittlegym.mobile.utils.msg.utils.ConfigLoader;
@@ -50,14 +49,14 @@ public class LoginCtrl {
 
     @PostMapping("/login")
     @ResponseBody
-    public Map<String, Object> login(HttpServletRequest request, String username, String password) {
+    public Result login(HttpServletRequest request, String username, String password) {
 
-        Map<String, Object> map = loginService.login(username, password);
-        //获取user实体
-        Object object = map.get("user");
+        Result res = loginService.login(username, password);
 
-        if (object != null) {
-            User user = (User) object;
+
+        if (res != null) {
+            //获取user实体
+            User user = (User) res.getData();
             HttpSession session = request.getSession(true);
             Object objSession = session.getAttribute("user");
             //重复登录清空之前session所有attr
@@ -72,12 +71,12 @@ public class LoginCtrl {
             }
             session.setAttribute("user", user);
         }
-        return map;
+        return res;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> register(HttpServletRequest request, String username, String valnum, String password, String email) {
+    public Result register(HttpServletRequest request, String username, String valnum, String password, String email) {
 
         HttpSession session = request.getSession();
         Map<String, Object> returnMap = new HashMap<String, Object>();
@@ -86,20 +85,14 @@ public class LoginCtrl {
         if (session.getAttribute("valNumMap") != null) {
             valNumMap = (HashMap) session.getAttribute("valNumMap");
             if (valNumMap.get("valNum").equals(valnum) == false) {
-                returnMap.put("message", "验证码错误!");
-                returnMap.put("success", false);
-                return returnMap;
+                throw new MyException(ResultEnum.CHECKSUM_WRONG);
             }
             long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
             if (minsPass > 30) {
-                returnMap.put("message", "验证码已过期!");
-                returnMap.put("success", false);
-                return returnMap;
+                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
             }
         } else {
-            returnMap.put("message", "验证码错误!");
-            returnMap.put("success", false);
-            return returnMap;
+            throw new MyException(ResultEnum.CHECKSUM_WRONG);
         }
 
 
@@ -109,29 +102,18 @@ public class LoginCtrl {
             JSONArray jsonArray = oasisService.getResultJson(sqlExist);
             //是否是会员校验
             if (jsonArray == null){
-                    returnMap.put("message", "手机号非会员!");
-                    returnMap.put("success", false);
-                    return returnMap;
+                    throw new MyException(ResultEnum.REGISTER_NOT_ALLOW);
             }
 
             JSONObject familyObj = jsonArray.getJSONObject(0);
             Family family = JSONObject.toJavaObject(familyObj,Family.class);
 
-            //log.info(family.toString());
+            return  loginService.register(username, password,email,family);
 
-            Map<String, Object> map = loginService.register(username, password,email,family);
-            if((boolean) map.get("success")){
-                returnMap.put("user",map.get("user"));
-                session.setAttribute("user",map.get("user"));
-            }
-            returnMap.put("result", map.get("result"));
-            returnMap.put("success", map.get("success"));
         } catch (Exception e) {
-            returnMap.put("message", ResultEnum.REGISTER_EXCEPTION.getMessage());
-            returnMap.put("success", false);
-            e.printStackTrace();
+            throw e;
         }
-        return returnMap;
+
     }
 
 
@@ -181,7 +163,7 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/getUserPageListForSearch", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> getUserPageListForSearch(HttpServletRequest request,
+    public Result getUserPageListForSearch(HttpServletRequest request,
                                                         @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                                                         @RequestParam(value = "size", defaultValue = "10") Integer size, String blurUserName) {
         Map<String, Object> returnMap = new HashMap<String, Object>();
@@ -189,12 +171,11 @@ public class LoginCtrl {
         Pageable pageable = new PageRequest(pageNow, size, sort);
         try {
             Page<User> userPages = userService.getUserPageListForSearch(blurUserName,pageable);
-            returnMap.put("page", userPages);
+            return ResultUtil.success(userPages);
         } catch (Exception e) {
-            returnMap.put("result", ResultEnum.FAILURE);
-            log.error(e.getMessage());
+            //继续外抛系统错误，后续会处理
+            throw e;
         }
-        return returnMap;
     }
 
     @RequestMapping(value = "/validateNum", method = RequestMethod.POST)
@@ -211,7 +192,6 @@ public class LoginCtrl {
         submail.addVar("time", "30分钟");
         submail.addVar("code", valnum);
         submail.xsend();
-
 
         try {
             //验证码map
@@ -232,7 +212,7 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/deleteOneUser", method = RequestMethod.POST)
     @ResponseBody
-    public ResultEnum deleteOneUser(HttpServletRequest request, Integer id) {
+    public Result deleteOneUser(HttpServletRequest request, Integer id) {
 
         return  userService.deleteOneUser(id);
 
@@ -240,82 +220,77 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/getUserPageList", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> getUserPageList(HttpServletRequest request,
+    public Result getUserPageList(HttpServletRequest request,
                 @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                 @RequestParam(value = "size", defaultValue = "10") Integer size ) {
-            Map<String, Object> returnMap = new HashMap<String, Object>();
+
             Sort sort = new Sort(Sort.Direction.ASC, "id");
             Pageable pageable = new PageRequest(pageNow, size, sort);
             try {
                 Page<User> userPages = userService.getUserPageList(pageable);
-                returnMap.put("page", userPages);
-                returnMap.put("result", ResultEnum.SUCCESS);
+                return ResultUtil.success(userPages);
             } catch (Exception e) {
-                returnMap.put("result", ResultEnum.FAILURE);
-                log.error(e.getMessage());
+                throw e;
             }
-            return returnMap;
         }
 
 
     @RequestMapping(value = "/exist", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> exist(String telephone) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public Result exist(String telephone) {
         try {
             if (userService.isReged(telephone) ){
-                returnMap.put("success",false);
-                returnMap.put("message","该号码已注册，请返回直接登录");
-                return returnMap;
+                throw new MyException(ResultEnum.REGISTER_USER_EXIST);
             }
         } catch (Exception e) {
-            returnMap.put("success",false);
-            returnMap.put("message","异常错误");
-            return returnMap;
+                throw e;
         }
         String sqlExist = "select top 1 crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +telephone+"',crmzdy_81767199)>0";
         if (oasisService.getResultJson(sqlExist) != null){
-            returnMap.put("success",true);
-            returnMap.put("message","该号码是会员");
+            return ResultUtil.success(ResultEnum.REGISTER_ALLOW);
         }else{
-            returnMap.put("success",false);
-            returnMap.put("message","该号码非会员");
+            return ResultUtil.success(ResultEnum.REGISTER_NOT_ALLOW);
         }
-        return returnMap;
+
     }
 
     @RequestMapping(value = "/exist_reged", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> exist_reged(String telephone) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public Result exist_reged(String telephone) {
+
         try {
             User u = userService.getByTel(telephone);
             if ( null != u){
-                returnMap.put("value",u);
-                returnMap.put("message","已注册");
-                returnMap.put("success",true);
+                return ResultUtil.success(ResultEnum.IS_REGISTERED);
             }else{
-                returnMap.put("message","未注册用户");
-                returnMap.put("success",false);
+                throw new MyException(ResultEnum.IS_NOT_REGISTERED);
             }
         } catch (Exception e) {
-            returnMap.put("message","异常错误");
-            returnMap.put("success",false);
+            throw e;
         }
-        return returnMap;
+
     }
 
     @RequestMapping(value = "/feedback", method = RequestMethod.POST)
     @ResponseBody
     public  String feedback(String Franchisee,String name,String details,String contactTel,String type) {
+        log.info(contactTel);
         String result;
         Feedback feedback = new Feedback();
         try {
-            if( null == type || "".equals(type)){
-                type="手机号码不存在";
+            if( null == contactTel || "".equals(contactTel)){
+                throw new MyException(ResultEnum.VALIDATE_TEL);
             }
+            if( null == type || "".equals(type)){
+                throw new MyException(ResultEnum.VALIDATE_TYPE);
+            }
+            if( null == name || "".equals(name)){
+                throw new MyException(ResultEnum.VALIDATE_NAME);
+            }
+
             feedback.setFranchisee(Franchisee);
             feedback.setCreateTime(new Date());
+            feedback.setHandled(false);
             feedback.setContactTel(contactTel);
             feedback.setName(name);
             feedback.setDetails(details);
@@ -327,8 +302,7 @@ public class LoginCtrl {
                 result = ResultEnum.FEEDBACK_FAILURE.toJson();
             }
         } catch (Exception e) {
-            log.info(e.getMessage());
-            result = ResultEnum.FEEDBACK_FAILURE.toJson();
+            throw  e;
         }
         return result;
     }

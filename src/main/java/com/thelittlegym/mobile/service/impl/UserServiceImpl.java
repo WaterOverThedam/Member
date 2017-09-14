@@ -3,9 +3,11 @@ package com.thelittlegym.mobile.service.impl;
 import com.thelittlegym.mobile.dao.CouponDao;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.Coupon;
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,7 +55,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ResultEnum deleteOneUser(Integer id) {
+    public Result deleteOneUser(Integer id) {
         User user = new User();
         try {
             user = userDao.getOne(id);
@@ -63,11 +65,9 @@ public class UserServiceImpl implements IUserService {
         if(user != null){
             user.setIsDelete(true);
             userDao.save(user);
-
-            return ResultEnum.DEL_SUCCESS;
+            return ResultUtil.success();
         }else{
-
-            return ResultEnum.DEL_FAIL;
+            return ResultUtil.error();
         }
     }
 

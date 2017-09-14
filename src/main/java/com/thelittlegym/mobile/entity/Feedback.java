@@ -23,6 +23,4 @@ public class Feedback {
     private String type;
     private Boolean handled;
     private Date handledTime;
-
-
-}
+ }

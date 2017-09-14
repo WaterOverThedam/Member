@@ -254,9 +254,9 @@ function regsister_ajax(username, valnum, password, email) {
         dataType: "json",
         success: function (data) {
             console.log(data);
-            if (data.success == true && data.result == "注册成功") {
+            if (!data.code) {
                 layer.open({
-                    content: '注册成功'
+                    content: data.msg
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });
@@ -264,9 +264,9 @@ function regsister_ajax(username, valnum, password, email) {
                 mySwiper.slidePrev(fadeInClass());
                 mySwiper.lockSwipes();
                 $("#login_tel").val(username);
-            } else if (data.success == false) {
+            } else{
                 layer.open({
-                    content: data.message
+                    content: data.msg
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });
@@ -285,8 +285,8 @@ function exist_ajax(telephone) {
         dataType: "json",
         success: function (data) {
             console.log(data);
-            if (data.success == false) {
-                if (data.message == "该号码非会员"){
+            if (data.code) {
+                if (data.msg == "该号码非会员"){
                     layer.open({
                         content: '系统中没有显示此手机号码,点击是与我们联系'
                         , btn: ['是', '否']
@@ -309,7 +309,7 @@ function exist_ajax(telephone) {
 
             }else{
                 layer.open({
-                    content: '该号码是会员帐号,可以注册√'
+                    content: data.msg
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });
@@ -326,7 +326,7 @@ function exist_ajax_changePass(telephone) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            if (data.success == false) {
+            if (data.code) {
                     layer.open({
                         content: telephone+'未注册，无法修改密码'
                         , skin: 'msg'

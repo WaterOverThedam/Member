@@ -4,8 +4,11 @@ spring:
   devtools:
     restart:
       enabled: false
-
-
+  jpa:
+    hibernate:
+      naming:
+        strategy: org.hibernate.cfg.DefaultNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 # jackson:
 #   default-property-inclusion: non_null

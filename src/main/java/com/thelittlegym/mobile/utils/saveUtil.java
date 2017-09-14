@@ -41,15 +41,15 @@ public class saveUtil {
 
     }
 
-    public static void themeSave(HttpServletRequest request, HashMap returnMap){
+    public static void themeSave(HttpServletRequest request,HashMap returnMap){
 
         try {
+
             Theme theme = new Theme();
             theme.setId(1);
             theme.setCreateTime(toDate(request.getParameter("beginDate")));
             theme.setName(request.getParameter("name"));
-            theme.setType(request.getParameter("type"));
-            theme.setDetail(request.getParameter("detail"));
+            theme.setIsShow(Boolean.parseBoolean(request.getParameter("isShow")));
             theme.setWeekNum(Integer.parseInt(request.getParameter("weekNum")));
             theme.setVideoSrc(returnMap.get("path").toString());
             theme.setBeginDate(toDate(request.getParameter("beginDate")));

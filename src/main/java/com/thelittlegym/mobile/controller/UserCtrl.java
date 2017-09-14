@@ -66,7 +66,7 @@ public class UserCtrl {
             boolean ittest = it.isTrue(request);
             Object adminSession = session.getAttribute("admin");
             String linkId = (String)session.getAttribute("linkId");
-            log.info(linkId);
+            //log.info(linkId);
             if (show == null && !ittest && null == adminSession) {
                 if (null != linkId && "1225".equals(linkId)) {
                     session.setAttribute("show", System.currentTimeMillis() / 1000);
@@ -84,7 +84,6 @@ public class UserCtrl {
 
 
             //获孩子所有信息
-
             List<Child> listChild = new ArrayList<Child>();
             Integer idFamily = user.getIdFamily();
             String sqlUser = "declare @rest float=0,@dtend varchar(10)='';select @rest =sum(kss),@dtend =convert(varchar(10),max(dtend),120) from(select top 6 case when ht.crmzdy_81733324<getdate() then 0 else bmksb.crmzdy_81739422 end kss,ht.crmzdy_81733324 dtend from crm_zdytable_238592_25111_238592_view zx join crm_zdytable_238592_25115_238592_view" +
@@ -161,7 +160,7 @@ public class UserCtrl {
             model.addAttribute("weixinMap", weixinMap);
             model.addAttribute("in3000", in3000);
         }catch (Exception e){
-            log.info("/index错误信息：{}",e.getMessage());
+            log.error("/index错误信息：{}",e);
         }
         return "/member/index";
     }
@@ -200,9 +199,9 @@ public class UserCtrl {
 
 
     @RequestMapping(value = "/myinfo", method = RequestMethod.GET)
-    public String myinfo(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name, String age, Model model) throws Exception {
+    public String myinfo(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name,String age,Model model) throws Exception {
         try {
- 
+
             //我的信息
             Integer idFamily = user.getIdFamily();
             String tel = user.getTel();
@@ -215,14 +214,14 @@ public class UserCtrl {
             pointsService.updatePoints_http(tel);
 
             JSONObject childObj = new JSONObject();
-
             childObj.put("idhz", idhz);
             childObj.put("name", name);
             childObj.put("age", age);
+
             model.addAttribute("listContract", contractArr);
-            model.addAttribute("childObj", childObj);
+            model.addAttribute("child", childObj);
         }catch(Exception e){
-            log.info("错误信息：{}",e.getMessage());
+            log.error("错误信息：{}",e);
         }
 
         return "/member/myinfo";
@@ -234,17 +233,15 @@ public class UserCtrl {
     //考勤查询
     @RequestMapping(value = "/attend", method = RequestMethod.GET)
     @ResponseBody
-    public JSONArray getAttend(HttpServletRequest request, String idGym, String nameGym, Integer idChild, String beginDate, String endDate, Integer child_index) {
+    public Result getAttend(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idGym, String nameGym, Integer idChild, String beginDate, String endDate, Integer child_index) {
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
         JSONObject jsonObject = new JSONObject();
         JSONArray classArray = new JSONArray();
         List<GymSelected> listGymSelected = new ArrayList<GymSelected>();
         if (user == null) {
-            jsonObject.put("success", false);
-            classArray.add(jsonObject);
-            return classArray;
+            throw new MyException(ResultEnum.FAILURE);
         }
+        //session更新GymSelected
         Object listGymSelectedSession = session.getAttribute("listGymSelectedSession");
         if (listGymSelectedSession != null) {
             listGymSelected = (List<GymSelected>) listGymSelectedSession;
@@ -257,18 +254,23 @@ public class UserCtrl {
             gymSelected.setEndDate(endDate);
             listGymSelected.set(child_index, gymSelected);
         }
+        session.setAttribute("gymSelected", listGymSelectedSession);
+
         String sqlClass = "select bj.crmzdy_80620202_id idgym,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq " +
                 "from crm_zdytable_238592_25118_238592_view bmks where bmks.crmzdy_81618215_id=" + idChild + " /*idhz*/ and bmks.crmzdy_81636525>='" + beginDate + "'/*dtbegin*/ and bmks.crmzdy_81636525<='" + endDate + "'/*dtend*/ and crmzdy_81619234='已报名' union all select crmzdy_80652349,crmzdy_80652340_id from crm_zdytable_238592_23696_238592_view bk where crmzdy_80658051_id=" + idChild + "  and bk.crmzdy_81761865>='" + beginDate + "'/*dtbegin*/ and bk.crmzdy_81761865<='" + endDate + "'/*dtend*/)ks join crm_zdytable_238592_23870_238592_view rq on ks.idrq=rq.id join crm_zdytable_238592_23583_238592_view bj on rq.crmzdy_80650267_id=bj.id and bj.crmzdy_80620202_id=" + idGym + "/*idgym*/order by date desc";
         classArray = oasisService.getResultJson(sqlClass);
-        session.setAttribute("listGymSelectedSession", listGymSelectedSession);
 
-        return classArray;
+        if (classArray != null) {
+            return ResultUtil.success(ResultEnum.SUCCESS.getMessage(),classArray);
+        }
+        return ResultUtil.error();
+
     }
 
     //头像上传
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public Result getAttend(HttpServletRequest request,@SessionAttribute("user") User user, MultipartFile file) {
+    public Result getAttend(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user, MultipartFile file) {
         String tel = user.getTel();
         try {
             // 获取图片原始文件名

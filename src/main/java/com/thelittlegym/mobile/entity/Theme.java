@@ -13,7 +13,6 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name="theme")
 public class Theme {
     @Id
     @GeneratedValue
@@ -21,11 +20,10 @@ public class Theme {
     private Date createTime;
     private String name;
     private Integer weekNum;
-    private String detail;
     private Date beginDate;
     private Date endDate;
-    private String type;
     private String videoSrc;
+    private Boolean isShow;
     private Boolean isDelete;
 
 }

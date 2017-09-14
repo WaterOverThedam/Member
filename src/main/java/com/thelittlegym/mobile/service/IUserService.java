@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service;
 
 
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ public interface IUserService {
     public Page<User> getUserPageListForSearch(String username,Pageable pageable);
 
     //删除用户
-    public ResultEnum deleteOneUser(Integer id);
+    public Result deleteOneUser(Integer id);
 
     public User getUserById(Integer id) ;
 

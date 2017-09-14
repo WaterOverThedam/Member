@@ -2,9 +2,12 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.Family;
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.ILoginService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,39 +26,27 @@ public class LoginServiceImpl implements ILoginService {
     private UserDao userDao;
 
     @Override
-    public Map<String, Object> login(String username, String password){
-        Map<String,Object> returnMap = new HashMap<String,Object>();
-        User user = new User();
-        try {
-            user = userDao.findOneByUsername(username);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Result login(String username, String password){
+
+        User  user = userDao.findOneByUsername(username);
+
         if(user != null){
             if(user.getPassword().equals(password)){
-                returnMap.put("user", user);
-                returnMap.put("result", ResultEnum.LOGIN_SUCCESS.getMessage());
-                returnMap.put("success", true);
+                return ResultUtil.success(user);
             }else{
-                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
-                returnMap.put("success", false);
+                return ResultUtil.error(ResultEnum.LOGIN_WRONG_PWD.getCode(),ResultEnum.LOGIN_WRONG_PWD.getMessage());
             }
         }else{
-            returnMap.put("user", ResultEnum.LOGIN_USER_NO_EXIST.getMessage());
-            returnMap.put("success", false);
+                throw new MyException(ResultEnum.LOGIN_USER_NO_EXIST);
         }
 
-        return returnMap;
     }
 
     @Override
-    public Map<String, Object> register(String username, String password,String email,Family family)  {
-        Map<String,Object> returnMap = new HashMap<String,Object>();
+    public Result register(String username, String password,String email,Family family)  {
         User res = userDao.findOneByUsername(username);
         if(res != null){
-            returnMap.put("result", ResultEnum.REGISTER_USER_EXIST.getMessage());
-            returnMap.put("success", false);
-            return returnMap;
+            throw new MyException(ResultEnum.REGISTER_USER_EXIST);
         }else{
             User user = new User();
             user.setUsername(username);
@@ -70,14 +61,10 @@ public class LoginServiceImpl implements ILoginService {
             user.setIsDelete(false);
             User value = userDao.save(user);
             if (value==null){
-                returnMap.put("result",ResultEnum.REGISTER_EXCEPTION.getMessage());
-                returnMap.put("success", false);
+                throw new MyException(ResultEnum.REGISTER_EXCEPTION);
             }else {
-                returnMap.put("user", value);
-                returnMap.put("result", ResultEnum.REGISTER_SUCCESS.getMessage());
-                returnMap.put("success", true);
+                return  ResultUtil.success();
             }
-            return returnMap;
         }
     }
 

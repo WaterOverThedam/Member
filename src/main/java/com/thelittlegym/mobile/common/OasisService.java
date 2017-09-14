@@ -2,6 +2,7 @@ package com.thelittlegym.mobile.common;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * Created by hibernate on 2017/4/19.
  */
+@Slf4j
 @Service
 public class OasisService {
     private static final String POST_URL = "https://bbk.800app.com/uploadfile/staticresource/238592/279832/MobileApiPost.aspx";
@@ -40,7 +42,7 @@ public class OasisService {
             }
 
         }  catch (IOException e) {
-            e.printStackTrace();
+           log.error("系统错误：{}",e);
         } 
         return jsonArray;
     }

@@ -15,23 +15,22 @@
 </head>
 <body>
 <div class="page-group">
-        <div class="page" th:each="child,childStat : ${listChild}" th:classappend="${childStat.index==0}?' page-current'"
-             th:attr="data-index = ${childStat.index},data-name =${child.name},data-id=${child.idhz},id='child'+${childStat.index}">
+        <div class="page" th:each="child,childStat : ${listChild}" th:classappend="${childStat.count==1}?' page-current'"
+             th:attr="data-index = ${childStat.count},data-name =${child.name},data-id=${child.idhz},id='child'+${childStat.count}">
             <div class="content">
                 <div class="card">
-                    <div th:switch="${childStat.index}" class="card-header no-border gym-card-title">
+                    <div class="card-header no-border gym-card-title">
 
-                                <label th:case="0" class="child-name" th:text="${child.name}"></label>
-                                <a th:case="0" th:href="'#child'+${childStat.index==0?1:0}" th:if="${#lists.size(listChild)> 1}">
+                                <a th:if="${childStat.count-1> 0}" th:href="'#child'+${childStat.count-1}" >
+                                    <i class="fa fa-angle-double-left"></i>
+                                    <small>返回上一位宝宝</small>
+                                </a>
+                                 <label class="child-name"  th:text="${child.name}"></label>
+                                <a th:href="'#child'+ ${childStat.count+1>childStat.size?1:childStat.count+1}">
                                     <small>查询另一位宝宝</small>
                                     <i class="fa fa-angle-double-right"></i>
                                 </a>
 
-                                <a th:href="'#child'+ ${childStat.index==0?1:0}">
-                                    <i class="fa fa-angle-double-left"></i>
-                                    <small>查询另一位宝宝</small>
-                                </a>
-                                <label th:case="*" th:text="${child.name}"></label>
 
                     </div>
                 </div>
@@ -144,7 +143,7 @@
                                     <div class="swiper-slide swiper-slide-active">
                                         <ul th:switch="${not #lists.isEmpty(child.gymClasses)}" class="details_list">
                                             <li th:case="true" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
-                                                <span th:text="${#calendars.format(gymClass.date,'yyyy.MM.dd')}" class="col-20  date"></span>
+                                                <span th:text="${#calendars.format(gymClass.date,'yyyy-MM-dd')}" class="col-20  date"></span>
                                                 <span th:text="${gymClass.time}" class="col-20  time"></span>
                                                 <span th:text="${gymClass.course}" class="col-20  class"></span>
                                                 <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
@@ -171,15 +170,32 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     /*全局孩子标识*/
-    var PAGE_ID = $(".page-current").attr("id") ? $(".page-current").attr("id") : 'child1';
-    var CHILD_ID = $("#" + PAGE_ID).data("id");
-    var CHILD_INDEX = $("#" + PAGE_ID).data("index");
+    var PAGE_ID;
+    var CHILD_ID;
+    var CHILD_INDEX;
+
     $(document).on("pageInit", function (e, pageId, $page) {
         CHILD_ID = $page.data("id");
         PAGE_ID = pageId;
         CHILD_INDEX = $page.data("index");
         document.title = $page.data("name") + "的主页";
     });
+
+    $(".nav").click(function () {
+      PAGE_ID = this.href.split("#")[1];
+      CHILD_ID = $("#" + PAGE_ID).data("id");
+      CHILD_INDEX = $("#" + PAGE_ID).data("index");
+      document.title = $("#" + PAGE_ID).data("name") + "的主页";
+    })
+    function updatePageId() {
+        if (location.href.indexOf("#")!=-1){
+            PAGE_ID = location.href.split("#")[1];
+            CHILD_ID = $("#" + PAGE_ID).data("id");
+            CHILD_INDEX = $("#" + PAGE_ID).data("index");
+            document.title = $("#" + PAGE_ID).data("name") + "的主页";
+        }
+    }
+
 
     wx.config({
         debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -324,6 +340,7 @@
 
     //考勤明细
     function attend_ajax(idGym, nameGym, idChild, beginDate, endDate) {
+        //alert(idChild)
         $.ajax({
             type: "GET",
             url: "/index/attend",
@@ -340,10 +357,10 @@
             beforeSend: function () {
                 $("#" + PAGE_ID + " .details_list").html('<p class="text-center  animated slideInDown "><i class="fa fa-circle-o-notch fa-2x fa-spin"></i></p>');
             },
-            success: function (data) {
+            success: function (result) {
                 var divGymClass = "";
-                if (data != null && data.length > 0) {
-                    $.each(data, function (index, content) {
+                if (!result.code  && result.data.length > 0) {
+                    $.each(result.data, function (index, content) {
                         divGymClass += "<li class='row no-gutter'>"
                         divGymClass += "<span class='col-20  date'>" + content.date + "</span>";
                         divGymClass += "<span class='col-20  time'>" + content.time + "</span>";
@@ -367,6 +384,7 @@
 
     //    gyms绑定到actions上
     $('.gym-select').on('click', function () {
+        updatePageId();
         var selectedGymId = $("#" + PAGE_ID + " .gym-select").data("id");
         var buttons1 = [
             {
