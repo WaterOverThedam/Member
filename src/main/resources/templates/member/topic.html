@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中心主题</title>
+    <link rel="stylesheet" href="/css/sm.min.css">
+    <link rel="stylesheet" href="/css/gym.css">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.bootcss.com/video.js/6.0.0-RC.6/video-js.min.css">
+</head>
+
+
+<body>
+<div class="page-group">
+    <div class="page" id="topic">
+        <div class="content" >
+            <div class="card">
+                <div class="card-content gym-topic">
+                    <div class="card-header no-padding no-border gym-topic">
+                        <a href="/index" class="gym-banner-left external"><i class="fa fa-angle-double-left fa-3x"></i></a>
+                        <div id="title1" class="gym-banner-title">家庭作业</div>
+                        <i></i>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card" >
+                <div  class="card-header no-padding no-border gym-card-title"><i></i><span id="title2">HomeWork</span><i></i></div>
+                <div class="card-content">
+
+                    <video  id="video" class="video-js vjs-big-play-centered vjs-big-play-button vjs-default-skin vjs-fluid" controls preload="none"   poster="${theme.poster}" data-setup="{}">
+                        <source id="videoSrc" src="${theme.videoSrc}" type="video/mp4">
+
+                        <p class="vjs-no-js">点击观看</p>
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
+<script src="/js/swiper-3.4.2.jquery.min.js"></script>
+<script src="/js/video.min.js"></script>
+<script>
+    $.init()
+
+</script>
+</body>
+
+</html>

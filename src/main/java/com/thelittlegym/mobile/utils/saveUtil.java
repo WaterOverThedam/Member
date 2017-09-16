@@ -53,9 +53,7 @@ public class saveUtil {
             theme.setWeekNum(Integer.parseInt(request.getParameter("weekNum")));
             theme.setVideoSrc(returnMap.get("path").toString());
             theme.setBeginDate(toDate(request.getParameter("beginDate")));
-            theme.setEndDate(toDate(request.getParameter("endDate")));
             theme.setIsDelete(false);
-
             themeDao.save(theme);
         }
         catch (Exception e)

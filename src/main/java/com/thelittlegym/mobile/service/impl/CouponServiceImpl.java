@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.thelittlegym.mobile.common.H5Service;
 import com.thelittlegym.mobile.dao.CouponDao;
 import com.thelittlegym.mobile.entity.Coupon;
+import com.thelittlegym.mobile.entity.Result;
+import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.service.ICouponService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,16 +32,12 @@ public class CouponServiceImpl implements ICouponService {
     private CouponDao couponDao;
 
     @Override
-    public Map<String, Object> getCoupon_http(String tel) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public Result getCoupon_http(String tel) {
         try {
             //是否已存，已存则不去调接口
             Coupon c = couponDao.findOneByTelAndType(tel,"1");
             if (null != c) {
-                returnMap.put("value", c);
-                returnMap.put("success", true);
-                returnMap.put("message", "存在");
-                return returnMap;
+                return ResultUtil.success(ResultEnum.COUPON_EXISTS,c);
             }
             tel = tel.trim();
             JSONArray couponArr = h5Service.getByType(tel, "coupon");
@@ -53,48 +52,50 @@ public class CouponServiceImpl implements ICouponService {
                 coupon.setUsed(false);
                 coupon.setTel(tel);
                 couponDao.save(coupon);
-                returnMap.put("value", coupon);
-                returnMap.put("success", true);
-                returnMap.put("message", "第一次存入");
-                return returnMap;
-            } else {
-                returnMap.put("success", false);
-                returnMap.put("message", "返回结果为空");
-                return returnMap;
+                return ResultUtil.success(ResultEnum.COUPON_SYNC_SUCCESS,coupon);
+            } else {;
+                return ResultUtil.error(ResultEnum.COUPON_SYNC_EMPTY);
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("系统错误{}",e);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("系统错误{}",e);
         }
-        return null;
+        return ResultUtil.error();
     }
 
     @Override
-    public Map<String, Object> useCoupon(String tel, String code,String type) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public Result useCoupon(String tel, String code,String type) {
         Coupon coupon = couponDao.findOneByTelAndTypeAndUsed(tel,type,false);
         //种类
         String nowCode = coupon.getType().equals("1")?useCode:useCode_2;
         if (nowCode.equals(code)) {
                 if (null != coupon) {
                     coupon.setUsed(true);
-                    couponDao.save(coupon);
-                    returnMap.put("success", true);
-                    returnMap.put("message", "使用成功");
+                    coupon = couponDao.save(coupon);
+                    if (coupon != null) {
+                        return ResultUtil.success(ResultEnum.COUPON_SUCCESS_USE);
+                    }else{
+                        return ResultUtil.error();
+                    }
                 } else {
-                    returnMap.put("success", false);
-                    returnMap.put("message", "该用户没有优惠券");
+                    return ResultUtil.error(ResultEnum.COUPON_NOT_EXISTS);
                 }
             } else {
-                returnMap.put("success", false);
-                returnMap.put("message", "核销码错误");
+
+              return ResultUtil.error(ResultEnum.COUPON_WRONG_NUMBER);
         }
-        return returnMap;
+
     }
 
     @Override
-    public Map<String, Object> addCoupon3000(String tel) throws Exception {
+    public Result addCoupon3000(String tel) throws Exception {
+
+        Coupon coupon = couponDao.findOneByTelAndType(tel, "2");
+        if (null != coupon) {
+            return ResultUtil.success(ResultEnum.COUPON_EXISTS,coupon);
+        }
+
         //临时添加  活动开始时间为8-17 8点
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -102,19 +103,10 @@ public class CouponServiceImpl implements ICouponService {
         String endDateStr = "2017-09-10 23:59:59";
         Date beginDate = sdf.parse(beginDateStr);
         Date endDate = sdf.parse(endDateStr);
-        if ( now.getTime() < beginDate.getTime() || now.getTime() > endDate.getTime()){
-            return null;
+        if (now.getTime() < beginDate.getTime() || now.getTime() > endDate.getTime()) {
+            return  ResultUtil.error();
         }
-
-        Map<String, Object> returnMap = new HashMap<String, Object>();
-        Coupon c = couponDao.findOneByTelAndType(tel,"1");
-        if (null != c ){
-            returnMap.put("value",c);
-            returnMap.put("success",false);
-            returnMap.put("message","已领取");
-            return returnMap;
-        }
-        Coupon coupon = new Coupon();
+        coupon = new Coupon();
         coupon.setCreate_time(new Date());
         coupon.setMoney(0.0f);
         coupon.setName("3000新用户注册");
@@ -122,10 +114,11 @@ public class CouponServiceImpl implements ICouponService {
         coupon.setType("2");
         coupon.setUsed(false);
         coupon.setTel(tel);
-        couponDao.save(coupon);
-        returnMap.put("value",coupon);
-        returnMap.put("success",true);
-        returnMap.put("message","领取成功");
-        return returnMap;
+        coupon = couponDao.save(coupon);
+        if (coupon != null) {
+            return ResultUtil.success(ResultEnum.COUPON_SUCCESS_GET,coupon);
+        }else{
+            return ResultUtil.error();
+        }
     }
 }

@@ -2,10 +2,7 @@ package com.thelittlegym.mobile.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -21,6 +18,9 @@ public class Admin {
     private String username;
     private String password;
     private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roleId", nullable = true)
+    private Role role;
     private Date createTime;
     private boolean isDelete;
 

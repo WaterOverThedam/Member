@@ -48,5 +48,8 @@ public class ResultUtil{
     public static Result error(){
         return error(ResultEnum.FAILURE.getCode(),ResultEnum.FAILURE.getMessage());
     }
+    public static Result error(ResultEnum resultEnum){
+        return error(resultEnum.getCode(),resultEnum.getMessage());
+    }
 }
 

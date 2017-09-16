@@ -40,20 +40,20 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         InterceptorRegistration addInterceptor = registry.addInterceptor(getSecurityInterceptor());
 
-        //拦截配置
-        addInterceptor.addPathPatterns("/**");
 
         // 排除配置
         addInterceptor.excludePathPatterns("/noaccess.html");
         addInterceptor.excludePathPatterns("/forgetPass.html");
         addInterceptor.excludePathPatterns("/wxbrowser.html");
         addInterceptor.excludePathPatterns("/error.html");
+        addInterceptor.excludePathPatterns("/error");
         addInterceptor.excludePathPatterns("/login/**");
         addInterceptor.excludePathPatterns("/login.html");
         addInterceptor.excludePathPatterns("/timeout.html");
-        addInterceptor.excludePathPatterns("/admin/**");
-        addInterceptor.excludePathPatterns("/admin");
-
+        addInterceptor.excludePathPatterns("/admin/login");
+        addInterceptor.excludePathPatterns("/admin/login/**");
+        //拦截配置
+        addInterceptor.addPathPatterns("/**");
 
     }
 
@@ -69,16 +69,27 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                 session.setAttribute("linkId", linkId);
             }
 
+
+            log.info(requestUri);
+            log.info(String.valueOf(requestUri.indexOf("admin")));
+            Object admin = session.getAttribute("admin");
+            if(requestUri.indexOf("admin")!=-1 && admin==null){
+                String url = "/admin/login";
+                response.sendRedirect(url);
+                return false;
+            }
+
             Object user = session.getAttribute("user");
-            //log.info(requestUri);
-            if (user == null) {
+            if (requestUri.indexOf("admin")==-1 && user == null) {
                 // 跳转登录
                 String url = "/login.html";
                 response.sendRedirect(url);
                 return false;
             }
-            return true
-                    ;
+
+
+
+            return true;
         }
     }
 }

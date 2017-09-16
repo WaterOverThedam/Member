@@ -232,7 +232,7 @@ function login_ajax(telephone, password) {
                 window.location.href = "/index";
             } else {
                 layer.open({
-                    content: data.result?data.result:"登陆异常，请重试"
+                    content: data.msg?data.msg:"登陆异常，请重试"
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });
@@ -253,7 +253,7 @@ function regsister_ajax(username, valnum, password, email) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             if (!data.code) {
                 layer.open({
                     content: data.msg
@@ -303,7 +303,7 @@ function exist_ajax(telephone) {
                     layer.open({
                         content: data.message
                         , skin: 'msg'
-                        , time: 2 //2秒后自动关闭
+                        , time: 3 //2秒后自动关闭
                     });
                 }
 

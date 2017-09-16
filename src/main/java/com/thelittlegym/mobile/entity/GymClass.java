@@ -14,5 +14,6 @@ public class GymClass {
     private String time;
     private String course;
     private String kq;
+    private String weekNum;
 
 }

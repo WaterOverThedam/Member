@@ -2,6 +2,8 @@ package com.thelittlegym.mobile.common;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,7 @@ public class OasisService {
 
         }  catch (IOException e) {
            log.error("系统错误：{}",e);
+           throw  new MyException(ResultEnum.TIMEOUT);
         } 
         return jsonArray;
     }

@@ -29,24 +29,27 @@
             <img class="img" src="/images/admin/logo.jpg"/>
             <div class="content">手机会员后台登录</div>
         </h2>
-        <div class="ui form">
-            <div class="ui segment">
+        <form class="ui large form">
+            <div class="ui stacked segment">
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
-                        <input id="username" type="text" name="username" placeholder="输入用户名"/>
+                        <input id="username" type="text" name="email" placeholder="E-mail address"/>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
-                        <input id="password" type="password" name="password" placeholder="输入密码"/>
+                        <input id="password" type="password" name="password" placeholder="Password"/>
                     </div>
                 </div>
-                <div class="ui error message"></div>
-                <div id="login" class="ui fluid submit button">登录</div>
+                <div id="login" class="ui fluid large teal submit button">登录</div>
             </div>
-        </div>
+
+            <div  class="ui error message"></div>
+
+        </form>
+
     </div>
 </div>
 
@@ -94,7 +97,7 @@
         this.password = password;
         $.ajax({
             type:'POST',
-            url:'/admin/Login',
+            url:'/admin/login',
             data:{
                 'username':this.username,'password':this.password
             },

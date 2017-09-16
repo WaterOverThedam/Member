@@ -86,10 +86,9 @@ public class UserCtrl {
             //获孩子所有信息
             List<Child> listChild = new ArrayList<Child>();
             Integer idFamily = user.getIdFamily();
-            String sqlUser = "declare @rest float=0,@dtend varchar(10)='';select @rest =sum(kss),@dtend =convert(varchar(10),max(dtend),120) from(select top 6 case when ht.crmzdy_81733324<getdate() then 0 else bmksb.crmzdy_81739422 end kss,ht.crmzdy_81733324 dtend from crm_zdytable_238592_25111_238592_view zx join crm_zdytable_238592_25115_238592_view" +
-                    " bmksb on zx.crmzdy_81611091_id= " + idFamily + " and bmksb.crmzdy_81756836_id=zx.id  and bmksb.crmzdy_81733119='销售'  and bmksb.crmzdy_81739422/*rest*/>0 join crm_zdytable_238592_23796_238592_view" +
-                    " ht on ht.id  =bmksb.crmzdy_81486464_id and datediff(d,getdate(),crmzdy_81733324/*dtDaoQi*/)>=0 order by bmksb.id  desc)bmksb;select hz.id  idhz,hz.crm_name name,hz.crmzdy_81497217 age,replace(isnull(hz.crmzdy_82017585,''),'''','\\\"')ranking,isnull(@rest,0) rest,isnull(@dtend,'无') dtend from crm_zdytable_238592_23893_238592_view hz where crmzdy_80653840_id=" + idFamily + "order by hz.id desc";
-
+            String sqlUser = "declare @rest float=0,@dtend varchar(10)='',@gym varchar(50)='';select @gym =max(case when xh=1 then gym end),@rest =sum(kss),@dtend =convert(varchar(10),max(dtend),120) from(select top 6 row_number() over(order by bmksb.id desc)xh,case when ht.crmzdy_81733324<getdate() then 0 else bmksb.crmzdy_81739422 end kss,ht.crmzdy_81733324 dtend,crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx join crm_zdytable_238592_25115_238592_view bmksb on zx.crmzdy_81611091_id= idFamily and bmksb.crmzdy_81756836_id=zx.id  and bmksb.crmzdy_81733119='销售' and bmksb.crmzdy_81739422/*rest*/>0 join crm_zdytable_238592_23796_238592_view ht on ht.id =bmksb.crmzdy_81486464_id and datediff(d,getdate(),crmzdy_81733324/*dtDaoQi*/)>=0)bmksb;select hz.id  idhz,hz.crm_name name,hz.crmzdy_81497217 age,replace(isnull(hz.crmzdy_82017585,''),'''','\\\"')ranking,isnull(@rest,0) rest,isnull(@dtend,'无') dtend,@gym gym from crm_zdytable_238592_23893_238592_view hz where crmzdy_80653840_id=idFamily order by hz.id desc";
+            sqlUser = sqlUser.replace("idFamily",idFamily.toString());
+            log.info(sqlUser);
             JSONArray childArray = oasisService.getResultJson(sqlUser);
             String str = childArray.toJSONString().replace("\\", "").replace("}\"", "}").replace("ranking\":\"\"", "ranking\":{}");
             str = "[" + str.replace(":\"{", ":{").replace("[", "").replace("]", "") + "]";
@@ -109,7 +108,7 @@ public class UserCtrl {
 
                 //中心列表及所选中心
                 if (null == session.getAttribute("listGym")) {
-                    String sqlGym = "select crmzdy_81620171 gymName,crmzdy_81620171_id gymId from crm_zdytable_238592_25111_238592_view where crmzdy_81611091_id =" + idFamily;
+                    String sqlGym = "select crmzdy_81620171 gymName,crmzdy_81620171_id gymId from crm_zdytable_238592_25111_238592_view where crmzdy_81611091_id =" + idFamily + " order by id desc";
                     JSONArray gymArray = oasisService.getResultJson(sqlGym);
                     listGym = JSONObject.parseArray(gymArray.toString(), Gym.class);
                 } else {
@@ -136,7 +135,7 @@ public class UserCtrl {
                     gymId = gymSelected.getGym().getGymId();
                     beginDate = gymSelected.getBeginDate();
                     endDate = gymSelected.getEndDate();
-                    String sqlClass = "select bj.crmzdy_80620202_id idgym,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq from " +
+                    String sqlClass = "select bj.crmzdy_80620202_id idgym,case when rq.crm_name>convert(varchar(5),getdate(),120)+'10-01' then rq.crmzdy_80695562-1 else rq.crmzdy_80695562 end weekNum,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq from " +
                             "crm_zdytable_238592_25118_238592_view bmks where bmks.crmzdy_81618215_id=" + idChild + "/*idhz*/ and bmks.crmzdy_81636525>='" + beginDate + "'/*dtbegin*/ and bmks.crmzdy_81636525<='" + endDate + "'/*dtend*/ and crmzdy_81619234='已报名' union all select crmzdy_80652349,crmzdy_80652340_id from crm_zdytable_238592_23696_238592_view bk where crmzdy_80658051_id=3519 and bk.crmzdy_81761865>='" + beginDate + "'/*dtbegin*/ and bk.crmzdy_81761865<='" + endDate + "'/*dtend*/)ks join crm_zdytable_238592_23870_238592_view rq on ks.idrq=rq.id join crm_zdytable_238592_23583_238592_view bj on rq.crmzdy_80650267_id=bj.id and bj.crmzdy_80620202_id=" + gymId + "/*idgym*/order by date desc";
                     //System.out.println(sqlClass);
                     JSONArray classArray = oasisService.getResultJson(sqlClass);
@@ -256,7 +255,7 @@ public class UserCtrl {
         }
         session.setAttribute("gymSelected", listGymSelectedSession);
 
-        String sqlClass = "select bj.crmzdy_80620202_id idgym,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq " +
+        String sqlClass = "select bj.crmzdy_80620202_id idgym,case when rq.crm_name>convert(varchar(5),getdate(),120)+'10-01' then rq.crmzdy_80695562-1 else rq.crmzdy_80695562 end weekNum,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq " +
                 "from crm_zdytable_238592_25118_238592_view bmks where bmks.crmzdy_81618215_id=" + idChild + " /*idhz*/ and bmks.crmzdy_81636525>='" + beginDate + "'/*dtbegin*/ and bmks.crmzdy_81636525<='" + endDate + "'/*dtend*/ and crmzdy_81619234='已报名' union all select crmzdy_80652349,crmzdy_80652340_id from crm_zdytable_238592_23696_238592_view bk where crmzdy_80658051_id=" + idChild + "  and bk.crmzdy_81761865>='" + beginDate + "'/*dtbegin*/ and bk.crmzdy_81761865<='" + endDate + "'/*dtend*/)ks join crm_zdytable_238592_23870_238592_view rq on ks.idrq=rq.id join crm_zdytable_238592_23583_238592_view bj on rq.crmzdy_80650267_id=bj.id and bj.crmzdy_80620202_id=" + idGym + "/*idgym*/order by date desc";
         classArray = oasisService.getResultJson(sqlClass);
 

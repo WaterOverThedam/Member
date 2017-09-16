@@ -82,23 +82,23 @@ public class LoginCtrl {
         Map<String, Object> returnMap = new HashMap<String, Object>();
         Map valNumMap = new HashMap();
         //验证码校验
-        if (session.getAttribute("valNumMap") != null) {
-            valNumMap = (HashMap) session.getAttribute("valNumMap");
-            if (valNumMap.get("valNum").equals(valnum) == false) {
-                throw new MyException(ResultEnum.CHECKSUM_WRONG);
-            }
-            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-            if (minsPass > 30) {
-                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
-            }
-        } else {
-            throw new MyException(ResultEnum.CHECKSUM_WRONG);
-        }
+//        if (session.getAttribute("valNumMap") != null) {
+//            valNumMap = (HashMap) session.getAttribute("valNumMap");
+//            if (valNumMap.get("valNum").equals(valnum) == false) {
+//                throw new MyException(ResultEnum.CHECKSUM_WRONG);
+//            }
+//            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+//            if (minsPass > 30) {
+//                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
+//            }
+//        } else {
+//            throw new MyException(ResultEnum.CHECKSUM_WRONG);
+//        }
 
 
         try {
-            String sqlExist = "select top 1 crmzdy_81778300 gym,crmzdy_81486367 city,crmzdy_80610671 addr,crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from crm_sj_238592_view  where charindex('" +username+"',crmzdy_81767199)>0";
-
+            String sqlExist = "select top 1 jt.id from crm_sj_238592 jt join crm_zdytable_238592_25111_238592 zx on zx.isdelete=0 and zx.crmzdy_81611091_id=jt.id and zx.crmzdy_81802303<>'' and jt.isdelete=0 and zx.isdelete=0 and charindex('" +username+"',jt.crmzdy_81767199)>0";
+            log.info(sqlExist);
             JSONArray jsonArray = oasisService.getResultJson(sqlExist);
             //是否是会员校验
             if (jsonArray == null){
@@ -237,15 +237,16 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/exist", method = RequestMethod.POST)
     @ResponseBody
-    public Result exist(String telephone) {
+    public Result exist(@RequestParam(name = "telephone") String username) {
         try {
-            if (userService.isReged(telephone) ){
+            if (userService.isReged(username) ){
                 throw new MyException(ResultEnum.REGISTER_USER_EXIST);
             }
         } catch (Exception e) {
                 throw e;
         }
-        String sqlExist = "select top 1 crm_surname name,id,crmzdy_80620120 tel,crmzdy_81802271 childname,crmzdy_81778300 zx from   crm_sj_238592_view  where charindex('" +telephone+"',crmzdy_81767199)>0";
+        String sqlExist = "select top 1 jt.id from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx where zx.crmzdy_81611091_id=jt.id and zx.crmzdy_81802303<>'' order by zx.id desc)zx where charindex('" +username+"',jt.crmzdy_81767199)>0";
+
         if (oasisService.getResultJson(sqlExist) != null){
             return ResultUtil.success(ResultEnum.REGISTER_ALLOW);
         }else{

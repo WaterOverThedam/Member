@@ -62,7 +62,7 @@ public class AdminCtrl {
 
     }
 
-    @PostMapping(value="/Login")
+    @PostMapping(value="/login")
     @ResponseBody
     public Map<String,Object>  adminLogin(HttpServletRequest request, String username,String password) throws Exception {
         Map<String,Object> returnMap = new HashMap<String,Object>();
@@ -86,53 +86,32 @@ public class AdminCtrl {
         return returnMap;
     }
 
-    @RequestMapping(value = {"","/index"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"","/index","/activity"}, method = RequestMethod.GET)
     public String adminIndex (HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                               @RequestParam(value = "size", defaultValue = "10") Integer size,
                               Model model) throws Exception {
-        //ToDo admin权限
         HttpSession session = request.getSession();
-        Object admin = session.getAttribute("admin");
-        if(admin==null){
-            return "redirect:/admin/login";
-        }
+        session.setAttribute("menuId","activity");
 
-        Object obj = session.getAttribute("menu");
-        if (obj==null) {
-            session.setAttribute("menu", menuEnum.ACTIVITY);
-        }
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
         Page<Activity> pages = activityDao.findAll(pageable);
         model.addAttribute("page", pages);
         return "/admin/index";
     }
-    @RequestMapping(value = "/{menu}.html", method = RequestMethod.GET)
-    public String adminIndex(@PathVariable("menu") String menu, HttpServletRequest request ,
+    @RequestMapping(value = "/theme", method = RequestMethod.GET)
+    public String adminIndex(HttpServletRequest request ,
                              @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
                              String keyword,Model model) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
 
-        session.setAttribute("menu", menuEnum.getMenu(menu));
+        HttpSession session = request.getSession();
+        session.setAttribute("menuId","theme");
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow, size, sort);
-
-        switch (menu){
-            case "activity":
-                Page<Activity> activityPages = activityDao.findAll(pageable);
-                model.addAttribute("page", activityPages);
-                break;
-            case "theme":
-                Page<Theme> themePages = themeDao.findAll(pageable);
-                model.addAttribute("page", themePages);
-                break;
-        }
+        Page<Theme> themePages = themeDao.findAll(pageable);
+        model.addAttribute("page", themePages);
 
         return "/admin/index";
     }

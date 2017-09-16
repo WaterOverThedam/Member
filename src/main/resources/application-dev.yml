@@ -8,6 +8,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  devtools:
+    restart:
+      enabled: true
 logging:
   path: d:/
   level: trace

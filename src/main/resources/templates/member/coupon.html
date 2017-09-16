@@ -29,19 +29,19 @@
                 <div class="tabs">
                     <div id="coupon_1" class="tab">
                         <!-- 我的优惠券 -->
-                        <div  th:switch="${not #maps.isEmpty(coupon) and coupon.success}"  class="card">
+                        <div  th:switch="${coupon.data==null}"  class="card">
                             <div class="card-header no-border no-padding ">
-                                        <div th:case="true" class="coupon-box">
-                                                    <a th:if="${not coupon.value.used}" href="javascript:void(0);" class="coupon" data-value="1"
-                                                       th:attr="data-type=${coupon['value']['type']}"> <img
+                                        <div th:case="false" class="coupon-box">
+                                                    <a th:if="${not coupon.data.used}" href="javascript:void(0);" class="coupon" data-value="1"
+                                                       th:attr="data-type=${coupon.data.type}"> <img
                                                             src="/images/member/coupon_unused.png"/>
                                                     </a>
 
-                                                    <a th:if="${coupon.value.used}" href="javascript:void(0);" class="coupon" data-value="0"><img
+                                                    <a th:if="${coupon.data.used}" href="javascript:void(0);" class="coupon" data-value="0"><img
                                                             src="/images/member/coupon_used.png"/> </a>
                                         </div>
 
-                                        <div th:case="false" class="coupon-box">
+                                        <div th:case="*" class="coupon-box">
                                             <div class="no-coupon text-center">
                                                 <img src="/images/member/no_coupon.png"/>
                                                 <p>您目前没有优惠券可用</p>
@@ -61,19 +61,19 @@
                     </div>
                     <div id="coupon_2" class="tab  active">
                         <!-- 我的兑换券 -->
-                        <div th:switch="${not #maps.isEmpty(coupon2)}" class="card">
+                        <div th:switch="${coupon2.data==null}" class="card">
                                 <div class="card-header no-border no-padding ">
-                                        <div th:case="true" class="coupon-box">
-                                                    <a th:if="${not coupon2['value']['used']}"  href="javascript:;" class="coupon" data-value="1"
-                                                       th:attr="data-type=${coupon2['value']['type']}"><img
+                                        <div th:case="false" class="coupon-box">
+                                                    <a th:if="${not coupon2.data.used}"  href="javascript:;" class="coupon" data-value="1"
+                                                       th:attr="data-type=${coupon2.data.type}"><img
                                                             src="/images/member/coupon_2_unused.jpg"/>
                                                     </a>
 
-                                                    <a th:if="${coupon2.value.used}" href="javascript:;" class="coupon" data-value="0"><img
+                                                    <a th:if="${coupon2.data.used}" href="javascript:;" class="coupon" data-value="0"><img
                                                             src="/images/member/coupon_2_used.jpg"/> </a>
                                         </div>
 
-                                        <div th:case="false" class="coupon-box">
+                                        <div th:case="*" class="coupon-box">
                                             <div class="no-coupon text-center">
                                                 <img src="/images/member/no_coupon.png"/>
                                                 <p>您目前没有兑换券可用</p>
@@ -147,15 +147,15 @@
             beforeSend: function () {
                 $.showIndicator();
             },
-            success: function (data) {
-                if (data.success == true) {
-                    $.toast("使用成功");
+            success: function (result) {
+                if (!result.code) {
+                    $.toast(result.msg);
                     setTimeout(function () {
                                 location.reload();
                             },
                             2000);
-                } else if (data.success == false) {
-                    $.alert("使用失败," + data.message);
+                } else  {
+                    $.alert("使用失败," + result.message);
                 }
             },
             complete: function () {

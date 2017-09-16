@@ -19,9 +19,9 @@ public class Theme {
     private Integer id;
     private Date createTime;
     private String name;
-    private Integer weekNum;
     private Date beginDate;
-    private Date endDate;
+    private Integer weekNum;
+    private String poster;
     private String videoSrc;
     private Boolean isShow;
     private Boolean isDelete;

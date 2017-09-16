@@ -148,7 +148,7 @@
                                                 <span th:text="${gymClass.course}" class="col-20  class"></span>
                                                 <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
                                                 </span>
-                                                <a onclick="'toTopic('+${gymClass.course}+')'"><span class="col-20 details">课程亮点</span></a>
+                                                <a clase="homework" th:attr="data-week=${gymClass.weekNum},data-course=${gymClass.course}"><span class="col-20 details">家庭作业</span></a>
                                              </li>
                                              <p  th:case="*" class="text-center">没有查询到课程</p>
                                         </ul>
@@ -371,7 +371,7 @@
                             divGymClass += "<span class='col-20  state'>";
                         }
                         divGymClass += content.kq + "</span>";
-                        divGymClass += "<a onclick='toTopic(\""+content.course+"\")'><span class='col-20 details'>课程亮点</span></a>";
+                        divGymClass += "<a class='homework' data-week='"+content.weekNum + "','" + "data-course='" + content.course + "'><span class='col-20 details'>家庭作业</span></a>";
                         divGymClass += "</li>";
                     });
                 } else {
@@ -428,15 +428,18 @@
         attend_ajax(gymId, gymName, CHILD_ID, $("#" + PAGE_ID + " .beginDate").val(), $("#" + PAGE_ID + " .endDate").val());
     }
 
-    function toTopic(course) {
+    $("#" + PAGE_ID + " .homework").click(function () {
+        alert(this.date("course"))
+        var course = this.date("course");
         if(course=="") {
             $.alert("敬请期待..." + course);
             return;
         }else{
-          location.href="/index/topic";
+            location.href="/index/topic";
 
         }
-    }
+    });
+
 
     function shareLink(){
         var link =location.href + '/share';
