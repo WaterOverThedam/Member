@@ -22,16 +22,11 @@
         <div class="ui segments">
 
             <div class="ui segment">
-                <div class="ui selection dropdown">
-                    <input name="gender" type="hidden" value="default"/>
-                    <i class="dropdown icon"></i>
-                        <div class="text" >待处理</div>
-                        <div class="menu">
-                            <div class="item" data-value="0">待处理</div>
-                            <div class="item" data-value="1">已处理</div>
-                            <div class="item" data-value="-1">全部</div>
-                        </div>
-                    </div>
+                    <select class="ui dropdown">
+                        <option value="0">待处理</option>
+                        <option value="1">已处理</option>
+                        <option value="-1">全部</option>
+                    </select>
                     <div class="ui blue statistic">
                         <div class="value" th:text="${page.totalElements}">
                         </div>
@@ -58,12 +53,12 @@
             </div>
             <div class="ui segment right aligned ">
                 <div class="ui buttons">
-                    <a th:href="@{/admin/feedback(page=${page.number-1})}"
-                       class="ui left labeled icon button" th:classappend="${page.number&lt;= 0}?'disabled'"><i
+                    <a href="#" th:attr="data_id=${page.number}"
+                       class="ui left labeled icon button item" th:classappend="${page.number&lt;= 0}?'disabled'"><i
                             class="left arrow icon"></i> 上一页 </a>
                     <a class="ui blue active button" th:text="${page.number+1}"></a>
-                    <a th:href="@{/admin/feedback(page=${page.number+1})}"
-                       class="ui right labeled icon button" th:classappend="${page.number+1&gt;page.totalPages}?'disabled'"><i
+                    <a href="#" th:attr="data_id=${page.number+2}"
+                       class="ui right labeled icon button item" th:classappend="${page.number+2&gt;page.totalPages}?'disabled'"><i
                             class="right arrow icon"></i> 下一页 </a>
                 </div>
             </div>
@@ -103,8 +98,9 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui black deny button">
-            关闭
+        <div class="ui black deny right labeled icon button">
+            稍候处理
+            <i class="remove icon"></i>
         </div>
         <div id="sign" data-id="" class="ui positive right labeled icon button">
             标记为已处理
@@ -115,7 +111,52 @@
 
 <script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
-<script>
+
+<script th:inline="JavaScript">
+        /*<![CDATA[*/
+    var page;
+    var type;
+    var pageNow=[[${page.number+1}]];
+    if(page=getUrlParam("pageNow")){
+        pageNow = page;
+    }
+    //alert(getUrlParam("type"))
+    if(type=getUrlParam("type")){
+        switch(type)
+        {
+            case '0':
+                $(".ui .dropdown").get(0).selectedIndex=0;
+                break;
+            case '1':
+                $(".ui .dropdown").get(0).selectedIndex=1;
+                alert(type);
+                break;
+            case '-1':
+                $(".ui .dropdown").get(0).selectedIndex=2;
+                alert(type);
+                break;
+            default:
+                $(".ui .dropdown").get(0).selectedIndex=0;
+        }
+
+    }
+
+     $(".ui .dropdown").change(function () {
+            url = "/admin/feedback?"+$.param({pageNow:pageNow,type:$(this).find("option:selected").val()})
+            window.location.href=url;
+     })
+
+
+      $(".item").click(function () {
+            var url = '/admin/feedback?'+$.param({pageNow:$(this).attr('data_id'),type:type});
+            window.location.href=url;
+      })
+
+     function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
 
     $(".feedback-details").on('click', function () {
         var that = $(this);
@@ -132,7 +173,7 @@
     function inFeedback(id) {
         $.ajax({
             type: 'POST',
-            url: '/admin/feedbackView',
+            url: '/admin/feedback',
             data: {
                 'id': id
             },
@@ -141,9 +182,9 @@
             dataType: "json",
             beforeSend: function () {
             },
-            success: function (data) {
-                if (data != null) {
-                    var feedback = data;
+            success: function (res) {
+                if (!res.code) {
+                    var feedback = res.data;
                     $("#feedback_tel").text(feedback.contactTel?feedback.contactTel:'无');
                     $("#feedback_tel").data('tel',feedback.contactTel?feedback.contactTel:'无');
                     $("#feedback_name").text(feedback.name);
@@ -193,8 +234,8 @@
             },
             contentType: "application/x-www-form-urlencoded",
             dataType: "json",
-            success: function (data) {
-                if (data.success == true) {
+            success: function (res) {
+                if (!res.code) {
                     location.reload();
                 } else {
                     alert("标记失败，请重试");
@@ -205,6 +246,9 @@
             }
         })
     }
+
+
+    /*]]>*/
 </script>
 </body>
 
