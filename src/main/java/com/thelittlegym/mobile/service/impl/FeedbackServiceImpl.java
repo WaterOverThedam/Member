@@ -30,6 +30,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Override
     public Page<Feedback> findAllByHandled(Integer type,Pageable pageable){
         Page<Feedback> feedbacks =null;
+        log.info(String.valueOf(type));
         switch(type) {
             case 0:
                 //未处理

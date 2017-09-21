@@ -18,12 +18,18 @@ public class Theme {
     @GeneratedValue
     private Integer id;
     private Date createTime;
-    private String name;
     private Date beginDate;
+    private String course;
     private Integer weekNum;
-    private String poster;
     private String videoSrc;
     private Boolean isShow;
-    private Boolean isDelete;
+    private String search;
 
+    @Override
+    public String toString() {
+        return "Theme{" +
+                "course='" + course + '\'' +
+                ", weekNum=" + weekNum.toString() +"周"+
+                '}';
+    }
 }

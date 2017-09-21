@@ -46,14 +46,11 @@ public class saveUtil {
         try {
 
             Theme theme = new Theme();
-            theme.setId(1);
             theme.setCreateTime(toDate(request.getParameter("beginDate")));
-            theme.setName(request.getParameter("name"));
             theme.setIsShow(Boolean.parseBoolean(request.getParameter("isShow")));
             theme.setWeekNum(Integer.parseInt(request.getParameter("weekNum")));
             theme.setVideoSrc(returnMap.get("path").toString());
             theme.setBeginDate(toDate(request.getParameter("beginDate")));
-            theme.setIsDelete(false);
             themeDao.save(theme);
         }
         catch (Exception e)

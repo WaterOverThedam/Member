@@ -44,7 +44,6 @@
                                 <div class="content" >
                                     <a href="javascript:;" th:attr="data-id=${feedback.id}" class="item feedback-details"
                                        th:text="${#strings.length(feedback.details)&gt;40}? ${#strings.substring(feedback.details,0,40)}:(${#strings.trim(feedback.details)==''}?'无':${feedback.details})">
-
                                     </a>
                                     <div class="ui orange  right tag label" th:text="${feedback.type}"></div>
                                 </div>
@@ -53,6 +52,8 @@
             </div>
             <div class="ui segment right aligned ">
                 <div class="ui buttons">
+                    <a href="#" th:attr="data_id=1"
+                       class="ui button item" > 首页</a>
                     <a href="#" th:attr="data_id=${page.number}"
                        class="ui left labeled icon button item" th:classappend="${page.number&lt;= 0}?'disabled'"><i
                             class="left arrow icon"></i> 上一页 </a>
@@ -60,6 +61,8 @@
                     <a href="#" th:attr="data_id=${page.number+2}"
                        class="ui right labeled icon button item" th:classappend="${page.number+2&gt;page.totalPages}?'disabled'"><i
                             class="right arrow icon"></i> 下一页 </a>
+                    <a href="#" th:attr="data_id=${page.totalPages}"
+                       class="ui button item" > 尾页</a>
                 </div>
             </div>
         </div>
@@ -129,11 +132,9 @@
                 break;
             case '1':
                 $(".ui .dropdown").get(0).selectedIndex=1;
-                alert(type);
                 break;
             case '-1':
                 $(".ui .dropdown").get(0).selectedIndex=2;
-                alert(type);
                 break;
             default:
                 $(".ui .dropdown").get(0).selectedIndex=0;

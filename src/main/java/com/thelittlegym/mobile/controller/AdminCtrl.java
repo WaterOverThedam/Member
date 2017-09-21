@@ -3,16 +3,17 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lly835.bestpay.rest.type.Post;
+import com.thelittlegym.mobile.common.JsonService;
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
-import com.thelittlegym.mobile.enums.menuEnum;
-import com.thelittlegym.mobile.service.*;
-import com.thelittlegym.mobile.utils.saveUtil;
+import com.thelittlegym.mobile.service.IAdminService;
+import com.thelittlegym.mobile.service.IFeedbackService;
+import com.thelittlegym.mobile.service.ILoginService;
+import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.IOException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -54,7 +54,8 @@ public class AdminCtrl {
     private IFeedbackService feedbackService;
     @Autowired
     private IUserService userService;
-
+    @Autowired
+    private JsonService jsonService;
     @GetMapping(value="/login")
     public String adminToLogin(HttpServletRequest request) throws Exception {
 
@@ -99,21 +100,59 @@ public class AdminCtrl {
         model.addAttribute("page", pages);
         return "/admin/index";
     }
-    @RequestMapping(value = "/theme", method = RequestMethod.GET)
+
+    @GetMapping(value = "/theme")
     public String adminIndex(HttpServletRequest request ,
                              @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
-                             String keyword,Model model) throws Exception {
+                             @RequestParam(value = "kw", defaultValue = "") String keyword,
+                             Model model) throws Exception {
 
         HttpSession session = request.getSession();
+        //Json同步数据
+        //        List<Theme> themes =jsonService.getThemeData();
+        //        if(themes!=null){
+        //            themeDao.save(themes);
+        //        }
         session.setAttribute("menuId","theme");
 
+        keyword = "%" + keyword + "%";
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        Pageable pageable = new PageRequest(pageNow, size, sort);
-        Page<Theme> themePages = themeDao.findAll(pageable);
+        Pageable pageable = new PageRequest(pageNow-1, size, sort);
+        Theme theme = new Theme();
+        Page<Theme> themePages = themeDao.findAllBySearchLike(keyword,pageable);
+        log.info(String.valueOf(themePages.getTotalElements()));
+
         model.addAttribute("page", themePages);
 
-        return "/admin/index";
+       return  "/admin/index";
+    }
+
+
+
+    @PostMapping(value = "/theme")
+    @ResponseBody
+    public Result adminIndex(HttpServletRequest request) throws Exception {
+
+        Integer id=Integer.parseInt(request.getParameter("id"));
+        Boolean isShow = Boolean.parseBoolean(request.getParameter("isShow"));
+        Theme theme = themeDao.findOne(id);
+        theme.setIsShow(isShow);
+        Theme res = themeDao.save(theme);
+        if(res!=null){
+            return ResultUtil.success();
+        }else{
+            return ResultUtil.error();
+        }
+    }
+
+
+    @GetMapping(value = "/themeDel")
+    @ResponseBody
+    public Result themeDel(Integer id) throws Exception {
+        themeDao.delete(id);
+        return ResultUtil.success();
+
     }
 
     @RequestMapping(value = "/add/{menu}", method = RequestMethod.GET)
@@ -173,47 +212,28 @@ public class AdminCtrl {
 
 
 
-    @RequestMapping(value = "/themeAdd")
+    @PostMapping(value = "/themeAdd")
     @ResponseBody
-    public HashMap Add(HttpServletRequest request, MultipartFile videoFile, @PathVariable String menu) throws Exception {
-        String name=request.getParameter("name");
-        String type=request.getParameter("type");
-        String weekNum=request.getParameter("weekNum");
+    public Result  themeAdd(HttpServletRequest request) throws Exception {
 
-        //System.out.println(menu);
-        HashMap<String, Object> returnMap = new HashMap<String, Object>();
-        try {
-            // 获取图片原始文件名
-            String originalFilename = videoFile.getOriginalFilename();
-
-            // 获取上传图片的扩展名(jpg/png/...)
-            String extension = FilenameUtils.getExtension(originalFilename);
-
-            // 图片上传的相对路径（因为相对路径放到页面上就可以显示图片）
-            String path = "/upload/video/" + type + "/" +type+ "_" +weekNum + "." + extension.toUpperCase();
-
-            // 图片上传的绝对路径
-            String url = request.getSession().getServletContext().getRealPath("") + path;
-
-            String urlHttp = "/upload/video/" + type + "/" + weekNum + "." + "MP4";
-            File dir = new File(url);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            // 上传图片
-            videoFile.transferTo(new File(url));
-
-            returnMap.put("success", true);
-            returnMap.put("path", path);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            returnMap.put("success", false);
-            returnMap.put("message", "请重新登录后再试");
-        }
-
-        return returnMap;
+        String course =request.getParameter("course");
+        log.info(course);
+        String course_id=request.getParameter("course_id");
+        String weekNum =request.getParameter("weekNum");
+        String videoSrc = "/upload/video/"+course_id+"_"+ weekNum+".mp4";
+        String dtBegin=request.getParameter("dtBegin");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = sdf.parse( dtBegin );
+        Theme theme = new Theme();
+        theme.setIsShow(true);
+        theme.setCourse(course);
+        theme.setBeginDate(date);
+        theme.setWeekNum(Integer.parseInt(weekNum));
+        theme.setVideoSrc(videoSrc);
+        theme.setCreateTime(new Date());
+        theme.setSearch(theme.toString());
+        themeDao.save(theme);
+        return ResultUtil.success();
     }
 
 
@@ -373,10 +393,10 @@ public class AdminCtrl {
 
 
 
-
     @RequestMapping(value="/feedback",method = RequestMethod.GET)
-    public String feedback(HttpServletRequest request,@RequestParam(value = "page", defaultValue = "0",required = false) Integer pageNow,
-                           @RequestParam(value = "size", defaultValue = "7",required = false) Integer size,
+    public String feedback(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1",required = false) Integer pageNow,
+                           @RequestParam(value = "size", defaultValue = "8",required = false) Integer size,
+                           @RequestParam(value = "type", defaultValue = "0",required = false) Integer type,
                            Model model) throws Exception {
         HttpSession session = request.getSession();
         Object sessionObj = session.getAttribute("admin");
@@ -384,58 +404,40 @@ public class AdminCtrl {
             return "/admin/login";
         }
 
-        //TODO 切换反馈类型等操作
-//        Object typeObj = session.getAttribute("selectedFeedback");
-        String type = "0";
-//        type = request.getParameter("type");
-//        if (null == type || "".equals(type)){
-//            if(null == typeObj || "".equals(typeObj)){
-//                type = "0";
-//            }else{
-//                type = typeObj.toString();
-//            }
-//        }
-       log.info(pageNow.toString());
-//        session.setAttribute("selectedFeedback",type);
-//        session.setAttribute("selectedFeedback",type);
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        Pageable pageable = new PageRequest(pageNow, size, sort);
-        Page<Feedback> feedbackPages = feedbackService.findAllByHandled(1,pageable);
+        Pageable pageable = new PageRequest(pageNow-1, size, sort);
+        Page<Feedback> feedbackPages = feedbackService.findAllByHandled(type,pageable);
         model.addAttribute("page", feedbackPages);
         return "/admin/feedback";
     }
 
 
-    @RequestMapping(value="/feedbackView",method = RequestMethod.POST)
+    @PostMapping(value="/feedback")
     @ResponseBody
-    public JSONObject feedbackView(HttpServletRequest request, String id) throws Exception {
+    public Result feedbackView(HttpServletRequest request, String id) throws Exception {
         Integer fid = -1;
         if (null != id && id.matches("[0-9]+")){
             fid = Integer.parseInt(id);
         }
-        log.info(id);
 
         Feedback feedback = feedbackService.findOne(fid);
-        log.info(feedback.toString());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         String name = "".equals(feedback.getName()) ? "匿名":feedback.getName();
-        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(feedback);
-        jsonObject.put("createTime",sdf.format(feedback.getCreateTime()));
-        jsonObject.put("name",name);
-        return jsonObject;
+
+        return ResultUtil.success(feedback);
     }
 
     @RequestMapping(value="/sign",method = RequestMethod.POST)
     @ResponseBody
-    public Boolean sign(HttpServletRequest request, String id) throws Exception {
+    public Result sign(HttpServletRequest request, String id) throws Exception {
         Integer fid = -1;
         JSONObject jsonObject = new JSONObject();
         if (null != id && id.matches("[0-9]+")){
             fid = Integer.parseInt(id);
             feedbackService.handle(fid);
-            return true;
+            return ResultUtil.success();
         }else{
-            return false;
+            return ResultUtil.error();
         }
     }
 
