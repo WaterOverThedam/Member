@@ -11,4 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ThemeDao extends JpaRepository<Theme,Integer> {
     Page<Theme> findAllBySearchLike(String keyword, Pageable pageable);
+    Theme findFirstByCourseAndWeekNum(String course,Integer WeekNum);
 }

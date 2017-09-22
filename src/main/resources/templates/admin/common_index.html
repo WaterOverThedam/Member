@@ -25,7 +25,7 @@
             <div class="ui segment">
                 <div class="ui two column stackable grid">
                     <div class="column">
-                        <a href="@{/admin/add/activity}" class="ui primary button">新建活动</a>
+                        <a th:href="@{/admin/activityAdd}" class="ui primary button">新建活动</a>
                     </div>
                     <div class="column right aligned">
                         <select name="skills" multiple="" class="ui multiple search selection dropdown">
@@ -39,13 +39,17 @@
             </div>
             <div class="ui segment right aligned">
                 <div class="ui buttons">
-                    <a href="@{/admin(pageNow=${pages.current-1})}"
-                       class="ui  left labeled icon button" th:classappend="${page.number &lt;= 1}? 'disabled'"><i
+                    <a href="#" th:attr="data_id=1"
+                       class="ui button item" > 首页</a>
+                    <a href="#" th:attr="data_id=${page.number}"
+                       class="ui left labeled icon button item" th:classappend="${page.number&lt;= 0}?'disabled'"><i
                             class="left arrow icon"></i> 上一页 </a>
-                    <a class="ui blue active button" th:text="${page.number}"></a>
-                    <a href="@{/admin(pageNow=${page.current+1})}"
-                       class="ui right labeled icon button" th:classappend="${page.number+1 &gt; page.totalPages}? 'disabled'"><i
+                    <a class="ui blue active button" th:text="${page.number+1}"></a>
+                    <a href="#" th:attr="data_id=${page.number+2}"
+                       class="ui right labeled icon button item" th:classappend="${page.number+2&gt;page.totalPages}?'disabled'"><i
                             class="right arrow icon"></i> 下一页 </a>
+                    <a href="#" th:attr="data_id=${page.totalPages}"
+                       class="ui button item" > 尾页</a>
                 </div>
             </div>
             <div class="ui segment">
@@ -109,10 +113,25 @@
         </a>
     </div>
 </div>
-<script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
-<script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
 <script th:inline="JavaScript">
     /*<![CDATA[*/
+    var page;
+    var city;
+    var pageNow=[[${page.number+1}]];
+    if(page=getUrlParam("pageNow")){
+        pageNow = page;
+    }
+
+    if(type=getUrlParam("city")){
+
+alert(type)
+    }
+
+    $(".ui.button.item").click(function () {
+        var url = '/admin/index?'+$.param({pageNow:$(this).attr('data_id'),type:type});
+        window.location.href=url;
+    }),
+
     $('.ui.dropdown').dropdown();
     $("#menu").on('click', function () {
         $(".ui.sidebar").sidebar('toggle');
@@ -164,9 +183,9 @@
 
 <!--家庭作业-->
 <body th:fragment="theme">
+
 <div th:substituteby="/admin/common_admin :: menu">
 </div>
-
 <div class="pusher">
     <div class="ui masthead  segment">
         <div class="ui container">
@@ -182,88 +201,253 @@
             <div class="ui segment">
                 <div class="ui two column stackable grid">
                     <div class="column left aligned">
-                        <a href="@{/admin/add/activity}" class="ui primary button">新建主题</a>
+                        <a id="add" href="#" class="ui primary button">新建主题视频</a>
                     </div>
                     <div class="column right aligned">
                         <div class="ui search">
-                            <div class="ui icon input">
-                                <input class="prompt" type="text" placeholder="关键字"/>
-                                <i class="search icon"></i>
-                            </div>
-                            <div class="results"></div>
+                            <a class="ui icon input" th:id="${page.number+1}">
+                                <input  class="prompt" type="text" placeholder="关键字"/>
+                                <i style="cursor:pointer"  class="search icon"></i>
+                            </a>
                         </div>
+                        <div class="results"></div>
                     </div>
                 </div>
             </div>
-            <div class="ui segment">
-                <table class="ui selectable celled table">
+        </div>
+        <div class="ui segment">
+            <table class="ui selectable celled table">
                 <thead>
-                <tr class="positive"><th><div class="ui ribbon label">项目</div></th>
-                    <th>标题</th>
-                    <th>标题</th>
-                    <th>启用</th>
+                <tr class="positive" >
+                    <th><div class="ui ribbon label">主题课程</div></th>
+                    <th>学期开始日期</th>
+                    <th>第几周</th>
+                    <th>视频名称</th>
+                    <th>是否启用</th>
+                    <th>删除</th>
                 </tr></thead>
                 <tbody>
-                <tr>
+                <tr  th:unless="${#lists.isEmpty(page.content)}" th:each="theme : ${page.content}">
+                    <td th:text="${theme.course}"></td>
+                    <td th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
+                    <td class="tip"  data-position="top left" th:text="${theme.weekNum}"></td>
+                    <td th:text="${theme.videoSrc}"></td>
                     <td>
-                        First
-                    </td>
-                    <td>Cell</td>
-                    <td>Cell</td>
-                    <td>
-                        <div class="ui toggle checkbox">
-                            <input type="checkbox" name="public"/>
+                        <div  class="ui toggle checkbox">
+                            <input class="isShow" th:attr="data_id=${theme.id}" th:checked="${theme.isShow}" type="checkbox" name="public"/>
                             <label></label>
+
                         </div>
+
                     </td>
+                    <td><a class="del" href="#" th:attr="data_id=${theme.id}">删除</a></td>
 
                 </tr>
-                <tr>
-                    <td>Cell</td>
-                    <td>Cell</td>
-                    <td>Cell</td>
-                    <td>
-                        <div class="ui toggle checkbox">
-                            <input type="checkbox" name="public"/>
-                            <label></label>
-                        </div>
-                    </td>
+                <tr  th:if="${#lists.isEmpty(page.content)}"><td colspan="4" style="text-align: center">
+                    <div   class="ui pointing red  label">
+                        OOPS! No Record!
+                    </div>
+                </td></tr>
 
-                </tr>
-                <tr>
-                    <td>Cell</td>
-                    <td>Cell</td>
-                    <td>Cell</td>
-                    <td>
-                        <div class="ui toggle checkbox">
-                            <input type="checkbox" name="public"/>
-                            <label></label>
-                        </div>
-                    </td>
-
-                </tr>
                 </tbody>
                 <tfoot>
-                <tr><th colspan="4">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
+                <tr><th colspan="6">
+                    <div class="ui right floated pagination menu" >
+
+                        <a th:if="${page.number &gt; 0}" th:attr="data_id=${page.number}"  class="icon item">
                             <i class="left chevron icon"></i>
                         </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
+
+                        <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item"></a>
+
+                        <a th:if="${page.number &lt; page.totalPages-1}" th:attr="data_id=${page.number+2}" class="icon item">
                             <i class="right chevron icon"></i>
                         </a>
+
                     </div>
                 </th>
                 </tr></tfoot>
-                </table>
-            </div>
+            </table>
         </div>
     </div>
 </div>
-</body>
 
+
+<div class="ui mini modal">
+    <div class="header">
+        提示
+    </div>
+    <div class="content">
+        <p>操作失败</p>
+    </div>
+    <div class="actions">
+        <div onclick="window.location.reload()" class="ui positive right labeled icon button">
+            确定
+        </div>
+    </div>
+</div>
+
+<div id="formAdd" class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        新增
+    </div>
+    <div class="content">
+
+        <form class="ui form segment">
+            <div class="one fields">
+                <div class="field">
+                    <label>主题课程</label>
+                    <input name="course_id" type="hidden" value="funnyBug"/>
+                    <input name="course" type="text" value="趣味小虫"/>
+                </div>
+                <div class="field">
+                    <label>学期开始日期</label>
+                    <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
+                </div>
+                <div class="field">
+                    <label>第几周</label>
+                    <input name="weekNum" type="text" placeholder="输入数字" value=""/>
+                </div>
+
+            </div>
+
+            <div class="ui blue submit button">Submit</div>
+            <div class="ui reset button">Reset</div>
+        </form>
+    </div>
+
+</div>
+
+<div class="ui tiny modal">
+    <div class="header">
+        提示
+    </div>
+    <div class="content">
+        <p>是否确定删除？</p>
+    </div>
+    <div class="actions">
+        <div id="sure" class="ui positive button">
+            确定<i class="checkmark icon"></i>
+        </div>
+        <div onclick="window.location.reload()" class="ui black deny button">
+            取消<i class="remove icon"></i>
+        </div>
+    </div>
+</div>
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+    $(".tip").each(function () {
+        $(this).attr("data-tooltip",$(this).text())
+    })
+
+
+    if(kw=getUrlParam('kw')){
+        $(".prompt").val(kw)
+    };
+
+    $("#add").click(function() {
+        $('#formAdd').modal('show');
+    });
+    $(".del").click(function(){
+        $('#sure').attr('onclick','del('+$(this).attr("data_id")+')')
+        $('.ui.tiny.modal').modal('show');
+        $(this).parent().parent().hide();
+    });
+    function del(id) {
+        $.get("/admin/themeDel",{id:id}, function(data){
+            if(data.code){
+                result();
+            }
+        })
+    }
+    function result(sucess,data) {
+        var dialog = $('.ui.mini.modal');
+
+        if(!sucess){
+            data = data ? data : "操作失败";
+        }else {
+            data = data ? data : "操作成功";
+        }
+        data = "<p>"+data+"</p>"
+        dialog.find("content").html(data)
+        $('.ui.mini.modal').modal('show');
+    }
+    $(".isShow").click(function(){
+        var origin = !this.checked
+        var current =$(this);
+        $.post("/admin/theme",{id:$(this).attr('data_id'),isShow:this.checked}, function(data){
+            if(data.code){
+                result();
+            };
+
+        })
+
+    })
+
+    $(".search .icon ").on("keydown change keyup",function (event) {
+        if(event.keyCode==13){
+            var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
+            window.location.href=url;
+        }
+
+    })
+
+
+    $(".item").click(function () {
+        var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
+        window.location.href=url;
+
+    })
+
+
+    //validation
+
+    $('.ui.form')
+        .form({
+            fields: {
+
+                dtBegin: {
+                    identifier : 'dtBegin',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : '请输入正确的日期'
+                        }
+                    ]
+                },
+                weekNum: {
+                    identifier  : 'weekNum',
+                    rules: [
+                        {
+                            type   : 'integer',
+                            prompt : '请输入正确的数字'
+                        }
+                    ]
+                }
+            },
+
+            onSuccess: function(e) {
+                alert('submit')
+                $.ajax({
+                    type: 'post',
+                    url: '/admin/themeAdd',
+                    data:  $(".ui.form").serialize(),
+                    success: function(res) {
+                        if(re.code){
+                            result();
+                        }else{
+                           // window.location.reload();
+                        }
+                  }
+                });
+
+            }
+        })
+    ;
+
+    /*]]>*/
+</script>
+</body>
 </html>

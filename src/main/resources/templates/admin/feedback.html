@@ -4,9 +4,12 @@
 </head>
 
 
+
+
 <body>
 <div th:substituteby="/admin/common_admin :: menu">
 </div>
+
 
 <div class="pusher">
     <div class="ui masthead  segment">
@@ -20,35 +23,34 @@
     </div>
     <div class="ui container">
         <div class="ui segments">
-
             <div class="ui segment">
-                    <select class="ui dropdown">
-                        <option value="0">待处理</option>
-                        <option value="1">已处理</option>
-                        <option value="-1">全部</option>
-                    </select>
-                    <div class="ui blue statistic">
-                        <div class="value" th:text="${page.totalElements}">
-                        </div>
-                        <div class="label">
-                            已处理反馈
-                        </div>
+                <select class="ui dropdown">
+                    <option value="0">待处理</option>
+                    <option value="1">已处理</option>
+                    <option value="-1">全部</option>
+                </select>
+                <div class="ui blue statistic">
+                    <div class="value" th:text="${page.totalElements}">
                     </div>
+                    <div class="label">
+                        已处理反馈
+                    </div>
+                </div>
             </div>
             <div class="ui segment">
-                    <div class="ui ordered list" th:unless="${#lists.isEmpty(page.content)}">
-                        <div class="ui dimmer">
-                            <div class="ui text loader">加载中</div>
-                        </div>
-                            <div class="item" th:each="feedback : ${page.content}">
-                                <div class="content" >
-                                    <a href="javascript:;" th:attr="data-id=${feedback.id}" class="item feedback-details"
-                                       th:text="${#strings.length(feedback.details)&gt;40}? ${#strings.substring(feedback.details,0,40)}:(${#strings.trim(feedback.details)==''}?'无':${feedback.details})">
-                                    </a>
-                                    <div class="ui orange  right tag label" th:text="${feedback.type}"></div>
-                                </div>
-                            </div>
+                <div class="ui ordered list" th:unless="${#lists.isEmpty(page.content)}">
+                    <div class="ui dimmer">
+                        <div class="ui text loader">加载中</div>
                     </div>
+                    <div class="item" th:each="feedback : ${page.content}">
+                        <div class="content" >
+                            <a href="javascript:;" th:attr="data-id=${feedback.id}" class="item feedback-details"
+                               th:text="${#strings.length(feedback.details)&gt;40}? ${#strings.substring(feedback.details,0,40)}:(${#strings.trim(feedback.details)==''}?'无':${feedback.details})">
+                            </a>
+                            <div class="ui orange  right tag label" th:text="${feedback.type}"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="ui segment right aligned ">
                 <div class="ui buttons">
@@ -112,11 +114,11 @@
     </div>
 </div>
 
-<script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
-<script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
+
+
 
 <script th:inline="JavaScript">
-        /*<![CDATA[*/
+    /*<![CDATA[*/
     var page;
     var type;
     var pageNow=[[${page.number+1}]];
@@ -142,21 +144,25 @@
 
     }
 
-     $(".ui .dropdown").change(function () {
-            url = "/admin/feedback?"+$.param({pageNow:pageNow,type:$(this).find("option:selected").val()})
-            window.location.href=url;
-     })
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
+
+    $(".ui .dropdown").change(function () {
+        url = "/admin/feedback?"+$.param({pageNow:pageNow,type:$(this).find("option:selected").val()})
+        window.location.href=url;
+    })
 
 
-      $(".item").click(function () {
-            var url = '/admin/feedback?'+$.param({pageNow:$(this).attr('data_id'),type:type});
-            window.location.href=url;
-      })
+    $(".button.item").click(function () {
+        var url = '/admin/feedback?'+$.param({pageNow:$(this).attr('data_id'),type:type});
+        window.location.href=url;
+    })
 
-     function getUrlParam(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-            var r = window.location.search.substr(1).match(reg); //匹配目标参数
-            if (r != null) return unescape(r[2]); return null; //返回参数值
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
     }
 
     $(".feedback-details").on('click', function () {
@@ -252,5 +258,6 @@
     /*]]>*/
 </script>
 </body>
+
 
 </html>

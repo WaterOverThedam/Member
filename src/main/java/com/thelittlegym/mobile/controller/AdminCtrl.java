@@ -90,12 +90,13 @@ public class AdminCtrl {
     @RequestMapping(value = {"","/index","/activity"}, method = RequestMethod.GET)
     public String adminIndex (HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                               @RequestParam(value = "size", defaultValue = "10") Integer size,
+                              @RequestParam(value = "city", defaultValue = "") Integer city,
                               Model model) throws Exception {
         HttpSession session = request.getSession();
         session.setAttribute("menuId","activity");
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        Pageable pageable = new PageRequest(pageNow, size, sort);
+        Pageable pageable = new PageRequest(pageNow-1, size, sort);
         Page<Activity> pages = activityDao.findAll(pageable);
         model.addAttribute("page", pages);
         return "/admin/index";
@@ -155,18 +156,17 @@ public class AdminCtrl {
 
     }
 
-    @RequestMapping(value = "/add/{menu}", method = RequestMethod.GET)
-    public String activityToAdd(@PathVariable("menu") String menu, HttpServletRequest request, Model model) throws Exception {
-        HttpSession session = request.getSession();
-        //TODO
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
+    @GetMapping(value = "/activityAdd")
+    public String activityToAdd( @RequestParam(value = "id",required = false) Integer id,Model model) throws Exception {
+        Activity activity=null;
+        if (id != null){
+             activity = activityDao.findOne(id);
         }
-        return "/admin/" + menu + "Add";
+        model.addAttribute("activity",activity);
+        return "/admin/activityAdd";
     }
 
-    @RequestMapping(value = "/activityAdd")
+    @RequestMapping(value = "/activityHandle")
     @ResponseBody
     public HashMap Add(HttpServletRequest request, MultipartFile file) throws Exception {
         String gym = request.getParameter("gym");
@@ -393,7 +393,7 @@ public class AdminCtrl {
 
 
 
-    @RequestMapping(value="/feedback",method = RequestMethod.GET)
+    @GetMapping(value="/feedback")
     public String feedback(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1",required = false) Integer pageNow,
                            @RequestParam(value = "size", defaultValue = "8",required = false) Integer size,
                            @RequestParam(value = "type", defaultValue = "0",required = false) Integer type,

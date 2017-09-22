@@ -21,7 +21,7 @@
     </div>
     <div class="ui container">
         <div class="ui segments">
-            <form class="ui form segment" action="/admin/activityAdd" method="POST" enctype="multipart/form-data">
+            <form class="ui form segment" action="/admin/activityHandle" method="POST" enctype="multipart/form-data">
 
                 <div class="field">
                     <label>活动头图</label>
@@ -48,19 +48,19 @@
                 <div class="fields">
                     <div class="field">
                         <label>活动类别</label>
-                        <input name="type" type="text" value="测试类别" placeholder="First Name"/>
+                        <input name="type" type="text" placeholder="测试类别"/>
                     </div>
                     <div class="field">
                         <label>活动收费类型</label>
-                        <input name="chargeType" value="测试类型" type="text" placeholder="Last Name"/>
+                        <input name="chargeType"   type="text" placeholder="Last Name"/>
                     </div>
                     <div class="field">
                         <label>活动针对人群</label>
-                        <input name="crowd" type="text" value="测试人群" placeholder="Last Name"/>
+                        <input name="crowd" type="text"  placeholder="测试人群"/>
                     </div>
                     <div class="field">
                         <label>运动强度</label>
-                        <input name="strength" type="text" value="测试强度" placeholder="Last Name"/>
+                        <input name="strength" type="text"   placeholder="测试强度"/>
                     </div>
                 </div>
                 <button type="submit" class="ui primary submit button">保存</button>
@@ -69,9 +69,10 @@
         </div>
     </div>
 </div>
-<script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
-<script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
-<script>
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+    var activity = [[${activity}]];
     $('.ui.dropdown').dropdown();
     $("#menu").on('click', function () {
         $(".ui.sidebar").sidebar('toggle');
@@ -91,10 +92,19 @@
                     type: 'empty',
                     chargeType: 'empty',
                     crowd: 'empty',
-                    strength: 'empty'
+                    strength:  'empty'
                 }
             })
     ;
+
+    $('.ui form')
+    .form('set values', {
+        name     : 'Jack',
+        detail   : 'male',
+        type : 'youdliketoknow'
+
+    })
+    /*]]>*/
 </script>
 </body>
 

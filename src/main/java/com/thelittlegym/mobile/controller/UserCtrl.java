@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.common.WeixinService;
+import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
@@ -21,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +52,8 @@ public class UserCtrl {
     private IPointsService pointsService;
     @Value("${upload-path}")
     private String filePath;
+    @Autowired
+    private ThemeDao themeDao;
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -164,10 +164,17 @@ public class UserCtrl {
         return "/member/index";
     }
 
-    @RequestMapping(value = "/topic", method = RequestMethod.GET)
-    public String details(HttpServletRequest request) throws Exception {
+    @GetMapping(value = "/topic")
+    @ResponseBody
+    public Result topic(String course,Integer weekNum) throws Exception {
+        log.info("{}-{}",course,weekNum);
+        Theme theme = themeDao.findFirstByCourseAndWeekNum(course,weekNum);
+        if(theme!=null){
+            return ResultUtil.success(ResultEnum.SUCCESS,theme.getVideoSrc());
+        }else{
+            return ResultUtil.error();
+        }
 
-        return "/member/topic";
 
     }
 
@@ -198,7 +205,7 @@ public class UserCtrl {
 
 
     @RequestMapping(value = "/myinfo", method = RequestMethod.GET)
-    public String myinfo(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name,String age,Model model) throws Exception {
+    public String myinfo(@SessionAttribute("gymSelected") GymSelected gymSelected ,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name,String age,Model model) throws Exception {
         try {
 
             //我的信息
