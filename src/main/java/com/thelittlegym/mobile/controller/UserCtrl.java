@@ -154,7 +154,7 @@ public class UserCtrl {
             Boolean in3000 = userService.isNum(user.getTel(), 3000);
             session.setAttribute("gymSelected", gymSelected);
             session.setAttribute("listGym", listGym);
-
+            //log.info(gymSelected.toString());
             model.addAttribute("listChild", listChild);
             model.addAttribute("weixinMap", weixinMap);
             model.addAttribute("in3000", in3000);
@@ -205,7 +205,7 @@ public class UserCtrl {
 
 
     @RequestMapping(value = "/myinfo", method = RequestMethod.GET)
-    public String myinfo(@SessionAttribute("gymSelected") GymSelected gymSelected ,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idhz, String name,String age,Model model) throws Exception {
+    public String myinfo(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String gymName,String idhz, String name,String age,Model model) throws Exception {
         try {
 
             //我的信息
@@ -217,12 +217,14 @@ public class UserCtrl {
 
             // Map<String, Object> couponMap = couponService.getCoupon_http(tel);
             //18751609081
-            pointsService.updatePoints_http(tel);
+           // pointsService.updatePoints_http(tel);
 
             JSONObject childObj = new JSONObject();
             childObj.put("idhz", idhz);
             childObj.put("name", name);
             childObj.put("age", age);
+            childObj.put("age", age);
+            childObj.put("gymSelected", gymName);
 
             model.addAttribute("listContract", contractArr);
             model.addAttribute("child", childObj);
@@ -298,7 +300,7 @@ public class UserCtrl {
 
             //缩略图PATH
             String urlNoExtension = realPath  +  "/" + name;
-            String urlHttp = relativePath  + "/"  + name + "." + "jpg";
+            String urlHttp = "/files" + relativePath  + "/"  + name + "." + "jpg";
             File dir = new File(realPath);
             if (!dir.exists()) {
                 dir.mkdirs();

@@ -41,8 +41,7 @@
                             <div class="header-img">
                                 <img th:src="${session.user.head_src}" onerror="this.src='/images/member/head.png'"/>
                             </div>
-                            <a class="header-text external"
-                               th:href="@{/index/myinfo(idhz=${child.idhz},name=${child.name},age=${child.age})}">
+                            <a class="header-text external"  href="javascript:void(0)" th:attr="idhz=${child.idhz},name=${child.name},age=${child.age}">
                                 <div class="header-p">
                                     <p th:text="'年龄：'+${child['age']}"></p>
                                     <p th:text="'剩余课时：'+${child['rest']}+'节课'"> </p>
@@ -141,16 +140,16 @@
                                     class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
                                 <div class="swiper-wrapper">
                                     <div class="swiper-slide swiper-slide-active">
-                                        <ul th:switch="${not #lists.isEmpty(child.gymClasses)}" class="details_list">
-                                            <li th:case="true" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
+                                        <ul  th:with="has =${not #lists.isEmpty(child.gymClasses)}" class="details_list">
+                                            <li th:if="${has}" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
                                                 <span th:text="${#calendars.format(gymClass.date,'yyyy-MM-dd')}" class="col-20  date"></span>
                                                 <span th:text="${gymClass.time}" class="col-20  time"></span>
                                                 <span th:text="${gymClass.course}" class="col-20  class"></span>
                                                 <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
                                                 </span>
-                                                <a clase="homework" th:attr="data-week=${gymClass.weekNum},data-course=${gymClass.course}"><span class="col-20 details">家庭作业</span></a>
+                                                <a clase="homework" th:href="${'javascript:toTopic('''+gymClass.course+''','+gymClass.weekNum+')'}"><span class="col-20 details">家庭作业</span></a>
                                              </li>
-                                             <p  th:case="*" class="text-center">没有查询到课程</p>
+                                             <p  th:unless="${has}" class="text-center">没有查询到课程</p>
                                         </ul>
                                     </div>
                                 </div>
@@ -173,6 +172,8 @@
     var PAGE_ID;
     var CHILD_ID;
     var CHILD_INDEX;
+    //var child=[[${listChild[1]}]];
+    var gymSelected =[[${session.gymSelected.gym.gymName}]];
 
     $(document).on("pageInit", function (e, pageId, $page) {
         CHILD_ID = $page.data("id");
@@ -371,7 +372,7 @@
                             divGymClass += "<span class='col-20  state'>";
                         }
                         divGymClass += content.kq + "</span>";
-                        divGymClass += "<a class='homework' data-week='"+content.weekNum + "','" + "data-course='" + content.course + "'><span class='col-20 details'>家庭作业</span></a>";
+                        divGymClass += "<a href='#' onclick='toTopic(\""+content.course+"\",\""+content.weekNum+"\")'><span class='col-20 details'>家庭作业</span></a>";
                         divGymClass += "</li>";
                     });
                 } else {
@@ -422,23 +423,46 @@
     });
 
 
+    $(".header-text.external").click(function () {
+        url = "/index/myinfo?"
+        url += $.param({idhz:$(this).attr("idhz"),name:$(this).attr("name"),age:$(this).attr("age"),gymName:gymSelected});
+        window.location.href = url;
+    })
+
+
     function gym_change(gymName, gymId) {
         $("#" + PAGE_ID + " .gym-select .gym-name").text($.trim(gymName));
         $("#" + PAGE_ID + " .gym-select").data("id", gymId);
+        gymSelected = $.trim(gymName);
+        //alert(gymSelected);
         attend_ajax(gymId, gymName, CHILD_ID, $("#" + PAGE_ID + " .beginDate").val(), $("#" + PAGE_ID + " .endDate").val());
     }
 
-    $("#" + PAGE_ID + " .homework").click(function () {
-        alert(this.date("course"))
-        var course = this.date("course");
-        if(course=="") {
-            $.alert("敬请期待..." + course);
-            return;
-        }else{
-            location.href="/index/topic";
 
-        }
-    });
+    function toTopic(course,weeknum) {
+        $.ajax({
+            type: 'GET',
+            url: '/index/topic',
+            // data to be added to query string:
+            data: { course: course, weekNum :weeknum},
+            // type of data we are expecting in return:
+            dataType: 'json',
+            timeout: 300,
+            success: function(result){
+                if(!result) {
+                    $.alert("敬请期待..." );
+                    return;
+                }else{
+                    location.href="/topic.html?"+$.param({src:result.data});
+
+                }
+            },
+            error: function(xhr, errorType, error){
+                $.alert("敬请期待..." );
+                console.log(course+ ":" + error)
+            }
+        })
+    }
 
 
     function shareLink(){

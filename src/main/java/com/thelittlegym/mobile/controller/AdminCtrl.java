@@ -8,6 +8,7 @@ import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.IAdminService;
 import com.thelittlegym.mobile.service.IFeedbackService;
 import com.thelittlegym.mobile.service.ILoginService;
@@ -220,7 +221,7 @@ public class AdminCtrl {
         log.info(course);
         String course_id=request.getParameter("course_id");
         String weekNum =request.getParameter("weekNum");
-        String videoSrc = "/upload/video/"+course_id+"_"+ weekNum+".mp4";
+        String videoSrc = "/files/video/"+course_id+"_"+ weekNum+".mp4";
         String dtBegin=request.getParameter("dtBegin");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date = sdf.parse( dtBegin );
@@ -241,11 +242,7 @@ public class AdminCtrl {
 
     @RequestMapping(value = "/edit/{menu}", method = RequestMethod.GET)
     public String activityToEdit(@PathVariable("menu") String menu, HttpServletRequest request, Model model, Integer id) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
+
         Activity activity = activityDao.findOne(id);
         model.addAttribute("activity", activity);
         return "/admin/activityEdit";
@@ -253,11 +250,7 @@ public class AdminCtrl {
 
     @RequestMapping(value = "/edit/{menu}", method = RequestMethod.POST)
     public String activityEdit(@PathVariable("menu") String menu, HttpServletRequest request, MultipartFile banner, String name, String detail, String  beginDate, String endDate, String type, String chargeType, String crowd, String strength) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
+
         Integer id = Integer.parseInt(request.getParameter("id"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
         Activity activity = new Activity();
@@ -286,34 +279,10 @@ public class AdminCtrl {
         return "redirect:/admin";
     }
 
-    @RequestMapping(value = "/del/{menu}", method = RequestMethod.GET)
-    public String activityDel(@PathVariable("menu") String menu, HttpServletRequest request, Integer id) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
-        HashMap<String, Object> returnMap = new HashMap<String, Object>();
-        Activity activity  = new Activity();
-        if(null != id && !"".equals(id)){
-            activity = activityDao.findOne(id);
-            if ( null != activity ){
-                activity.setIsDelete(true);
-                activityDao.save(activity);
-            }
-        }
-        activityDao.save(activity);
-        return "redirect:/admin";
-    }
-
 
     @RequestMapping(value = "/simulation", method = RequestMethod.GET)
     public String simulation(HttpServletRequest request, Model model) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null) {
-            return "/admin/login";
-        }
+
         String tel = request.getParameter("tel");
         Long totalMember = userService.getTotal();
 
@@ -328,13 +297,11 @@ public class AdminCtrl {
 
     @RequestMapping(value = "/member", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> member(HttpServletRequest request, String tel)  {
+    public Result member(HttpServletRequest request, String tel)  {
         HttpSession session = request.getSession();
-        Map<String,Object> returnMap = new HashMap<String,Object>();
-        Map<String,Object> map = null;
         try {
-            map = loginService.login(tel);
-            Object object = map.get("value");
+            Result result = loginService.login(tel);
+            Object object = result.getData();
             if (object != null) {
                 User user = (User) object;
                 session = request.getSession(true);
@@ -351,27 +318,12 @@ public class AdminCtrl {
                 }
 
                 session.setAttribute("user", user);
-                returnMap.put("success",true);
-                returnMap.put("message","登录成功");
+                return result;
             }
         } catch (Exception e) {
-            returnMap.put("success",false);
-            returnMap.put("message","登录异常，请重试");
+                throw e;
         }
-        //获取user实体
-        Object object = map.get("value");
-        if (object != null) {
-            User user = (User) object;
-            Object objSession = session.getAttribute("user");
-
-            session.setAttribute("user", user);
-            returnMap.put("result",ResultEnum.LOGIN_SUCCESS);
-            returnMap.put("message","登录成功");
-            return returnMap;
-        }else {
-            returnMap.put("result",ResultEnum.LOGIN_USER_NO_EXIST);
-            return returnMap;
-        }
+             return ResultUtil.error();
     }
 
     @RequestMapping(value = "/activityView", method = RequestMethod.POST)
@@ -398,11 +350,6 @@ public class AdminCtrl {
                            @RequestParam(value = "size", defaultValue = "8",required = false) Integer size,
                            @RequestParam(value = "type", defaultValue = "0",required = false) Integer type,
                            Model model) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow-1, size, sort);
@@ -452,11 +399,6 @@ public class AdminCtrl {
     public String actUser(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                           @RequestParam(value = "size", defaultValue = "20") Integer size,
                           Model model) throws Exception {
-        HttpSession session = request.getSession();
-        Object sessionObj = session.getAttribute("admin");
-        if (sessionObj == null){
-            return "/admin/login";
-        }
 
         Sort sort = new Sort(Sort.Direction.DESC,"createTime");
         Pageable pageable =new PageRequest(pageNow,size,sort);

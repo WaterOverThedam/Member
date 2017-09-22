@@ -16,5 +16,5 @@ public interface ILoginService {
     public Result register(String username, String password, String email,Family family);
 
     //管理员模拟登录
-    public Map<String,Object> login(String username);
+    public Result login(String username);
 }

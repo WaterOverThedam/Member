@@ -183,7 +183,6 @@ alert(type)
 
 <!--家庭作业-->
 <body th:fragment="theme">
-
 <div th:substituteby="/admin/common_admin :: menu">
 </div>
 <div class="pusher">
@@ -394,6 +393,9 @@ alert(type)
 
     })
 
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
 
     $(".item").click(function () {
         var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});

@@ -70,8 +70,7 @@ public class LoginServiceImpl implements ILoginService {
 
    //后台登陆时用
     @Override
-    public Map<String, Object> login(String username)  {
-        Map<String,Object> returnMap = new HashMap<String,Object>();
+    public Result login(String username)  {
         User user = new User();
         try {
             user = userDao.findOneByUsername(username);
@@ -79,11 +78,10 @@ public class LoginServiceImpl implements ILoginService {
             log.error(e.getMessage());
         }
         if(user != null){
-                returnMap.put("value", user);
-                returnMap.put("result", ResultEnum.LOGIN_SUCCESS);
+            return ResultUtil.success(user);
+
         }else{
-            returnMap.put("result", ResultEnum.LOGIN_USER_NO_EXIST);
+            throw new MyException(ResultEnum.LOGIN_USER_NO_EXIST);
         }
-        return returnMap;
     }
 }

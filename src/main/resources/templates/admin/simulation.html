@@ -67,11 +67,11 @@
             },
             contentType: "application/x-www-form-urlencoded",
             dataType: "json",
-            success: function (data) {
-                if (data.success == true) {
+            success: function (res) {
+                if (!res.code) {
                     location.href="/index";
                 } else {
-                    var errmessage = '<ul><li>' +  data.message + '</li></ul>'
+                    var errmessage = '<ul><li>' +  res.msg + '</li></ul>'
                     $(".ui.error.message").html(errmessage);
                     $(".ui.error.message").fadeIn();
                 }
