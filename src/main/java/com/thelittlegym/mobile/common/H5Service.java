@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
  */
 @Service
 public class H5Service {
-    private static final String URL = "http://h5.qq125.com/2017/04/coupon2/loadcoupon.php?tel=";
+    private static final String URL = "http://h5.qq125.com/2017/06/coupon/loadcoupon.php?tel=";
     @Autowired
     private HttpService httpService;
 
