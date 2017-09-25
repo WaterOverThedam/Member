@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.JsonService;
 import com.thelittlegym.mobile.dao.ActivityDao;
+import com.thelittlegym.mobile.dao.PageLogDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
@@ -55,6 +56,8 @@ public class AdminCtrl {
     private IFeedbackService feedbackService;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private PageLogDao pageLogDao;
     @Autowired
     private JsonService jsonService;
     @GetMapping(value="/login")
@@ -386,6 +389,28 @@ public class AdminCtrl {
         }else{
             return ResultUtil.error();
         }
+    }
+
+    @GetMapping(value="/pageLog")
+    public String statView(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1",required = false) Integer pageNow,
+                           @RequestParam(value = "size", defaultValue = "8",required = false) Integer size,
+                           Model model) throws Exception {
+
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Pageable pageable = new PageRequest(pageNow-1, size, sort);
+        HttpSession session = request.getSession();
+        session.setAttribute("menuId","pageLog");
+        Page<PageLog> page = pageLogDao.findAll(pageable);
+        model.addAttribute("page",page);
+        return "/admin/index";
+    }
+
+    @PostMapping(value="/pageLog")
+    public String statData(HttpServletRequest request, String id) throws Exception {
+
+        HttpSession session = request.getSession();
+        session.invalidate();
+        return "/admin/index";
     }
 
     @RequestMapping(value="/exit",method = RequestMethod.GET)

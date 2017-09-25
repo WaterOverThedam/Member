@@ -34,14 +34,15 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     public Result getCoupon_http(String tel) {
         try {
-            //是否已存，已存则不去调接口
+            //是否已存一次记录，已存则不去调接口
             Coupon c = couponDao.findOneByTelAndType(tel,"1");
             if (null != c) {
                 return ResultUtil.success(ResultEnum.COUPON_EXISTS,c);
             }
             tel = tel.trim();
             JSONArray couponArr = h5Service.getByType(tel, "coupon");
-//            JSONObject couponObject = couponArr.getJSONObject(0);
+
+//          JSONObject couponObject = couponArr.getJSONObject(0);
             if (null != couponArr ) {
                 //优惠券
                 Coupon coupon = new Coupon();
@@ -51,8 +52,13 @@ public class CouponServiceImpl implements ICouponService {
                 coupon.setType("1");
                 coupon.setUsed(false);
                 coupon.setTel(tel);
-                couponDao.save(coupon);
-                return ResultUtil.success(ResultEnum.COUPON_SYNC_SUCCESS,coupon);
+                Coupon res = couponDao.save(coupon);
+
+                if(res!=null) {
+                    return ResultUtil.success(ResultEnum.COUPON_SYNC_SUCCESS, res);
+                }else {
+                    return ResultUtil.error(ResultEnum.SAVE_FAILURE);
+                }
             } else {;
                 return ResultUtil.error(ResultEnum.COUPON_SYNC_EMPTY);
             }

@@ -246,7 +246,15 @@ function regsister_ajax(username, valnum, password, email) {
     this.username = username;
     this.password = $.md5(password);
     this.email = email;
-    $.ajax({
+    var check = $("#reg_tel").data("data");
+    if (check && check.code){
+        layer.open({
+            content: check.msg
+            , skin: 'msg'
+            , time: 2 //2秒后自动关闭
+        });
+    }else {
+      $.ajax({
         type: "POST",
         url: "/login/register",
         data: {"username": this.username, "valnum": this.valnum, "password": this.password, "email": this.email},
@@ -272,7 +280,8 @@ function regsister_ajax(username, valnum, password, email) {
                 });
             }
         }
-    });
+      });
+    }
 }
 
 
@@ -284,8 +293,8 @@ function exist_ajax(telephone) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            console.log(data);
             if (data.code) {
+                $("#reg_tel").data("data",data);
                 if (data.msg == "该号码非会员"){
                     layer.open({
                         content: '系统中没有显示此手机号码,点击是与我们联系'
@@ -301,9 +310,9 @@ function exist_ajax(telephone) {
                     });
                 }else{
                     layer.open({
-                        content: data.message
+                        content: data.msg
                         , skin: 'msg'
-                        , time: 3 //2秒后自动关闭
+                        , time: 2//2秒后自动关闭
                     });
                 }
 
@@ -328,7 +337,7 @@ function exist_ajax_changePass(telephone) {
         success: function (data) {
             if (data.code) {
                     layer.open({
-                        content: telephone+'未注册，无法修改密码'
+                        content: data.msg
                         , skin: 'msg'
                         , time: 3 //2秒后自动关闭
                     });

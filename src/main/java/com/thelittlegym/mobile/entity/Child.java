@@ -10,7 +10,7 @@ import java.util.Map;
  */
 @Data
 public class Child {
-    private String idhz;
+    private Integer idhz;
     private String name;
     private String age;
     private String gym;

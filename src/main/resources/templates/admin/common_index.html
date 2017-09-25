@@ -228,7 +228,7 @@ alert(type)
                 <tbody>
                 <tr  th:unless="${#lists.isEmpty(page.content)}" th:each="theme : ${page.content}">
                     <td th:text="${theme.course}"></td>
-                    <td th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
+                    <td id="dt" th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
                     <td class="tip"  data-position="top left" th:text="${theme.weekNum}"></td>
                     <td th:text="${theme.videoSrc}"></td>
                     <td>
@@ -338,7 +338,240 @@ alert(type)
 <script th:inline="JavaScript">
     /*<![CDATA[*/
     $(".tip").each(function () {
-        $(this).attr("data-tooltip",$(this).text())
+        var weekNum = parseInt($(this).text());
+        dtFirst = ($(this).parent().find("#dt").text())
+        tip = date_start(dtFirst,weekNum)+" - "+date_end(dtFirst,weekNum+1)
+        $(this).attr("data-tooltip",tip)
+        $(this).next().attr("data-tooltip",tip)
+    })
+
+
+    if(kw=getUrlParam('kw')){
+        $(".prompt").val(kw)
+    };
+
+    $("#add").click(function() {
+        $('#formAdd').modal('show');
+    });
+    $(".del").click(function(){
+        $('#sure').attr('onclick','del('+$(this).attr("data_id")+')')
+        $('.ui.tiny.modal').modal('show');
+        $(this).parent().parent().hide();
+    });
+    function del(id) {
+        $.get("/admin/themeDel",{id:id}, function(data){
+            if(data.code){
+                result();
+            }
+        })
+    }
+    function result(sucess,data) {
+        var dialog = $('.ui.mini.modal');
+
+        if(!sucess){
+            data = data ? data : "操作失败";
+        }else {
+            data = data ? data : "操作成功";
+        }
+        data = "<p>"+data+"</p>"
+        dialog.find("content").html(data)
+        $('.ui.mini.modal').modal('show');
+    }
+    $(".isShow").click(function(){
+        var origin = !this.checked
+        var current =$(this);
+        $.post("/admin/theme",{id:$(this).attr('data_id'),isShow:this.checked}, function(data){
+            if(data.code){
+                result();
+            };
+
+        })
+
+    })
+
+    $(".search .icon ").on("keydown change keyup",function (event) {
+        if(event.keyCode==13){
+            var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
+            window.location.href=url;
+        }
+
+    })
+
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
+
+    $(".item").click(function () {
+        var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
+        window.location.href=url;
+
+    })
+
+    //validation
+    $('.ui.form')
+        .form({
+            fields: {
+
+                dtBegin: {
+                    identifier : 'dtBegin',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : '请输入正确的日期'
+                        }
+                    ]
+                },
+                weekNum: {
+                    identifier  : 'weekNum',
+                    rules: [
+                        {
+                            type   : 'integer',
+                            prompt : '请输入正确的数字'
+                        }
+                    ]
+                }
+            },
+
+            onSuccess: function(e) {
+                alert('submit')
+                $.ajax({
+                    type: 'post',
+                    url: '/admin/themeAdd',
+                    data:  $(".ui.form").serialize(),
+                    success: function(res) {
+                        if(re.code){
+                            result();
+                        }else{
+                           // window.location.reload();
+                        }
+                  }
+                });
+
+            }
+        })
+    ;
+
+    /*]]>*/
+</script>
+</body>
+
+
+
+<!--访问记录统计-->
+<body th:fragment="pageLog">
+<div th:substituteby="/admin/common_admin :: menu">
+</div>
+<div class="pusher">
+    <div class="ui masthead  segment">
+        <div class="ui container">
+            <div class="ui breadcrumb">
+                <a class="section" id="menu">Home</a>
+                <i class="right angle icon divider"></i>
+                <div class="active section"  >访问记录统计</div>
+            </div>
+        </div>
+    </div>
+    <div class="ui container">
+        <div class="ui segments">
+            <div class="ui segment">
+                <div class="ui two column stackable grid">
+                    <div class="ui tabular menu">
+                        <a class="active item">
+                            汇总
+                        </a>
+                        <a class="item">
+                            明细
+                        </a>
+                    </div>
+                    <div class="column right aligned">
+                        <div class="ui search">
+                            <a class="ui icon input" th:id="${page.number+1}">
+                                <input  class="prompt" type="text" placeholder="关键字"/>
+                                <i style="cursor:pointer"  class="search icon"></i>
+                            </a>
+                        </div>
+                        <div class="results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:substituteby="/admin/page :: stat_sum" > </div>
+
+    </div>
+</div>
+
+
+<div class="ui mini modal">
+    <div class="header">
+        提示
+    </div>
+    <div class="content">
+        <p>操作失败</p>
+    </div>
+    <div class="actions">
+        <div onclick="window.location.reload()" class="ui positive right labeled icon button">
+            确定
+        </div>
+    </div>
+</div>
+
+<div id="formAdd" class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        新增
+    </div>
+    <div class="content">
+
+        <form class="ui form segment">
+            <div class="one fields">
+                <div class="field">
+                    <label>主题课程</label>
+                    <input name="course_id" type="hidden" value="funnyBug"/>
+                    <input name="course" type="text" value="趣味小虫"/>
+                </div>
+                <div class="field">
+                    <label>学期开始日期</label>
+                    <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
+                </div>
+                <div class="field">
+                    <label>第几周</label>
+                    <input name="weekNum" type="text" placeholder="输入数字" value=""/>
+                </div>
+
+            </div>
+
+            <div class="ui blue submit button">Submit</div>
+            <div class="ui reset button">Reset</div>
+        </form>
+    </div>
+
+</div>
+
+<div class="ui tiny modal">
+    <div class="header">
+        提示
+    </div>
+    <div class="content">
+        <p>是否确定删除？</p>
+    </div>
+    <div class="actions">
+        <div id="sure" class="ui positive button">
+            确定<i class="checkmark icon"></i>
+        </div>
+        <div onclick="window.location.reload()" class="ui black deny button">
+            取消<i class="remove icon"></i>
+        </div>
+    </div>
+</div>
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+    $(".tip").each(function () {
+        var weekNum = parseInt($(this).text());
+        dtFirst = ($(this).parent().find("#dt").text())
+        tip = date_start(dtFirst,weekNum)+" - "+date_end(dtFirst,weekNum+1)
+        $(this).attr("data-tooltip",tip)
+        $(this).next().attr("data-tooltip",tip)
     })
 
 
@@ -404,8 +637,6 @@ alert(type)
     })
 
 
-    //validation
-
     $('.ui.form')
         .form({
             fields: {
@@ -440,16 +671,16 @@ alert(type)
                         if(re.code){
                             result();
                         }else{
-                           // window.location.reload();
+                            // window.location.reload();
                         }
-                  }
+                    }
                 });
 
             }
         })
     ;
-
     /*]]>*/
 </script>
 </body>
+
 </html>

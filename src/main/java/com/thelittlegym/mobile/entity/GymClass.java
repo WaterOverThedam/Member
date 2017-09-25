@@ -9,6 +9,7 @@ import java.util.Date;
  */
 @Data
 public class GymClass {
+    private Integer idChild;
     private String idgym;
     private Date date;
     private String time;

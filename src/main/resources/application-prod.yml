@@ -9,5 +9,7 @@ spring:
     hibernate:
       ddl-auto: update
 logging:
-  path: d:/
+  path: E:\tomcat8\apache-tomcat-8.0.42\logs\mylogs
   level: trace
+
+filePath: E:\tomcat8\apache-tomcat-8.0.42\files

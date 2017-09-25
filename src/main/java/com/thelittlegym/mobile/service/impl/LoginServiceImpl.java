@@ -51,12 +51,14 @@ public class LoginServiceImpl implements ILoginService {
             User user = new User();
             user.setUsername(username);
             user.setPassword(password);
-            user.setTel(username);
+            user.setTel(family.getTel());
             user.setEmail(email);
             user.setIdFamily(family.getId());
-            user.setGym(family.getGym());
-            user.setCity(family.getCity());
             user.setAddr(family.getAddr());
+            user.setChildname(family.getChildname());
+            user.setCity(family.getCity());
+            user.setGym(family.getGym());
+            user.setIdzx(family.getIdzx());
             user.setCreateTime(new Date());
             user.setIsDelete(false);
             User value = userDao.save(user);

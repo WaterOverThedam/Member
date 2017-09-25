@@ -6,7 +6,7 @@
 	<groupId>com.thelittlegym.mobile</groupId>
 	<artifactId>Member</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>member</name>
 	<description>会员club</description>
@@ -87,12 +87,6 @@
 		</dependency>
 
 
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
@@ -138,13 +132,12 @@
 
 
 		<!--外置tomcat-->
-		<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		-->
+
 	</dependencies>
 
 

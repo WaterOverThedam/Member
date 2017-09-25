@@ -7,8 +7,11 @@ import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.PointsDao;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.Points;
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.service.IPointsService;
+import com.thelittlegym.mobile.utils.ResultUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +21,8 @@ import java.util.*;
  * Created by hibernate on 2017/6/21.
  */
 @Service
+@Slf4j
 public class PointsServiceImpl implements IPointsService {
-    private static final String url = "http://h5.qq125.com/2017/04/coupon2/loadcoupon.php?tel=";
 
     @Autowired
     private PointsDao pointsDao;
@@ -29,21 +32,16 @@ public class PointsServiceImpl implements IPointsService {
     private H5Service h5Service;
     @Autowired
     private OasisService oasisService;
-    @Override
-    public Map<String, Object> updatePoints_http(String tel) throws Exception {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
-        Integer g_points;
+
+    public Result updatePoints_http(String tel, Integer pointed) throws Exception {
         Integer addPoints;
         Points p = pointsDao.findOneByTel(tel);
-        User u = userDao.findOneByTel(tel);
-        Integer idjt = u.getIdFamily();
         JSONArray resArr = h5Service.getByType(tel, "points");
         Integer http_num = 0;
         String zx = "";
 
         if (resArr != null) {
-            for (Object jObject :
-                    resArr) {
+            for (Object jObject : resArr) {
                 JSONObject item = (JSONObject) jObject;
                 if ("zx".equals(item.getString("type"))) {
                     zx = item.getString("val");
@@ -53,31 +51,11 @@ public class PointsServiceImpl implements IPointsService {
                     http_num = item.getInteger("total") * 2000;
                 }
             }
-        } else {
-            return null;
         }
 
-        //本地已存在
-        if (null != p) {
-            g_points = p.getNum();
-            //检查积分是否一致
-            if (http_num == g_points) {
-                returnMap.put("success", false);
-                returnMap.put("value", p);
-                returnMap.put("message", "校对一致，无需更新");
-            } else {
-                //更新积分
-                p.setNum(http_num);
-                pointsDao.save(p);
-                addPoints = Math.abs(http_num - g_points);
-                //TODO 增加积分
-                boolean isUpdate = oasisService.addPoints(idjt.toString(),addPoints,zx);
-                returnMap.put("success", true);
-                returnMap.put("value", p);
-                returnMap.put("message", "积分更新");
-            }
-        } else {
-            //本地不存在
+        //本地留存
+        if (null == p) {
+            //本地不存在创建
             Points p2 = new Points();
             p2.setNum(http_num);
             p2.setZx(zx);
@@ -85,12 +63,25 @@ public class PointsServiceImpl implements IPointsService {
             p2.setCreateTime(new Date());
             p2.setTel(tel);
             pointsDao.save(p2);
-            addPoints = http_num;
-            //TODO 增加积分
-            oasisService.addPoints(idjt.toString(),addPoints,zx);
+        }else{
+            //更新积分
+            p.setNum(http_num);
+            pointsDao.save(p);
         }
-        return returnMap;
+
+        if (pointed!=null && http_num > pointed) {
+            addPoints = Math.abs(http_num - pointed)*2000;
+            //TODO 增加积分
+            User u = userDao.findOneByTel(tel);
+            Integer idjt = u.getIdFamily();
+            boolean isUpdate = oasisService.addPoints(idjt.toString(),addPoints,zx);
+            return  isUpdate? ResultUtil.success(addPoints):ResultUtil.error("同步失败");
+        }  else{
+            return ResultUtil.error("校对一致，无需更新");
+        }
+
     }
+
 
 
 }

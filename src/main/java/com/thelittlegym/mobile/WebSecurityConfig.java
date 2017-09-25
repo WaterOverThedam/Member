@@ -3,11 +3,15 @@
  */
 package com.thelittlegym.mobile;
 
+import com.thelittlegym.mobile.dao.PageLogDao;
+import com.thelittlegym.mobile.entity.PageLog;
+import com.thelittlegym.mobile.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
@@ -15,6 +19,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import java.util.Date;
+
 
 @Configuration
 @Slf4j
@@ -40,7 +47,6 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         InterceptorRegistration addInterceptor = registry.addInterceptor(getSecurityInterceptor());
 
-
         // 排除配置
         addInterceptor.excludePathPatterns("/noaccess.html");
         addInterceptor.excludePathPatterns("/forgetPass.html");
@@ -58,10 +64,13 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
     }
 
     private class SecurityInterceptor extends HandlerInterceptorAdapter {
-
+        @Autowired
+        PageLogDao pageLogDao;
+        PageLog pageLog = new PageLog();
         @Override
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
                 throws Exception {
+            log.info("..............intercepted.................");
             HttpSession session = request.getSession();
             String requestUri = request.getRequestURI();
             String linkId = request.getParameter("linkId");
@@ -69,9 +78,8 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                 session.setAttribute("linkId", linkId);
             }
 
-
-            log.info(requestUri);
-            log.info(String.valueOf(requestUri.indexOf("admin")));
+            //log.info(requestUri);
+            //log.info(String.valueOf(requestUri.indexOf("admin")));
             Object admin = session.getAttribute("admin");
             if(requestUri.indexOf("admin")!=-1 && admin==null){
                 String url = "/admin/login";
@@ -80,14 +88,22 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
             }
 
             Object user = session.getAttribute("user");
-            if (requestUri.indexOf("admin")==-1 && user == null) {
-                // 跳转登录
-                String url = "/login.html";
-                response.sendRedirect(url);
-                return false;
+            if (requestUri.indexOf("admin")==-1) {
+                if (user == null) {
+                    // 跳转登录
+                    String url = "/login.html";
+                    response.sendRedirect(url);
+                    return false;
+                }else {
+                    User u = (User) user;
+                    pageLog.setCreateTime(new Date());
+                    pageLog.setPageURL(requestUri);
+                    pageLog.setRequestType(request.getMethod());
+                    pageLog.setUserName(u.getUsername());
+                    pageLog.setSearch(pageLog.toString());
+                    pageLogDao.save(pageLog);
+                }
             }
-
-
 
             return true;
         }

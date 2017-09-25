@@ -11,154 +11,170 @@
     <link rel="stylesheet" href="/css/gym.css"/>
     <link rel="stylesheet" href="/css/animate.css"/>
     <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+    <style>
 
+        video::-webkit-media-controls-enclosure {
+            overflow:hidden;
+        }
+        video::-webkit-media-controls-panel {
+            width: calc(100% + 30px);
+        }
+        video {
+            object-fit: fill
+        }
+
+
+        .modal-text {
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
 <div class="page-group">
-        <div class="page" th:each="child,childStat : ${listChild}" th:classappend="${childStat.count==1}?' page-current'"
-             th:attr="data-index = ${childStat.count},data-name =${child.name},data-id=${child.idhz},id='child'+${childStat.count}">
-            <div class="content">
-                <div class="card">
-                    <div class="card-header no-border gym-card-title">
+    <div class="page" th:each="child,childStat : ${listChild}" th:classappend="${childStat.count==1}?' page-current'"
+         th:attr="data-index = ${childStat.count},data-name =${child.name},data-id=${child.idhz},id='child'+${childStat.count}">
+        <div class="content">
+            <div class="card">
+                <div class="card-header no-border gym-card-title">
 
-                                <a th:if="${childStat.count-1> 0}" th:href="'#child'+${childStat.count-1}" >
-                                    <i class="fa fa-angle-double-left"></i>
-                                    <small>返回上一位宝宝</small>
-                                </a>
-                                 <label class="child-name"  th:text="${child.name}"></label>
-                                <a th:href="'#child'+ ${childStat.count+1>childStat.size?1:childStat.count+1}">
-                                    <small>查询另一位宝宝</small>
-                                    <i class="fa fa-angle-double-right"></i>
-                                </a>
+                    <a th:if="${childStat.count-1> 0}" th:href="'#child'+${childStat.count-1}" >
+                        <i class="fa fa-angle-double-left"></i>
+                        <small>返回上一位宝宝</small>
+                    </a>
+                    <label class="child-name"  th:text="${child.name}"></label>
+                    <a th:if="${childStat.size>1}" th:href="'#child'+ ${childStat.count+1>childStat.size?1:childStat.count+1}">
+                        <small>查询另一位宝宝</small>
+                        <i class="fa fa-angle-double-right"></i>
+                    </a>
 
 
-                    </div>
                 </div>
-                <div class="card">
-                    <div class="card-header no-padding no-border card-backinfo">
-                        <i></i>
-                        <div class="gym-header">
-                            <div class="header-img">
-                                <img th:src="${session.user.head_src}" onerror="this.src='/images/member/head.png'"/>
-                            </div>
-                            <a class="header-text external"  href="javascript:void(0)" th:attr="idhz=${child.idhz},name=${child.name},age=${child.age}">
-                                <div class="header-p">
-                                    <p th:text="'年龄：'+${child['age']}"></p>
-                                    <p th:text="'剩余课时：'+${child['rest']}+'节课'"> </p>
-                                    <p th:text="'最后有效期：'+ ${child['dtend']}"></p>
-                                </div>
-                                <div class="header-row-right">
-                                    <i class="fa fa-angle-right fa-3x "></i>
-                                </div>
-                            </a>
+            </div>
+            <div class="card">
+                <div class="card-header no-padding no-border card-backinfo">
+                    <i></i>
+                    <div class="gym-header">
+                        <div class="header-img">
+                            <img th:src="${session.user.head_src}" onerror="this.src='/images/member/head.png'"/>
                         </div>
-
-                            <!--<%&#45;&#45;<div class="inform">&#45;&#45;%>-->
-                            <!--<%&#45;&#45;<div class="inform-title">活动通知：</div>&#45;&#45;%>-->
-                            <!--<%&#45;&#45;<div class="activity-info">植树节活动|4月1号全面涨价</div>&#45;&#45;%>-->
-
-                        <i></i>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header gym-card-title">
-                        <label>我的运动</label>
-                        <i></i>
-                    </div>
-                    <div th:switch="${child.ranking.all!=null}" class="card-content">
-                        <!--<c:choose>-->
-                            <!--<c:when test="${not empty listRank[index]}">-->
-                                <div th:case="true" class="card-content-inner exercise-content">
-                                    <div class="row no-gutter  row-box">
-                                        <div class="col-33 ">
-                                            <div class="sign-first">过去三月超过全国</div>
-                                            <label class="big outpass" th:utext="${child.ranking.last3.outpass}"></label>%会员
-                                        </div>
-                                        <div class="col-33 c">
-                                            <div class="sign-first">总共运动</div>
-                                            <label class="big mins" th:utext="${child.ranking.all.mins}"></label>分钟
-                                        </div>
-                                        <div class="col-33">
-                                            <div class="sign-first">全国会员中排第</div>
-                                            <label class="big ranking" th:utext="${child.ranking.all.ranking}"></label>名<i
-                                                class="fa fa-angle-double-right"></i></div>
-                                    </div>
-                                    <div class="exercise-text">
-                                        <p><label class="big tian" th:utext="${child.ranking.all.tian}"></label>天您已加入小小运动馆</p>
-                                        <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(child.ranking.all.times_per_week,1,2)}">
-                                        </label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div th:case="*" class="card-content-inner">
-                                    <p class="text-center">暂时还没有排名</p>
-                                </div>
-
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header gym-card-title">
-                        <a class="gym-select"
-                           th:attr="data-id=${session.gymSelected.gym.gymId}"><span class="gym-name" th:text="${session.gymSelected.gym.gymName}"></span>
-                                <i th:if="${#lists.size(session.listGym) > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
-                                <span th:if="${session.listGym.size() > 1}" class="badge badge-tip">切换中心</span>
+                        <a class="header-text external"  href="javascript:void(0)" th:attr="idhz=${child.idhz},name=${child.name},age=${child.age}">
+                            <div class="header-p">
+                                <p th:text="'年龄：'+${child['age']}"></p>
+                                <p th:text="'剩余课时：'+${child['rest']}+'节课'"> </p>
+                                <p th:text="'最后有效期：'+ ${child['dtend']}"></p>
+                            </div>
+                            <div class="header-row-right">
+                                <i class="fa fa-angle-right fa-3x "></i>
+                            </div>
                         </a>
                     </div>
-                    <div class="card-content-inner">
-                        <div>
-                            <div class="gym-datepicker">
-                                <i class="fa fa-angle-double-left beginDate-i"></i>
-                                <input type="text" th:readonly="true" class="beginDate"
-                                       th:value="${session.gymSelected.beginDate}"
-                                       /> -
-                                <input type="text" th:readonly="true" class="endDate"
-                                       th:value="${session.gymSelected.endDate}"
-                                       data-toggle="date"/>
-                                <i class="fa fa-angle-double-right endDate-i"></i>
+
+                    <!--<%&#45;&#45;<div class="inform">&#45;&#45;%>-->
+                    <!--<%&#45;&#45;<div class="inform-title">活动通知：</div>&#45;&#45;%>-->
+                    <!--<%&#45;&#45;<div class="activity-info">植树节活动|4月1号全面涨价</div>&#45;&#45;%>-->
+
+                    <i></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header gym-card-title">
+                    <label>我的运动</label>
+                    <i></i>
+                </div>
+                <div th:switch="${child.ranking.all!=null}" class="card-content">
+                    <!--<c:choose>-->
+                    <!--<c:when test="${not empty listRank[index]}">-->
+                    <div th:case="true" class="card-content-inner exercise-content">
+                        <div class="row no-gutter  row-box">
+                            <div class="col-33 ">
+                                <div class="sign-first">过去三月超过全国</div>
+                                <label class="big outpass" th:utext="${child.ranking.last3.outpass}"></label>%会员
                             </div>
-                            <div class="row no-gutter gym-icon-list">
-                                <div class="col-20  text-center"><i class="fa fa-calendar fa-lg"></i>
-                                    <p>日期</p>
-                                </div>
-                                <div class="col-20 text-center"><i class="fa fa-clock-o fa-lg"></i>
-                                    <p>时间</p>
-                                </div>
-                                <div class="col-20 text-center"><i class="fa fa-users fa-lg"></i>
-                                    <p>班级</p>
-                                </div>
-                                <div class="col-20 text-center"><i class="fa fa-check-square fa-lg"></i>
-                                    <p>状态</p>
-                                </div>
-                                <div class="col-20 text-center"><i class="fa fa-bar-chart-o fa-lg"></i>
-                                    <p>课程详情</p>
-                                </div>
+                            <div class="col-33 c">
+                                <div class="sign-first">总共运动</div>
+                                <label class="big mins" th:utext="${child.ranking.all.mins}"></label>分钟
                             </div>
-                            <section
-                                    class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
-                                <div class="swiper-wrapper">
-                                    <div class="swiper-slide swiper-slide-active">
-                                        <ul  th:with="has =${not #lists.isEmpty(child.gymClasses)}" class="details_list">
-                                            <li th:if="${has}" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
-                                                <span th:text="${#calendars.format(gymClass.date,'yyyy-MM-dd')}" class="col-20  date"></span>
-                                                <span th:text="${gymClass.time}" class="col-20  time"></span>
-                                                <span th:text="${gymClass.course}" class="col-20  class"></span>
-                                                <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
-                                                </span>
-                                                <a clase="homework" th:href="${'javascript:toTopic('''+gymClass.course+''','+gymClass.weekNum+')'}"><span class="col-20 details">家庭作业</span></a>
-                                             </li>
-                                             <p  th:unless="${has}" class="text-center">没有查询到课程</p>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </section>
+                            <div class="col-33">
+                                <div class="sign-first">全国会员中排第</div>
+                                <label class="big ranking" th:utext="${child.ranking.all.ranking}"></label>名<i
+                                    class="fa fa-angle-double-right"></i></div>
                         </div>
+                        <div class="exercise-text">
+                            <p><label class="big tian" th:utext="${child.ranking.all.tian}"></label>天您已加入小小运动馆</p>
+                            <p><label class="big times_per_week" th:text="${#numbers.formatDecimal(child.ranking.all.times_per_week,1,2)}">
+                            </label>次您孩子平均每周锻炼次数<br/>（全国运动量前100名会员每周平均运动<label class="big">1.94</label>次）
+                            </p>
+                        </div>
+                    </div>
+
+                    <div th:case="*" class="card-content-inner">
+                        <p class="text-center">暂时还没有排名</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header gym-card-title">
+                    <a class="gym-select"
+                       th:attr="data-id=${session.gymSelected.gym.gymId}"><span class="gym-name" th:text="${session.gymSelected.gym.gymName}"></span>
+                        <i th:if="${#lists.size(session.listGym) > 1}" class="fa fa-angle-down" aria-hidden="true"></i>
+                        <span th:if="${session.listGym.size() > 1}" class="badge badge-tip">切换中心</span>
+                    </a>
+                </div>
+                <div class="card-content-inner">
+                    <div>
+                        <div class="gym-datepicker">
+                            <i class="fa fa-angle-double-left beginDate-i"></i>
+                            <input type="text" th:readonly="true" class="beginDate"
+                                   th:value="${session.gymSelected.beginDate}"
+                            /> -
+                            <input type="text" th:readonly="true" class="endDate"
+                                   th:value="${session.gymSelected.endDate}"
+                                   data-toggle="date"/>
+                            <i class="fa fa-angle-double-right endDate-i"></i>
+                        </div>
+                        <div class="row no-gutter gym-icon-list">
+                            <div class="col-20  text-center"><i class="fa fa-calendar fa-lg"></i>
+                                <p>日期</p>
+                            </div>
+                            <div class="col-20 text-center"><i class="fa fa-clock-o fa-lg"></i>
+                                <p>时间</p>
+                            </div>
+                            <div class="col-20 text-center"><i class="fa fa-users fa-lg"></i>
+                                <p>班级</p>
+                            </div>
+                            <div class="col-20 text-center"><i class="fa fa-check-square fa-lg"></i>
+                                <p>状态</p>
+                            </div>
+                            <div class="col-20 text-center"><i class="fa fa-bar-chart-o fa-lg"></i>
+                                <p>课程详情</p>
+                            </div>
+                        </div>
+                        <section
+                                class="swiper-container-dlist swiper-container-vertical swiper-container-free-mode">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide swiper-slide-active">
+                                    <ul  th:with="has =${not #lists.isEmpty(child.gymClasses)}" class="details_list">
+                                        <li th:if="${has}" th:each="gymClass : ${child.gymClasses}" class="row no-gutter">
+                                            <span th:text="${#calendars.format(gymClass.date,'yyyy-MM-dd')}" class="col-20  date"></span>
+                                            <span th:text="${gymClass.time}" class="col-20  time"></span>
+                                            <span th:text="${gymClass.course}" class="col-20  class"></span>
+                                            <span th:text="${gymClass.kq}" class="col-20 state " th:classappend="${gymClass.kq == '尚未开课'}? 'text-danger'">
+                                                </span>
+                                            <a clase="homework" th:href="${'javascript:toTopic('''+gymClass.course+''','+gymClass.weekNum+')'}"><span class="col-20 details">家庭作业</span></a>
+                                        </li>
+                                        <p  th:unless="${has}" class="text-center">没有查询到课程</p>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <input type="hidden"  value = "${in3000==true}？1" id="in3000"/>
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
@@ -172,7 +188,7 @@
     var PAGE_ID;
     var CHILD_ID;
     var CHILD_INDEX;
-    //var child=[[${listChild[1]}]];
+
     var gymSelected =[[${session.gymSelected.gym.gymName}]];
 
     $(document).on("pageInit", function (e, pageId, $page) {
@@ -182,12 +198,8 @@
         document.title = $page.data("name") + "的主页";
     });
 
-    $(".nav").click(function () {
-      PAGE_ID = this.href.split("#")[1];
-      CHILD_ID = $("#" + PAGE_ID).data("id");
-      CHILD_INDEX = $("#" + PAGE_ID).data("index");
-      document.title = $("#" + PAGE_ID).data("name") + "的主页";
-    })
+    $.init();
+
     function updatePageId() {
         if (location.href.indexOf("#")!=-1){
             PAGE_ID = location.href.split("#")[1];
@@ -438,7 +450,7 @@
         attend_ajax(gymId, gymName, CHILD_ID, $("#" + PAGE_ID + " .beginDate").val(), $("#" + PAGE_ID + " .endDate").val());
     }
 
-
+    var content='';
     function toTopic(course,weeknum) {
         $.ajax({
             type: 'GET',
@@ -449,11 +461,21 @@
             dataType: 'json',
             timeout: 300,
             success: function(result){
-                if(!result) {
+                if(result.code) {
                     $.alert("敬请期待..." );
                     return;
                 }else{
-                    location.href="/topic.html?"+$.param({src:result.data});
+                        content = '<style> .modal-inner{height: 11rem;}</style><video id="videoID" webkit-playsinline="true" x-webkit-airplay="true"  playsinline="true" x5-video-player-type="h5" x5-video-player-fullscreen="true" ' +
+                            'width="100%" height="100%" preload="auto" controls="controls" autoplay="autoplay" poster="posterImg" src="videoUrl"></video>'
+                        content = content.replace('videoUrl',result.data).replace('posterImg','/images/common/poster.png');
+                        var m= $.modal({
+                            text: content,
+                            buttons: [
+                                {
+                                    text: '关闭'
+                                }
+                            ]
+                        })
 
                 }
             },
@@ -478,25 +500,25 @@
         return params;
     }
 
-        if ($("#in3000").val() == 1 ){
-            $.modal({
-                text: '<a class="external" href="/coupon"><img src="/images/member/act3000.jpg" style="display:block" width="100%"/></a>',
-                buttons: [
-                    {
-                        text: '关闭',
-                        onClick:function(){
-                            $.toast('您可以在我的优惠-兑换券中查看')
-                        }
+    if ($("#in3000").val() == 1 ){
+        $.modal({
+            text: '<a class="external" href="/coupon"><img src="/images/member/act3000.jpg" style="display:block" width="100%"/></a>',
+            buttons: [
+                {
+                    text: '关闭',
+                    onClick:function(){
+                        $.toast('您可以在我的优惠-兑换券中查看')
                     }
-                ]
-            })
-            var modal = $(".modal.modal-in");
-            modal.css("margin-top","-10rem");
-            //只刷新时弹出一次
-            $("#in3000").val("");
-        }
+                }
+            ]
+        })
+        var modal = $(".modal.modal-in");
+        modal.css("margin-top","-10rem");
+        //只刷新时弹出一次
+        $("#in3000").val("");
+    }
 
-    $.init();
+
     /*]]>*/
 </script>
 </body>

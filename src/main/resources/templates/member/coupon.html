@@ -114,6 +114,13 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+
+    var isPointed = [[${pointAdd.code}]];
+    var point=  [[${pointAdd.data}]];
+
+    if(!isPointed){
+        $.alert("恭喜你获赠"+point+"积分！");
+    }
     $(".coupon").on('click', function () {
         if ($(this).data("value") == "0") {
             return;

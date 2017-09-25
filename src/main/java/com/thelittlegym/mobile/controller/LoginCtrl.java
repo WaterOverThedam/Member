@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.OasisService;
+import com.thelittlegym.mobile.dao.BlackListDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
@@ -45,6 +46,8 @@ public class LoginCtrl {
     private IFeedbackService feedbackService;
     @Autowired
     private OasisService oasisService;
+    @Autowired
+    private BlackListDao blackListDao;
 
 
     @PostMapping("/login")
@@ -52,7 +55,6 @@ public class LoginCtrl {
     public Result login(HttpServletRequest request, String username, String password) {
 
         Result res = loginService.login(username, password);
-
 
         if (res != null) {
             //获取user实体
@@ -77,41 +79,49 @@ public class LoginCtrl {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public Result register(HttpServletRequest request, String username, String valnum, String password, String email) {
-
         HttpSession session = request.getSession();
         Map<String, Object> returnMap = new HashMap<String, Object>();
         Map valNumMap = new HashMap();
+
         //验证码校验
-//        if (session.getAttribute("valNumMap") != null) {
-//            valNumMap = (HashMap) session.getAttribute("valNumMap");
-//            if (valNumMap.get("valNum").equals(valnum) == false) {
-//                throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//            }
-//            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-//            if (minsPass > 30) {
-//                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
-//            }
-//        } else {
-//            throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//        }
+        if (session.getAttribute("valNumMap") != null) {
+            valNumMap = (HashMap) session.getAttribute("valNumMap");
+            if (valNumMap.get("valNum").equals(valnum) == false) {
+                throw new MyException(ResultEnum.CHECKSUM_WRONG);
+            }
+            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+            if (minsPass > 30) {
+                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
+            }
+        } else {
+            throw new MyException(ResultEnum.CHECKSUM_WRONG);
+        }
 
 
         try {
-            String sqlExist = "select top 1 jt.id from crm_sj_238592 jt join crm_zdytable_238592_25111_238592 zx on zx.isdelete=0 and zx.crmzdy_81611091_id=jt.id and zx.crmzdy_81802303<>'' and jt.isdelete=0 and zx.isdelete=0 and charindex('" +username+"',jt.crmzdy_81767199)>0";
-            log.info(sqlExist);
-            JSONArray jsonArray = oasisService.getResultJson(sqlExist);
+            String sql = "select top 1 jt.crm_surname familyName,jt.crmzdy_81802271 childname,jt.crmzdy_80620120 tel,jt.id,jt.crmzdy_81486429 addr,zx.gym,jt.crmzdy_81486367 +'|'+zx.city city,zx.idzx from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym,zx.id idzx,gym.crmzdy_81744959 city from crm_zdytable_238592_25111_238592_view zx,crm_zdytable_238592_23594_238592_view gym where gym.id=zx.crmzdy_81620171_id  and isnull(zx.crmzdy_81802303,'')<>'' and zx.crmzdy_81611091_id=jt.id)zx where charindex('username',jt.crmzdy_81767199)>0";
+            sql = sql.replace("username",username);
+            //log.info(sql);
+            JSONArray jsonArray = oasisService.getResultJson(sql);
             //是否是会员校验
             if (jsonArray == null){
-                    throw new MyException(ResultEnum.REGISTER_NOT_ALLOW);
+                throw new MyException(ResultEnum.REGISTER_NOT_ALLOW);
+            }else{
+                //满足个别会员要求，信息不能访问
+                BlackList black = blackListDao.findOne(username);
+                if (black!=null){
+                    throw  new MyException(ResultEnum.REGISTER_FORBIDDEN);
+                }
             }
+
+
 
             JSONObject familyObj = jsonArray.getJSONObject(0);
             Family family = JSONObject.toJavaObject(familyObj,Family.class);
-
             return  loginService.register(username, password,email,family);
-
         } catch (Exception e) {
-            throw e;
+            log.error("注册失败{}",e);
+            throw new MyException(ResultEnum.FAILURE);
         }
 
     }
@@ -238,6 +248,8 @@ public class LoginCtrl {
     @RequestMapping(value = "/exist", method = RequestMethod.POST)
     @ResponseBody
     public Result exist(@RequestParam(name = "telephone") String username) {
+
+
         try {
             if (userService.isReged(username) ){
                 throw new MyException(ResultEnum.REGISTER_USER_EXIST);
@@ -245,16 +257,20 @@ public class LoginCtrl {
         } catch (Exception e) {
                 throw e;
         }
-        String sqlExist = "select top 1 jt.id from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx where zx.crmzdy_81611091_id=jt.id and zx.crmzdy_81802303<>'' order by zx.id desc)zx where charindex('" +username+"',jt.crmzdy_81767199)>0";
+        String sqlExist = "select top 1 jt.id from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx where zx.crmzdy_81611091_id=jt.id and isnull(zx.crmzdy_81802303,'')<>'' order by zx.id desc)zx where charindex('" +username+"',jt.crmzdy_81767199)>0";
 
         if (oasisService.getResultJson(sqlExist) != null){
+            BlackList black = blackListDao.findOne(username);
+            if (black!=null){
+                throw  new MyException(ResultEnum.REGISTER_FORBIDDEN);
+            }
             return ResultUtil.success(ResultEnum.REGISTER_ALLOW);
         }else{
             return ResultUtil.success(ResultEnum.REGISTER_NOT_ALLOW);
         }
 
     }
-
+    //修改密码权限判断
     @RequestMapping(value = "/exist_reged", method = RequestMethod.POST)
     @ResponseBody
     public Result exist_reged(String telephone) {

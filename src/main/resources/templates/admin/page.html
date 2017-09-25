@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <title>Title</title>
+</head>
+
+
+<body>
+
+<div class="ui segment" th:fragment="stat_sum">
+    <table class="ui selectable celled table">
+        <thead>
+        <tr class="positive" >
+            <th><div class="ui ribbon label">用户</div></th>
+            <th>访问页面</th>
+            <th>请求类型</th>
+            <th>访问时间</th>
+        </tr></thead>
+        <tbody>
+        <tr  th:unless="${#lists.isEmpty(page.content)}" th:each="p : ${page.content}">
+            <td th:text="${p.userName}"></td>
+            <td th:text="${p.pageURL}"></td>
+            <td th:text="${p.requestType}"></td>
+            <td id="dt" th:text="${#calendars.format(p.createTime,'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+        <tr  th:if="${#lists.isEmpty(page.content)}"><td colspan="4" style="text-align: center">
+            <div   class="ui pointing red  label">
+                OOPS! No Record!
+            </div>
+        </td></tr>
+        </tbody>
+        <tfoot>
+        <tr><th colspan="6">
+            <div class="ui right floated pagination menu" >
+
+                <a th:if="${page.number &gt; 0}" th:attr="data_id=${page.number}"  class="icon item">
+                    <i class="left chevron icon"></i>
+                </a>
+
+                <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item"></a>
+
+                <a th:if="${page.number &lt; page.totalPages-1}" th:attr="data_id=${page.number+2}" class="icon item">
+                    <i class="right chevron icon"></i>
+                </a>
+
+            </div>
+         </th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+</body>
+</html>

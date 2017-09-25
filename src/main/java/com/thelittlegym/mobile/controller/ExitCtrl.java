@@ -31,6 +31,7 @@ public class ExitCtrl {
             session.invalidate();
             return "redirect:/?linkId=1225";
         }
+        session.setAttribute("user",null);
         session.invalidate();
         return "redirect:/login.html";
     }
