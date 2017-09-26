@@ -1,5 +1,6 @@
 package com.thelittlegym.mobile.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/exit")
+@Slf4j
 public class ExitCtrl {
     //会员退出
     @RequestMapping(value = "",method = RequestMethod.GET)
@@ -20,9 +22,11 @@ public class ExitCtrl {
         HttpSession session = request.getSession();
         Object hideSession = session.getAttribute("hide");
         Object adminSession = session.getAttribute("admin");
-
+       log.info(adminSession.toString());
         //后台登录，退出到入口界面
         if (null != adminSession){
+            session.setAttribute("user",null);
+            System.out.println("sfssssssssssssssssssssss");
             return "redirect:/admin/simulation";
         }
 
@@ -31,7 +35,7 @@ public class ExitCtrl {
             session.invalidate();
             return "redirect:/?linkId=1225";
         }
-        session.setAttribute("user",null);
+        log.info("hello");
         session.invalidate();
         return "redirect:/login.html";
     }

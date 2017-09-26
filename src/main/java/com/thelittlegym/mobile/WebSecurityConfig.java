@@ -81,14 +81,18 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
             //log.info(requestUri);
             //log.info(String.valueOf(requestUri.indexOf("admin")));
             Object admin = session.getAttribute("admin");
-            if(requestUri.indexOf("admin")!=-1 && admin==null){
-                String url = "/admin/login";
-                response.sendRedirect(url);
-                return false;
-            }
-
-            Object user = session.getAttribute("user");
-            if (requestUri.indexOf("admin")==-1) {
+            if(requestUri.indexOf("admin")!=-1){
+            //后台
+                if(admin==null) {
+                    String url = "/admin/login";
+                    response.sendRedirect(url);
+                    return false;
+                }else {
+                    return true;
+                }
+            }else{
+             //前台
+                Object user = session.getAttribute("user");
                 if (user == null) {
                     // 跳转登录
                     String url = "/login.html";

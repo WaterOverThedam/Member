@@ -48,7 +48,7 @@ public class PointsServiceImpl implements IPointsService {
 
                 }
                 if ("points".equals(item.getString("type"))) {
-                    http_num = item.getInteger("total") * 2000;
+                    http_num = item.getInteger("total") ;
                 }
             }
         }
@@ -70,7 +70,7 @@ public class PointsServiceImpl implements IPointsService {
         }
 
         if (pointed!=null && http_num > pointed) {
-            addPoints = Math.abs(http_num - pointed)*2000;
+            addPoints = (http_num - pointed)* 2000;
             //TODO 增加积分
             User u = userDao.findOneByTel(tel);
             Integer idjt = u.getIdFamily();

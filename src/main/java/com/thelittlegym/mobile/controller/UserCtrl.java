@@ -10,9 +10,7 @@ import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
-import com.thelittlegym.mobile.service.IPointsService;
 import com.thelittlegym.mobile.service.IUserService;
-import com.thelittlegym.mobile.service.impl.CouponServiceImpl;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.test.InTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -151,14 +149,14 @@ public class UserCtrl {
                 }
 
             }
-
-            Boolean in3000 = userService.isNum(user.getTel(), 3000);
+            //新人注册优惠活动
+            //Boolean in3000 = userService.isNum(user.getTel(), 3000);
+            //model.addAttribute("in3000", in3000);
             session.setAttribute("gymSelected", gymSelected);
             session.setAttribute("listGym", listGym);
             //log.info(gymSelected.toString());
             model.addAttribute("listChild", listChild);
             model.addAttribute("weixinMap", weixinMap);
-            model.addAttribute("in3000", in3000);
         }catch (Exception e){
             log.error("/index错误信息：{}",e);
         }
