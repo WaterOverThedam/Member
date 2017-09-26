@@ -65,7 +65,6 @@ public class OasisService {
         paramMap.put("idjt",idjt);
         paramMap.put("val",val.toString());
         paramMap.put("zx",zx);
-        log.info(val.toString());
         String url = GET_ADDPOINTS_URL + "?idjt=" + idjt + "&val=" + val + "&zx=" + zx;
 //        String url = GET_ADDPOINTS_URL ;
 //        url = StringUtils.trim(url);
