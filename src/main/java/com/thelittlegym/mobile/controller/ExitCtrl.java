@@ -22,11 +22,9 @@ public class ExitCtrl {
         HttpSession session = request.getSession();
         Object hideSession = session.getAttribute("hide");
         Object adminSession = session.getAttribute("admin");
-       log.info(adminSession.toString());
         //后台登录，退出到入口界面
         if (null != adminSession){
             session.setAttribute("user",null);
-            System.out.println("sfssssssssssssssssssssss");
             return "redirect:/admin/simulation";
         }
 
@@ -35,7 +33,7 @@ public class ExitCtrl {
             session.invalidate();
             return "redirect:/?linkId=1225";
         }
-        log.info("hello");
+
         session.invalidate();
         return "redirect:/login.html";
     }

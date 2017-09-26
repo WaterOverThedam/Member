@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/timeout.html");
         addInterceptor.excludePathPatterns("/admin/login");
         addInterceptor.excludePathPatterns("/admin/login/**");
+        addInterceptor.excludePathPatterns("/exit");
         //拦截配置
         addInterceptor.addPathPatterns("/**");
 
@@ -78,27 +79,17 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                 session.setAttribute("linkId", linkId);
             }
 
-            //log.info(requestUri);
+            log.info(requestUri);
             //log.info(String.valueOf(requestUri.indexOf("admin")));
-            Object admin = session.getAttribute("admin");
-            if(requestUri.indexOf("admin")!=-1){
-            //后台
-                if(admin==null) {
-                    String url = "/admin/login";
-                    response.sendRedirect(url);
-                    return false;
-                }else {
-                    return true;
-                }
-            }else{
-             //前台
+            //前台
+            if(requestUri.indexOf("admin") == -1) {
                 Object user = session.getAttribute("user");
                 if (user == null) {
                     // 跳转登录
                     String url = "/login.html";
                     response.sendRedirect(url);
                     return false;
-                }else {
+                } else {
                     User u = (User) user;
                     pageLog.setCreateTime(new Date());
                     pageLog.setPageURL(requestUri);
@@ -107,8 +98,15 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                     pageLog.setSearch(pageLog.toString());
                     pageLogDao.save(pageLog);
                 }
+            }else {
+                //后台
+                Object admin = session.getAttribute("admin");
+                if(admin==null) {
+                    String url = "/admin/login";
+                    response.sendRedirect(url);
+                    return false;
+                }
             }
-
             return true;
         }
     }
