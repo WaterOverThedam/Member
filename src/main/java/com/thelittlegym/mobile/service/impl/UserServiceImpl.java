@@ -89,7 +89,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Boolean isReged(String tel)  {
-        User u = userDao.findOneByTel(tel);
+        User u = userDao.findOneByUsername(tel);
         if (null == u){
             return false;
         }

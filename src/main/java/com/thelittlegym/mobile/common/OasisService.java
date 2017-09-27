@@ -66,8 +66,8 @@ public class OasisService {
         paramMap.put("val",val.toString());
         paramMap.put("zx",zx);
         String url = GET_ADDPOINTS_URL + "?idjt=" + idjt + "&val=" + val + "&zx=" + zx;
-//        String url = GET_ADDPOINTS_URL ;
-//        url = StringUtils.trim(url);
+//      String url = GET_ADDPOINTS_URL ;
+//      url = StringUtils.trim(url);
         String result  = httpService.doGet(url);
 
         if (null != result) {

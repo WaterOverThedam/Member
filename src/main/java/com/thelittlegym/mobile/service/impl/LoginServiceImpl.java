@@ -29,7 +29,6 @@ public class LoginServiceImpl implements ILoginService {
     public Result login(String username, String password){
 
         User  user = userDao.findOneByUsername(username);
-
         if(user != null){
             if(user.getPassword().equals(password)){
                 return ResultUtil.success(user);
