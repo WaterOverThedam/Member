@@ -57,6 +57,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/login.html");
         addInterceptor.excludePathPatterns("/timeout.html");
         addInterceptor.excludePathPatterns("/admin/login");
+        addInterceptor.excludePathPatterns("/admin/exit");
         addInterceptor.excludePathPatterns("/admin/login/**");
         addInterceptor.excludePathPatterns("/exit");
         //拦截配置
@@ -71,7 +72,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         @Override
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
                 throws Exception {
-            log.info("..............intercepted.................");
+                log.info("..............intercepted.................");
             HttpSession session = request.getSession();
             String requestUri = request.getRequestURI();
             String linkId = request.getParameter("linkId");
@@ -79,7 +80,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                 session.setAttribute("linkId", linkId);
             }
 
-            log.info(requestUri);
+            //log.info(requestUri);
             //log.info(String.valueOf(requestUri.indexOf("admin")));
             //前台
             if(requestUri.indexOf("admin") == -1) {

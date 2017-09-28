@@ -61,7 +61,9 @@ public class UserCtrl {
             Object adminSession = session.getAttribute("admin");
             String linkId = (String)session.getAttribute("linkId");
             //log.info(linkId);
+            //log.info("index1");
             if (show == null && !ittest && null == adminSession) {
+                //log.info("index2");
                 if (null != linkId && "1225".equals(linkId)) {
                     session.setAttribute("show", System.currentTimeMillis() / 1000);
                     return "redirect:/index";
@@ -69,6 +71,7 @@ public class UserCtrl {
                     return "redirect:/noaccess.html";
                 }
             }
+            //log.info("index3");
             session.setAttribute("show", System.currentTimeMillis() / 1000);
 
             Map<String, String> weixinMap = new HashMap<String, String>();
