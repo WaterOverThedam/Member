@@ -73,7 +73,7 @@ public class AdminCtrl {
         Map<String,Object> returnMap = new HashMap<String,Object>();
         try {
             Admin  admin=  adminService.login( username, password);
-            if (admin != null) {
+            if (admin !=null && admin.getPassword().equals(password.trim())) {
                 HttpSession session = request.getSession();
                 session.setAttribute("admin", admin);
                 returnMap.put("admin", admin);
