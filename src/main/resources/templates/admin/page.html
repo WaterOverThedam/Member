@@ -33,13 +33,13 @@
         <tr><th colspan="6">
             <div class="ui right floated pagination menu" >
 
-                <a th:if="${page.number &gt; 0}" th:attr="data_id=${page.number}"  class="icon item">
+                <a th:if="${page.number &gt; 0}" th:attr="data_id=${page.number}"  class="icon item pager">
                     <i class="left chevron icon"></i>
                 </a>
 
-                <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item"></a>
+                <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,page.number+1+6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item pager"></a>
 
-                <a th:if="${page.number &lt; page.totalPages-1}" th:attr="data_id=${page.number+2}" class="icon item">
+                <a th:if="${page.number &lt; page.totalPages-1}" th:attr="data_id=${page.number+2}" class="icon item pager">
                     <i class="right chevron icon"></i>
                 </a>
 
@@ -50,5 +50,53 @@
     </table>
 </div>
 
+
+<div class="ui segment" th:fragment="stat_group">
+    <table class="ui selectable celled table">
+        <thead>
+        <tr class="positive" >
+            <th th:if="${#strings.contains(groups,'pageURL')}" th:text="请求页面" ></th>
+            <th th:if="${#strings.contains(groups,'requestType')}"  th:text="请求类型" ></th>
+            <th th:if="${#strings.contains(groups,'userName')}"  th:text="用户名" ></th>
+            <th th:if="${#strings.contains(groups,'createTime')}"  th:text="日期" ></th>
+            <th>访问次数</th>
+        </tr></thead>
+        <tbody>
+        <tr  th:unless="${#lists.isEmpty(page)}" th:each="p : ${page}">
+            <td th:if="${p.pageURL!=null}" th:text="${p.pageURL}" ></td>
+            <td th:if="${p.requestType!=null}" th:text="${p.requestType}" ></td>
+            <td th:if="${p.userName!=null}" th:text="${p.userName}" ></td>
+            <td th:if="${p.createTime!=null}" th:text="${p.createTime}" ></td>
+            <td  th:text="${p.ci}" ></td>
+        </tr>
+        <tr  th:if="${#lists.isEmpty(page)}"><td colspan="4" style="text-align: center">
+            <div   class="ui pointing red  label">
+                OOPS! No Record!
+            </div>
+        </td></tr>
+        </tbody>
+        <tfoot>
+        <tr><th colspan="6">
+            <div class="ui segment right aligned ">
+                <div class="ui buttons">
+                    <a href="#" th:attr="data_id=1"
+                       class="ui button item" > 首页</a>
+                    <a href="#" th:attr="data_id=${page.pageNum}"
+                       class="ui left labeled icon button item" th:classappend="${page.pageNum-1&lt;= 0}?'disabled'"><i
+                            class="left arrow icon"></i> 上一页 </a>
+                    <a class="ui blue active button" th:text="${page.pageNum}"></a>
+                    <a href="#" th:attr="data_id=${page.pageNum+1}"
+                       class="ui right labeled icon button item" th:classappend="${page.pageNum+1&gt; page.Pages}?'disabled'"><i
+                            class="right arrow icon"></i> 下一页 </a>
+                    <a href="#" th:attr="data_id=${page.Pages}"
+                       class="ui button item" > 尾页</a>
+                </div>
+            </div>
+        </th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
 </body>
+
 </html>

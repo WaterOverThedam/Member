@@ -2,8 +2,12 @@ package com.thelittlegym.mobile.controller;
 
 
 import com.alibaba.fastjson.JSON;
-import com.thelittlegym.mobile.entity.Msg;
-import com.thelittlegym.mobile.entity.User;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.pagehelper.PageHelper;
+import com.thelittlegym.mobile.entity.*;
+import com.thelittlegym.mobile.mapper.AdminMapper;
+import com.thelittlegym.mobile.mapper.PageLogMapper;
+import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -14,6 +18,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.jsoup.nodes.Document;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletContext;
@@ -27,8 +32,14 @@ import java.util.List;
 
 @Controller
 @Slf4j
-
+@RequestMapping("/test")
 public class testCtrl  {
+    @Autowired
+    private PageLogMapper pageLogMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private AdminMapper adminMapper;
     @Autowired
     private IUserService userService;
     @GetMapping(value = "/say")
@@ -54,8 +65,26 @@ public class testCtrl  {
 
     @GetMapping(value = "/tell")
     @ResponseBody
-    private  String tell(){
+    private  List <PageLogGroup>  tell(){
+        PageHelper.startPage(3,1);
+        List <PageLogGroup> p =pageLogMapper.getPageLogStat("pageURL,requestType");
 
-        return JSON.toJSONString(Msg.StatusCodeEnum.getEnum(500));
+        return p;
     }
+    @GetMapping(value = "/user")
+    @ResponseBody
+    private  List <User>  you(){
+        PageHelper.startPage(3,2);
+        List<User> u = userMapper.getAll();
+        return u;
+    }
+
+    @GetMapping(value = "/admin")
+    @ResponseBody
+    private Admin who(){
+        Admin admin= adminMapper.getAdminByUsername("market");
+        return admin;
+    }
+
+
 }

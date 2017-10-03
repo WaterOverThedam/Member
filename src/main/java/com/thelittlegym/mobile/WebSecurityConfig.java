@@ -31,7 +31,6 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/web/**").addResourceLocations("classpath:/web/");
         super.addResourceHandlers(registry);
-        //log.error("fuckyou!");
     }
 
     /**
@@ -60,6 +59,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/admin/exit");
         addInterceptor.excludePathPatterns("/admin/login/**");
         addInterceptor.excludePathPatterns("/exit");
+        addInterceptor.excludePathPatterns("/test/**");
         //拦截配置
         addInterceptor.addPathPatterns("/**");
 
@@ -68,7 +68,6 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
     private class SecurityInterceptor extends HandlerInterceptorAdapter {
         @Autowired
         PageLogDao pageLogDao;
-        PageLog pageLog = new PageLog();
         @Override
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
                 throws Exception {
@@ -92,6 +91,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                     return false;
                 } else {
                     User u = (User) user;
+                    PageLog pageLog = new PageLog();
                     pageLog.setCreateTime(new Date());
                     pageLog.setPageURL(requestUri);
                     pageLog.setRequestType(request.getMethod());

@@ -12,7 +12,7 @@ public enum ResultEnum {
     DEL_SUCCESS(0, "删除成功"),
     DEL_FAIL(-201, "删除失败"),
     LOGIN_SUCCESS(0, "登陆成功"),
-    LOGIN_WRONG_PWD(-301, "密码错误"),
+    LOGIN_WRONG_PWD(-301, "用户或密码错误"),
     LOGIN_EXCEPTION(-302, "登陆异常"),
     LOGIN_USER_NO_EXIST(-303,"帐号不存在"),
     REGISTER_SUCCESS(0,"注册成功"),

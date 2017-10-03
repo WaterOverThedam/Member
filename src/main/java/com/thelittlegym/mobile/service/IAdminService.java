@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service;
 
 import com.thelittlegym.mobile.entity.Admin;
+import com.thelittlegym.mobile.entity.Result;
 
 
 /**
@@ -8,5 +9,5 @@ import com.thelittlegym.mobile.entity.Admin;
  */
 public interface IAdminService {
     //登录
-    public Admin login(String username, String password) ;
+    public Result login(String username, String password) ;
 }

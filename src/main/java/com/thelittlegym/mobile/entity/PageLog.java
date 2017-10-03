@@ -1,6 +1,8 @@
 package com.thelittlegym.mobile.entity;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,6 +20,7 @@ public class PageLog {
     private String pageURL;
     private String requestType;
     private String userName;
+    @DateTimeFormat( pattern = "yyyy-MM-dd" )
     private Date createTime;
     private String search;
 

@@ -8,6 +8,9 @@ spring:
         strategy: org.hibernate.cfg.DefaultNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
 # jackson:
 #   default-property-inclusion: non_null
 # redis:
@@ -44,6 +47,8 @@ http.staleConnectionCheckEnabled: true
 server:
   session:
     timeout: -1
+
+
 
 
 

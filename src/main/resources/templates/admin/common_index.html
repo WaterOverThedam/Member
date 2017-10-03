@@ -18,6 +18,12 @@
                 <i class="right angle icon divider"></i>
                 <div class="active section"  >中心活动</div>
             </div>
+            <div style="float: right">
+                <a class="ui image label" th:inline="text">
+                    <img src="/images/admin/user.jpg"/>[[${session.admin.username}]]
+                    <div class="detail" th:utext="系统管理员"></div>
+                </a>
+            </div>
         </div>
     </div>
     <div class="ui container">
@@ -252,17 +258,15 @@ alert(type)
                 <tfoot>
                 <tr><th colspan="6">
                     <div class="ui right floated pagination menu" >
-
                         <a th:if="${page.number &gt; 0}" th:attr="data_id=${page.number}"  class="icon item">
                             <i class="left chevron icon"></i>
                         </a>
 
-                        <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item"></a>
+                        <a th:if="${i &lt; page.totalPages+1}" th:each="i:${#numbers.sequence(page.number+1,page.number+1+6)}" th:attr="data_id=${i}"  th:text="${i}" th:classappend="${i == page.number+1} ? ' disabled'" class="item"></a>
 
                         <a th:if="${page.number &lt; page.totalPages-1}" th:attr="data_id=${page.number+2}" class="icon item">
                             <i class="right chevron icon"></i>
                         </a>
-
                     </div>
                 </th>
                 </tr></tfoot>
@@ -450,7 +454,6 @@ alert(type)
             }
         })
     ;
-
     /*]]>*/
 </script>
 </body>
@@ -474,16 +477,25 @@ alert(type)
     <div class="ui container">
         <div class="ui segments">
             <div class="ui segment">
-                <div class="ui two column stackable grid">
-                    <div class="ui tabular menu">
-                        <a class="active item">
-                            汇总
-                        </a>
-                        <a class="item">
-                            明细
-                        </a>
+                <div class="ui one column stackable grid">
+                    <div class="column">
+                      <div class="ui tabular menu">
+                           <a th:class="${groups==null?'active item' : 'item'}" th:href="@{/admin/pageLog}">
+                               访问记录
+                           </a>
+                           <a th:class="${groups==null?'item' : 'active item'}" th:href="@{/admin/pageLogGroup(gp=${groups})}">
+                               汇总信息
+                           </a>
+                      </div>
                     </div>
-                    <div class="column right aligned">
+                </div>
+            </div>
+            <div  class="ui segment">
+                <div class="ui three column stackable grid">
+                    <div class="column">
+                        <input type="text" class="dt-input" placeholder="开始日期" id="dtBegin"/> - <input type="text" class="dt-input" placeholder="结束日期" id="dtEnd"/>
+                    </div>
+                    <div th:if="${groups==null}" class="column middle aligned">
                         <div class="ui search">
                             <a class="ui icon input" th:id="${page.number+1}">
                                 <input  class="prompt" type="text" placeholder="关键字"/>
@@ -492,80 +504,57 @@ alert(type)
                         </div>
                         <div class="results"></div>
                     </div>
+                    <div th:unless="${groups==null}" class="column aligned">
+                        <div class="ui fluid multiple search selection dropdown">
+                            <input id="groups" th:value="${groups}" type="hidden" />
+                            <i class="dropdown icon"></i>
+                            <div class="default text">选择分组条件</div>
+                            <div class="menu">
+                                <div class="item" data-value="pageURL">页面Url</div>
+                                <div class="item" data-value="requestType">请求类型</div>
+                                <div class="item" data-value="userName">用户</div>
+                                <div class="item" data-value="createTime">日期</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="column left aligned">
+                        <div>
+                            <a id="query" href="#" class="ui primary button">查询</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div th:substituteby="/admin/page :: stat_sum" > </div>
-
-    </div>
-</div>
-
-
-<div class="ui mini modal">
-    <div class="header">
-        提示
-    </div>
-    <div class="content">
-        <p>操作失败</p>
-    </div>
-    <div class="actions">
-        <div onclick="window.location.reload()" class="ui positive right labeled icon button">
-            确定
-        </div>
-    </div>
-</div>
-
-<div id="formAdd" class="ui modal">
-    <i class="close icon"></i>
-    <div class="header">
-        新增
-    </div>
-    <div class="content">
-
-        <form class="ui form segment">
-            <div class="one fields">
-                <div class="field">
-                    <label>主题课程</label>
-                    <input name="course_id" type="hidden" value="funnyBug"/>
-                    <input name="course" type="text" value="趣味小虫"/>
-                </div>
-                <div class="field">
-                    <label>学期开始日期</label>
-                    <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
-                </div>
-                <div class="field">
-                    <label>第几周</label>
-                    <input name="weekNum" type="text" placeholder="输入数字" value=""/>
-                </div>
-
-            </div>
-
-            <div class="ui blue submit button">Submit</div>
-            <div class="ui reset button">Reset</div>
-        </form>
-    </div>
-
-</div>
-
-<div class="ui tiny modal">
-    <div class="header">
-        提示
-    </div>
-    <div class="content">
-        <p>是否确定删除？</p>
-    </div>
-    <div class="actions">
-        <div id="sure" class="ui positive button">
-            确定<i class="checkmark icon"></i>
-        </div>
-        <div onclick="window.location.reload()" class="ui black deny button">
-            取消<i class="remove icon"></i>
-        </div>
+        <div th:substituteby="/admin/page :: ${groups==null?'stat_sum':'stat_group'}" > </div>
     </div>
 </div>
 
 <script th:inline="JavaScript">
     /*<![CDATA[*/
+    var groups =[[${groups}]];
+    var pageNow = getUrlParam('pageNow');
+
+    //日历
+    laydate.render({
+        elem: '#dtBegin' //指定元素
+        ,mark: {
+            '0-10-01': '国庆节'
+            ,'0-12-31': '跨年' //每年12月31日
+            ,'0-0-10': '发工资' //每个月10号
+        }
+
+    });
+    laydate.render({
+        elem: '#dtEnd' //指定元素
+        ,mark: {
+            '0-10-01': '国庆节'
+            ,'0-12-31': '跨年' //每年12月31日
+            ,'0-0-10': '发工资' //每个月10号
+        }
+
+    });
+    $('.ui.dropdown').dropdown();
+
     $(".tip").each(function () {
         var weekNum = parseInt($(this).text());
         dtFirst = ($(this).parent().find("#dt").text())
@@ -579,49 +568,18 @@ alert(type)
         $(".prompt").val(kw)
     };
 
-    $("#add").click(function() {
-        $('#formAdd').modal('show');
-    });
-    $(".del").click(function(){
-        $('#sure').attr('onclick','del('+$(this).attr("data_id")+')')
-        $('.ui.tiny.modal').modal('show');
-        $(this).parent().parent().hide();
-    });
-    function del(id) {
-        $.get("/admin/themeDel",{id:id}, function(data){
-            if(data.code){
-                result();
-            }
-        })
-    }
-    function result(sucess,data) {
-        var dialog = $('.ui.mini.modal');
 
-        if(!sucess){
-            data = data ? data : "操作失败";
-        }else {
-            data = data ? data : "操作成功";
-        }
-        data = "<p>"+data+"</p>"
-        dialog.find("content").html(data)
-        $('.ui.mini.modal').modal('show');
-    }
-    $(".isShow").click(function(){
-        var origin = !this.checked
-        var current =$(this);
-        $.post("/admin/theme",{id:$(this).attr('data_id'),isShow:this.checked}, function(data){
-            if(data.code){
-                result();
-            };
+    if(dtBegin=getUrlParam('dtBegin')){
+        $("#dtBegin").val(dtBegin)
+    };
+    if(dtEnd=getUrlParam('dtEnd')){
+        $("#dtEnd").val(dtEnd)
+    };
 
-        })
-
-    })
 
     $(".search .icon ").on("keydown change keyup",function (event) {
         if(event.keyCode==13){
-            var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
-            window.location.href=url;
+            goPageLog();
         }
 
     })
@@ -630,55 +588,64 @@ alert(type)
         $(".ui.sidebar").sidebar('toggle');
     })
 
-    $(".item").click(function () {
-        var url = '/admin/theme?'+$.param({pageNow:$(this).attr('data_id'),kw:$(".prompt").val()});
-        window.location.href=url;
+    function goPageLog() {
+        var dtEnd = $("#dtEnd").val();
+        var dtBegin = $("#dtBegin").val();
+        if (dtEnd!="" && dtBegin!=""){
+            var param = $.param({
+                pageNow: pageNow,
+                kw:  $.trim($(".prompt").val()),
+                dtBegin: dtBegin,
+                dtEnd: dtEnd
+            });
+        } else {
+            var param = $.param({
+                pageNow: pageNow,
+                kw: $(".prompt").val()
+            });
+        }
+        var url = "/admin/pageLog?" + param;
+        self.location = url;
+    }
+    function goPageGroup() {
+        var dtEnd = $("#dtEnd").val();
+        var dtBegin = $("#dtBegin").val();
+        if (dtEnd!="" && dtBegin!="") {
+            var param = $.param({
+                pageNow: pageNow,
+                gp: $("#groups").val(),
+                dtBegin: $("#dtBegin").val(),
+                dtEnd: $("#dtEnd").val()
+            })
+        }else{
+            var param = $.param({
+                pageNow: pageNow,
+                gp: $("#groups").val()
+            })
+        }
+        var url = "/admin/pageLogGroup?" + param;
+        self.location = url;
+    }
 
+    $("#query").click(function () {
+        if(groups==null){
+            goPageLog();
+        }else {
+            goPageGroup();
+        }
+    })
+
+    $(".ui.button.item").click(function () {
+        pageNow = $(this).attr('data_id');
+        goPageGroup();
+    })
+
+    $(".pager").click(function () {
+        pageNow = $(this).attr('data_id');
+        goPageLog();
     })
 
 
-    $('.ui.form')
-        .form({
-            fields: {
-
-                dtBegin: {
-                    identifier : 'dtBegin',
-                    rules: [
-                        {
-                            type   : 'empty',
-                            prompt : '请输入正确的日期'
-                        }
-                    ]
-                },
-                weekNum: {
-                    identifier  : 'weekNum',
-                    rules: [
-                        {
-                            type   : 'integer',
-                            prompt : '请输入正确的数字'
-                        }
-                    ]
-                }
-            },
-
-            onSuccess: function(e) {
-                alert('submit')
-                $.ajax({
-                    type: 'post',
-                    url: '/admin/themeAdd',
-                    data:  $(".ui.form").serialize(),
-                    success: function(res) {
-                        if(re.code){
-                            result();
-                        }else{
-                            // window.location.reload();
-                        }
-                    }
-                });
-
-            }
-        })
-    ;
     /*]]>*/
 </script>
 </body>

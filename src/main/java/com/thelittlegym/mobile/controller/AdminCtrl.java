@@ -3,6 +3,9 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.thelittlegym.mobile.Convertor.DateConvert;
 import com.thelittlegym.mobile.common.JsonService;
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.PageLogDao;
@@ -10,6 +13,8 @@ import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.mapper.AdminMapper;
+import com.thelittlegym.mobile.mapper.PageLogMapper;
 import com.thelittlegym.mobile.service.IAdminService;
 import com.thelittlegym.mobile.service.IFeedbackService;
 import com.thelittlegym.mobile.service.ILoginService;
@@ -31,11 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hibernate on 2017/5/15.
@@ -59,6 +62,9 @@ public class AdminCtrl {
     @Autowired
     private PageLogDao pageLogDao;
     @Autowired
+    private PageLogMapper pageLogMapper;
+
+    @Autowired
     private JsonService jsonService;
     @GetMapping(value="/login")
     public String adminToLogin(HttpServletRequest request) throws Exception {
@@ -69,26 +75,11 @@ public class AdminCtrl {
 
     @PostMapping(value="/login")
     @ResponseBody
-    public Map<String,Object>  adminLogin(HttpServletRequest request, String username,String password) throws Exception {
-        Map<String,Object> returnMap = new HashMap<String,Object>();
-        try {
-            Admin  admin=  adminService.login( username, password);
-            if (admin !=null && admin.getPassword().equals(password.trim())) {
-                HttpSession session = request.getSession();
-                session.setAttribute("admin", admin);
-                returnMap.put("admin", admin);
-                returnMap.put("result",ResultEnum.LOGIN_SUCCESS.getMessage());
-
-            }else {
-                returnMap.put("result", ResultEnum.LOGIN_WRONG_PWD.getMessage());
-            }
-
-        }catch (Exception e){
-            returnMap.put("result", ResultEnum.LOGIN_EXCEPTION.getMessage());
-            log.error(e.getMessage());
-        }
-
-        return returnMap;
+    public Result adminLogin(HttpServletRequest request, String username,String password) throws Exception {
+        Result result = adminService.login(username,password);
+        HttpSession session = request.getSession();
+        session.setAttribute("admin", result.getData());
+        return result;
     }
 
     @RequestMapping(value = {"","/index","/activity"}, method = RequestMethod.GET)
@@ -393,18 +384,55 @@ public class AdminCtrl {
 
     @GetMapping(value="/pageLog")
     public String statView(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1",required = false) Integer pageNow,
-                           @RequestParam(value = "size", defaultValue = "8",required = false) Integer size,
+                           @RequestParam(value = "kw",required = false) String keyWord,@RequestParam(value = "size", defaultValue = "16",required = false) Integer size,
+                           @RequestParam(value = "dtBegin",required = false ) String dtBegin,@RequestParam(value = "dtEnd", required = false) String dtEnd,
                            Model model) throws Exception {
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow-1, size, sort);
         HttpSession session = request.getSession();
         session.setAttribute("menuId","pageLog");
-        Page<PageLog> page = pageLogDao.findAll(pageable);
+
+        Page<PageLog> page;
+        if(dtBegin!=null){
+            page = pageLogDao.findAllBySearchIsLikeAndCreateTimeBetween('%'+keyWord+'%',DateConvert.convert(dtBegin),DateConvert.convert(dtEnd),pageable);
+        }else if(keyWord != null && keyWord != ""){
+            page = pageLogDao.findAllBySearchIsLike('%'+keyWord+'%',pageable);
+        }else {
+            page = pageLogDao.findAll(pageable);
+        }
         model.addAttribute("page",page);
         return "/admin/index";
     }
 
+    @GetMapping(value="/pageLogGroup")
+    public String statGroupView(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1",required = false) Integer pageNow,
+                           @RequestParam(value = "gp",required = false ) String groups,@RequestParam(value = "pageSize", defaultValue = "10",required = false) Integer pageSize,
+                           @RequestParam(value = "dtBegin",required = false ) String dtBegin,@RequestParam(value = "dtEnd",required = false) String dtEnd,
+                           Model model) throws Exception {
+
+        HttpSession session = request.getSession();
+        session.setAttribute("menuId","pageLog");
+
+        if (groups == null || groups == "") {
+            groups ="pageURL,requestType";
+        }
+
+        PageHelper.startPage(pageNow,pageSize);
+        List<PageLogGroup> page;
+        if(dtBegin!=null){
+            page = pageLogMapper.getPageLogStatByCreatTime(groups,dtBegin,dtEnd);
+        }else {
+            page = pageLogMapper.getPageLogStat(groups);
+        }
+
+        model.addAttribute("page",page);
+        model.addAttribute("groups",groups);
+
+
+        return "/admin/index";
+
+    }
     @PostMapping(value="/pageLog")
     public String statData(HttpServletRequest request, String id) throws Exception {
 
@@ -420,7 +448,7 @@ public class AdminCtrl {
         return "redirect:/admin";
     }
 
-    @RequestMapping(value="/actUser",method = RequestMethod.GET)
+    @RequestMapping(value="/enrollist",method = RequestMethod.GET)
     public String actUser(HttpServletRequest request,@RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                           @RequestParam(value = "size", defaultValue = "20") Integer size,
                           Model model) throws Exception {
