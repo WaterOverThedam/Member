@@ -66,7 +66,7 @@
             <td th:if="${p.pageURL!=null}" th:text="${p.pageURL}" ></td>
             <td th:if="${p.requestType!=null}" th:text="${p.requestType}" ></td>
             <td th:if="${p.userName!=null}" th:text="${p.userName}" ></td>
-            <td th:if="${p.createTime!=null}" th:text="${p.createTime}" ></td>
+            <td th:if="${p.createTime!=null}" th:text="${#calendars.format(p.createTime,'yyyy-MM-dd HH:mm')}" ></td>
             <td  th:text="${p.ci}" ></td>
         </tr>
         <tr  th:if="${#lists.isEmpty(page)}"><td colspan="4" style="text-align: center">
