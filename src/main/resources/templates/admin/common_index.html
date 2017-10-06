@@ -31,7 +31,7 @@
             <div class="ui segment">
                 <div class="ui two column stackable grid">
                     <div class="column">
-                        <a th:href="@{/admin/activityAdd}" class="ui primary button">新建活动</a>
+                        <a th:href="@{/admin/activitySave}" class="ui primary button">新建活动</a>
                     </div>
                     <div class="column right aligned">
                         <select name="skills" multiple="" class="ui multiple search selection dropdown">
@@ -60,7 +60,6 @@
             </div>
             <div class="ui segment">
                 <div class="ui four stackable  special cards">
-
                     <div th:each="activity : ${page.content}" class="card" th:unless="${#lists.isEmpty(page.content)}">
                         <div class="blurring dimmable image">
                             <div class="ui dimmer">
@@ -82,8 +81,8 @@
                             </div>
                         </div>
                         <div class="extra content">
-                            <a th:href="@{/admin/activityDel(id=${activity.id})}" class="right floated">删除</a>
-                            <a th:href="@{/admin/activityToEdit(id=${activity.id})}"> 编辑 </a>
+                            <a href="#" th:attr="data-id=${activity.id}" class="right floated delete">删除</a>
+                            <a th:href="@{/admin/activitySave(id=${activity.id})}"> 编辑 </a>
                         </div>
                     </div>
                 </div>
@@ -92,33 +91,38 @@
         </div>
     </div>
 </div>
+
 <!-- modal-->
-<div class="ui modal">
-    <i class="close icon"></i>
-    <div class="header" id="modal_name">
-
+<div class="ui tiny modal">
+    <div class="header">
+        提示
     </div>
-    <div class="image content">
-        <div class="ui medium image">
-            <img src="/images/admin/ERROR.png" onerror="this.src='/images/admin/ERROR.png'" id="modal_bannerSrc"/>
-        </div>
-        <div class="description">
-            <div class="ui header" >活动详情</div>
-            <p id="modal_detail"></p>
-            <div class="ui header" >活动时间</div>
-            <p id="modal_date"></p>
-            <div class="ui header" >活动细则</div>
-            <div id="modal_more" class="ui horizontal list">
-
-            </div>
-        </div>
+    <div class="content">
+        <p>是否确定删除？</p>
     </div>
     <div class="actions">
-        <a id="modal_edit" href="/admin/activityToEdit?id=" class="ui positive right  icon button">
-            编辑
-        </a>
+        <div id="sure" class="ui positive button">
+            确定<i class="checkmark icon"></i>
+        </div>
+        <div onclick="window.location.reload()" class="ui black deny button">
+            取消<i class="remove icon"></i>
+        </div>
     </div>
 </div>
+
+
+<div class="ui mini modal">
+    <div class="header">提示</div>
+    <div class="content">
+        <p>操作失败</p>
+    </div>
+    <div class="actions">
+        <div onclick="window.location.reload()" class="ui positive button">
+            确定
+        </div>
+    </div>
+</div>
+
 <script th:inline="JavaScript">
     /*<![CDATA[*/
     var page;
@@ -177,6 +181,23 @@ alert(type)
             },
         })
     })
+
+   //删除
+    $(".right.floated.delete").click(function(){
+        //alert($(this).data("id"))
+        //对象加事件属性
+        $('#sure').attr('onclick',"del('id')".replace('id',$(this).data('id')));
+        $('.ui.tiny.modal').modal('show');
+        $(this).parent().parent().hide();
+    });
+    function del(id) {
+        $.get("/admin/activityDel",{id:id}, function(res){
+            if(res.code){
+                var dialog = $('.ui.mini.modal')
+                result(dialog,res.code,res.data);
+            }
+        })
+    }
     /*]]>*/
 </script>
 </body>
@@ -232,7 +253,7 @@ alert(type)
                     <th>删除</th>
                 </tr></thead>
                 <tbody>
-                <tr  th:unless="${#lists.isEmpty(page.content)}" th:each="theme : ${page.content}">
+                <tr th:unless="${#lists.isEmpty(page.content)}" th:each="theme : ${page.content}">
                     <td th:text="${theme.course}"></td>
                     <td id="dt" th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
                     <td class="tip"  data-position="top left" th:text="${theme.weekNum}"></td>
@@ -277,50 +298,44 @@ alert(type)
 
 
 <div class="ui mini modal">
-    <div class="header">
-        提示
-    </div>
+    <div class="header">提示</div>
     <div class="content">
         <p>操作失败</p>
     </div>
     <div class="actions">
-        <div onclick="window.location.reload()" class="ui positive right labeled icon button">
+        <div onclick="window.location.reload()" class="ui positive button">
             确定
         </div>
     </div>
 </div>
 
-<div id="formAdd" class="ui modal">
-    <i class="close icon"></i>
-    <div class="header">
-        新增
-    </div>
-    <div class="content">
-
-        <form class="ui form segment">
-            <div class="one fields">
-                <div class="field">
-                    <label>主题课程</label>
-                    <input name="course_id" type="hidden" value="funnyBug"/>
-                    <input name="course" type="text" value="趣味小虫"/>
-                </div>
-                <div class="field">
-                    <label>学期开始日期</label>
-                    <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
-                </div>
-                <div class="field">
-                    <label>第几周</label>
-                    <input name="weekNum" type="text" placeholder="输入数字" value=""/>
-                </div>
-
-            </div>
-
-            <div class="ui blue submit button">Submit</div>
-            <div class="ui reset button">Reset</div>
-        </form>
-    </div>
-
-</div>
+<!--<div id="formAdd" class="ui modal">-->
+    <!--<i class="close icon"></i>-->
+    <!--<div class="header">-->
+        <!--新增-->
+    <!--</div>-->
+    <!--<div class="content">-->
+        <!--<form class="ui form segment">-->
+            <!--<div class="one fields">-->
+                <!--<div class="field">-->
+                    <!--<label>主题课程</label>-->
+                    <!--<input name="course_id" type="hidden" value="funnyBug"/>-->
+                    <!--<input name="course" type="text" value="趣味小虫"/>-->
+                <!--</div>-->
+                <!--<div class="field">-->
+                    <!--<label>学期开始日期</label>-->
+                    <!--<input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>-->
+                <!--</div>-->
+                <!--<div class="field">-->
+                    <!--<label>第几周</label>-->
+                    <!--<input name="weekNum" type="text" placeholder="输入数字" value=""/>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="ui blue submit button">Submit</div>-->
+            <!--<div class="ui reset button">Reset</div>-->
+        <!--</form>-->
+    <!--</div>-->
+<!--</div>-->
 
 <div class="ui tiny modal">
     <div class="header">
@@ -369,24 +384,14 @@ alert(type)
             }
         })
     }
-    function result(sucess,data) {
-        var dialog = $('.ui.mini.modal');
 
-        if(!sucess){
-            data = data ? data : "操作失败";
-        }else {
-            data = data ? data : "操作成功";
-        }
-        data = "<p>"+data+"</p>"
-        dialog.find("content").html(data)
-        $('.ui.mini.modal').modal('show');
-    }
     $(".isShow").click(function(){
         var origin = !this.checked
         var current =$(this);
         $.post("/admin/theme",{id:$(this).attr('data_id'),isShow:this.checked}, function(data){
-            if(data.code){
-                result();
+            if(res.code){
+                var dialog = $('.ui.mini.modal');
+                result(dialog,res.code,res.data);
             };
 
         })
@@ -444,7 +449,8 @@ alert(type)
                     data:  $(".ui.form").serialize(),
                     success: function(res) {
                         if(re.code){
-                            result();
+                            var dialog = $('.ui.mini.modal');
+                            result(dialog,res.code,res.data);
                         }else{
                            // window.location.reload();
                         }
@@ -542,7 +548,6 @@ alert(type)
             ,'0-12-31': '跨年' //每年12月31日
             ,'0-0-10': '发工资' //每个月10号
         }
-
     });
     laydate.render({
         elem: '#dtEnd' //指定元素
@@ -551,8 +556,8 @@ alert(type)
             ,'0-12-31': '跨年' //每年12月31日
             ,'0-0-10': '发工资' //每个月10号
         }
-
     });
+
     $('.ui.dropdown').dropdown();
 
     $(".tip").each(function () {

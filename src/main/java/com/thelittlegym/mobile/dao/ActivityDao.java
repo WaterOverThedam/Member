@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Created by TONY on 2017/8/26.
  */
 public interface ActivityDao extends JpaRepository<Activity,Integer> {
-    public Page<Activity> findAllByIsDeleteAndNameLike(Boolean isDelete, String name, Pageable pageable);
+    public Page<Activity> findAllByIsDeleteAndSearchLike(Boolean isDelete, String search, Pageable pageable);
 }

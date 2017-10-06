@@ -109,7 +109,7 @@
                     tip = "loading...";
                     window.location.href = '/admin/index';
                 } else {
-                    tip = data.result;
+                    tip = res.msg;
                 }
                 $(".ui.error.message").text(tip);
                 $(".ui.error.message").fadeIn()

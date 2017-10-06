@@ -3,14 +3,18 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.entity.Activity;
 import com.thelittlegym.mobile.entity.Participator;
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.service.IActivityService;
 import com.thelittlegym.mobile.service.IParticipatorService;
 
+import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.msg.send.ValNum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +35,8 @@ import java.util.Map;
 /**
  * Created by hibernate on 2017/5/3.
  */
-@Controller
+@Slf4j
+@RestController
 @RequestMapping("/activity")
 public class ActivityCtrl {
 
@@ -40,119 +45,72 @@ public class ActivityCtrl {
     @Autowired
     private IParticipatorService participatorService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public String activities(HttpServletRequest request, Model model) throws Exception {
-        HttpSession session = request.getSession();
-        Object objSession = session.getAttribute("user");
-        User user;
-        if (objSession != null) {
 
-        } else {
-            user = (User) objSession;
-        }
-
-        return "/activity/activities";
-    }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String,Object>  search(@RequestParam(value = "page", defaultValue = "1") Integer page,
+    public Result  search(@RequestParam(value = "page", defaultValue = "1") Integer pageNow,
                                       @RequestParam(value = "size", defaultValue = "10") Integer size,
-                                      @RequestParam(value = "kw", defaultValue = "") String keyword,
-                                      Map<String, Object> map) throws Exception {
+                                      @RequestParam(value = "kw", defaultValue = "") String keyword) throws Exception {
 
-
-//TODO 权限验证
         Sort sort = new Sort(Sort.Direction.DESC.DESC, "createTime");
-        Pageable pageable = new PageRequest(1, 10, sort);
-        Page<Activity> activityPages = activityService.findAllByIsDeleteAndNameLike(false,keyword,pageable);
+        Pageable pageable = new PageRequest(pageNow-1, 10, sort);
+        Page<Activity> activityPages = activityService.findAllByIsDeleteAndSearchLike(false,'%'+keyword+'%',pageable);
 
-        map.put("page", activityPages);
-        return  map;
+        return ResultUtil.success(activityPages);
     }
 
 
 
-    @RequestMapping(value = "/myinfo", method = RequestMethod.GET)
-    public String info(HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession();
-        Object objSession = session.getAttribute("user");
-        User user;
-        if (objSession != null) {
-
-        } else {
-            user = (User) objSession;
-        }
-
-        return "/activity/myinfo";
-    }
-
-
-
-
-
-    @PostMapping("/getItems")
-    @ResponseBody
-    public  Map<String,Object> getItems (@RequestParam(value = "page", defaultValue = "1") Integer page,
-                              @RequestParam(value = "size", defaultValue = "10") Integer size,
-                              @RequestParam(value = "kw", defaultValue = "") String keyword,
-                              Map<String, Object> map){
- //TODO 权限验证
+    @RequestMapping("/getItems")
+    public Result getItems (@RequestParam(value = "page", defaultValue = "1") Integer pageNow,
+                            @RequestParam(value = "size", defaultValue = "10") Integer size,
+                            @RequestParam(value = "kw", defaultValue = "") String keyword){
 
         Sort sort = new Sort(Sort.Direction.DESC.DESC, "createTime");
-        Pageable pageable = new PageRequest(1, 10, sort);
-        Page<Activity> activityPages = activityService.findAllByIsDeleteAndNameLike(false,keyword,pageable);
-
-        map.put("activityPage", activityPages);
-        map.put("currentPage", page);
-        map.put("size", size);
-        return  map;
+        Pageable pageable = new PageRequest(pageNow-1, 10, sort);
+        Page<Activity> activityPages = activityService.findAllByIsDeleteAndSearchLike(false,'%'+keyword+'%',pageable);
+//        Map<String, Object> returnMap = new HashMap<String, Object>();
+//        returnMap.put("activity",activityPages);
+//        returnMap.put("user",user);
+        return ResultUtil.success(activityPages);
     }
 
     @RequestMapping(value = "/view", method = RequestMethod.POST)
-    @ResponseBody
-    public JSONObject activityView(HttpServletRequest request, Integer id) throws Exception {
-        HttpSession session = request.getSession();
-        Object objSession = session.getAttribute("user");
-        User user;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.hh");
-        //TODO 权限验证
-        Activity activity = activityService.findOne(id);
-        JSONObject jsonObject = (JSONObject) JSON.toJSON(activity);
-        jsonObject.put("beginDate", sdf.format(activity.getBeginDate()));
-        jsonObject.put("endDate", sdf.format(activity.getEndDate()));
-        return jsonObject;
+    public Activity activityView(Integer id) throws Exception {
+        if (id!=null) {
+            return activityService.findOne(id);
+        }else{
+            return null;
+        }
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String,Object> add(HttpServletRequest request, String actId, String name, String tel, String num) throws Exception {
-        Participator p = new Participator();
-        HttpSession session = request.getSession();
-        Object objValMap = session.getAttribute("addValMap");
-        Map<String,Object> returnMap = new HashMap<String, Object>();
-        if (null != objValMap){
-            Map<String,Object> valMap = (HashMap<String, Object>)objValMap;
-            if (participatorService.valPar(valMap,num)){
-                returnMap = participatorService.addPar(tel,name,actId);
-                session.removeAttribute("addValMap");
-                session.setAttribute("participator",p);
-            }else{
-                returnMap.put("result", ResultEnum.ENROL_CHECKSUM_ERR);
-            }
-        }else{
-            returnMap.put("result",ResultEnum.ENROL_CHECKSUM_OVERDUE);
-        }
-        return returnMap;
-    }
+//    @RequestMapping(value = "/add", method = RequestMethod.POST)
+//    public Result add(HttpServletRequest request, String actId, String name, String tel, String num) throws Exception {
+//        Result res = null;
+//        HttpSession session = request.getSession();
+//        Object objValMap = session.getAttribute("addValMap");
+//
+//        if (null != objValMap){
+//            Map<String,Object> valMap = (HashMap<String, Object>)objValMap;
+//            if (participatorService.valPar(valMap,num)){
+//                res = participatorService.addPar(tel,name,actId);
+//                session.removeAttribute("addValMap");
+//                session.setAttribute("participator",res.getData());
+//            }else{
+//                return ResultUtil.error(ResultEnum.ENROL_CHECKSUM_ERR);
+//            }
+//        }else{
+//            return ResultUtil.error(ResultEnum.ENROL_CHECKSUM_OVERDUE);
+//        }
+//        return res;
+//    }
 
     @RequestMapping(value = "/val", method = RequestMethod.POST)
-    @ResponseBody
     public Map<String, Object> validateNum(HttpServletRequest request, String tel) {
         ValNum valNum = new ValNum();
         HttpSession session = request.getSession();
         //发送验证码
-//        Map<String,Object> returnMap = valNum.sendVal(tel);
+//      Map<String,Object> returnMap = valNum.sendVal(tel);
         Map<String, Object> returnMap = new HashMap<String, Object>();
         returnMap.put("success", true);
         returnMap.put("message", "2121");

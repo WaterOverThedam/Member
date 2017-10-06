@@ -17,8 +17,8 @@ public class ActivityServiceImpl implements IActivityService {
     private ActivityDao activityDao;
 
     @Override
-    public Page<Activity> findAllByIsDeleteAndNameLike(Boolean isDelete, String name,Pageable pageable) {
-        return activityDao.findAllByIsDeleteAndNameLike(isDelete,name,pageable);
+    public Page<Activity> findAllByIsDeleteAndSearchLike(Boolean isDelete, String name,Pageable pageable) {
+        return activityDao.findAllByIsDeleteAndSearchLike(isDelete,name,pageable);
     }
 
     @Override

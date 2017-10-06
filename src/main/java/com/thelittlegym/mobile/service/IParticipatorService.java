@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service;
 
 import com.thelittlegym.mobile.entity.Participator;
+import com.thelittlegym.mobile.entity.Result;
 
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  */
 public interface IParticipatorService {
     //参与活动
-    public Map<String,Object> addPar(String tel, String name,String actid);
+    public Result addPar(String tel, String name, Integer actid);
     //修改信息
     public void updatePar(Participator p);
     //验证码是否通过

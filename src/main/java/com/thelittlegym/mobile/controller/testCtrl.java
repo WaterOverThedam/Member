@@ -4,6 +4,7 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.pagehelper.PageHelper;
+import com.thelittlegym.mobile.config.MyConfig;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.mapper.AdminMapper;
 import com.thelittlegym.mobile.mapper.PageLogMapper;
@@ -42,6 +43,8 @@ public class testCtrl  {
     private AdminMapper adminMapper;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private MyConfig myConfig;
     @GetMapping(value = "/say")
     private String say(ModelMap map){
         ClassPathResource res = new ClassPathResource("static/common_admin.html");
@@ -84,6 +87,12 @@ public class testCtrl  {
     private Admin who(){
         Admin admin= adminMapper.getAdminByUsername("market");
         return admin;
+    }
+    @GetMapping(value = "/conf")
+    @ResponseBody
+    private String config(){
+
+        return myConfig.toString();
     }
 
 

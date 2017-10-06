@@ -3,11 +3,15 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.ParticipatorDao;
 import com.thelittlegym.mobile.entity.Participator;
+import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.IParticipatorService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,21 +25,18 @@ public class ParticipatorServiceImpl implements IParticipatorService {
     private ParticipatorDao participatorDao;
 
     @Override
-    public Map<String, Object> addPar(String tel, String name, String actId) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
-        Participator p = new Participator();
-        if (null != participatorDao.findOneByPhoneAndActid(tel,actId)) {
-            returnMap.put("result", ResultEnum.ENROL_EXIST);
+    public Result addPar(String tel, String name,  Integer actId) {
+        if (null != participatorDao.findOneByPhoneAndActivity_Id(tel,actId)) {
+            throw  new MyException(ResultEnum.ENROL_EXIST);
         } else {
+            Participator p = new Participator();
             p.setPhone(tel);
             p.setName(name);
-            p.setActid(actId);
+
             p.setCreateTime(new Date());
             participatorDao.save(p);
-            returnMap.put("value", p);
-            returnMap.put("result", ResultEnum.ENROL_SUCCESS);
+            return ResultUtil.success(ResultEnum.ENROL_SUCCESS,p);
         }
-        return returnMap;
     }
 
     @Override

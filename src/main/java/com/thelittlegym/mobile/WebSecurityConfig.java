@@ -60,6 +60,9 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/admin/login/**");
         addInterceptor.excludePathPatterns("/exit");
         addInterceptor.excludePathPatterns("/test/**");
+        addInterceptor.excludePathPatterns("/activities.html");
+
+
         //拦截配置
         addInterceptor.addPathPatterns("/**");
 

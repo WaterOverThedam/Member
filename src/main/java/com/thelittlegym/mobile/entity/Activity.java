@@ -36,7 +36,12 @@ public class Activity {
     private Boolean isDelete;
     @Column(name = "bannerSrc")
     private String bannerSrc;
-    private String gyms;
     private String city;
+    private String search;
 
+    @Override
+    public String toString() {
+        return "|"+ city + "|"+ name + "|"
+                +detail + "|"+beginDate;
+    }
 }

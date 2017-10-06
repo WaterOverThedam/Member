@@ -1,29 +1,30 @@
 package com.thelittlegym.mobile.entity;
 
+import com.thelittlegym.mobile.Convertor.DateConvert;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by hibernate on 2017/5/25.
+ * Created by TONY on 2017/10/6.
  */
-@Entity
+
+
 @Data
-@Table(name="participator")
-public class Participator {
+@Entity
+@Table(name="activity_enrollment")
+public class ActivityEnrollment {
     @Id
     @GeneratedValue
     private Integer id;
-    private String name;
-    private String phone;
+    private Date createTime;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = true)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activityId", nullable = true)
     private Activity activity;
-    private Date createTime;
-
-
+    //1：报名；0：取消；2：恢复
+    private  Integer status;
 }

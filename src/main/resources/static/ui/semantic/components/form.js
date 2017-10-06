@@ -227,7 +227,7 @@ $.fn.form = function(parameters) {
                 $field.prop('checked', defaultValue);
               }
               else {
-                module.verbose('Resetting field value', $field, defaultValue);
+                moduule.verbose('Resetting field value', $field, defaultValue);
                 $field.val(defaultValue);
               }
             })

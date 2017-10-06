@@ -49,7 +49,11 @@ public class UserCtrl {
     @Autowired
     private ThemeDao themeDao;
 
-
+    @RequestMapping("/profile")
+    @ResponseBody
+    public User profile(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user) throws Exception {
+       return user;
+    }
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user, Model model) throws Exception {
         try {

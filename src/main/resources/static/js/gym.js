@@ -15,6 +15,17 @@ function result(data) {
     return null;
 }
 
+function result(dialog,code,msg) {
+    if(code){
+        msg = msg ? msg : "操作失败";
+    }else {
+        msg = msg ? msg : "操作成功";
+    }
+    msg = "<p>" + msg + "</p>";
+    $(dialog).find(".content").html(msg)
+    $(dialog).modal('show');
+}
+
 function getUrlParam(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
     var r = window.location.search.substr(1).match(reg); //匹配目标参数
@@ -50,7 +61,6 @@ function date_cal(dt,ndays){
     return dtend
 }
 
-
 Date.prototype.Format = function(fmt)
 { //author: meizz
     var o = {
@@ -68,4 +78,14 @@ Date.prototype.Format = function(fmt)
         if(new RegExp("("+ k +")").test(fmt))
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
     return fmt;
+}
+
+
+
+function toDate(input){
+    var oDate=new Date(input);
+    return oDate.getFullYear()+'-'+(f(oDate.getMonth()+1))+'-'+f(oDate.getDate())+' '+f(oDate.getHours())+':'+f(oDate.getMinutes());
+    function f(s) {
+        return ('00'+s).substr(-2);
+    }
 }
