@@ -51,7 +51,7 @@ public class UserCtrl {
 
     @RequestMapping("/profile")
     @ResponseBody
-    public User profile(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user) throws Exception {
+    public User profile(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user) throws Exception {
        return user;
     }
     @RequestMapping(value = "", method = RequestMethod.GET)

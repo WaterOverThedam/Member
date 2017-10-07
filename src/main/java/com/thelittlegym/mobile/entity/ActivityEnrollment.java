@@ -1,5 +1,6 @@
 package com.thelittlegym.mobile.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.thelittlegym.mobile.Convertor.DateConvert;
 import lombok.Data;
 
@@ -25,6 +26,7 @@ public class ActivityEnrollment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activityId", nullable = true)
     private Activity activity;
-    //1：报名；0：取消；2：恢复
+    //1：报名；0：取消；3：预报名
+    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private  Integer status;
 }

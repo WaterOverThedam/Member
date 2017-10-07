@@ -322,21 +322,33 @@
                     </div>
                 </div>
             </div>
-
+            <div class="content-block-title">报名名单</div>
             <div class="card" id="apply">
                 <div class="card-content">
-                    <div class="gym-apply">
-                        <div class="gym-toApply">
-                            <div class="gym-main">
-                                <i class="fa fa-user"></i>报名人：<label class="gym-person-name">刘翔</label>
-                                <i class="fa fa-user"></i>报名人：<label class="gym-person-name">王二</label>
-                            </div>
-                        </div>
-                        <div class="gym-text">点击修改或者增加报名名单</div>
+
+                    <div class="list-block">
+                        <ul>
+                            <li class="item-content item-link">
+                                <div class="item-media"><i class="icon icon-edit"></i></div>
+                                <div class="item-inner">
+                                    <div class="item-title"><i class="fa fa-user"></i>刘翔</div>
+                                    <div class="item-after">家长</div>
+                                </div>
+                            </li>
+                            <li class="item-content item-link">
+                                <div class="item-media"><i class="icon icon-edit"></i></div>
+                                <div class="item-inner">
+                                    <div class="item-title"><i class="fa fa-user"></i>刘恒</div>
+                                    <div class="item-after">孩子</div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
+
+
                 </div>
                 <div class="card-footer">
-                    <div class="gym-checkbox"><label><input id="agree" type="checkbox" />我已同意小小运动馆相关条约和规定</label>
+                    <div class="gym-checkbox"><label><input id="agree" type="checkbox" />我已阅读活动内容及规则</label>
                     </div>
                     <a class="button button-fill " id="pickerActivity" href="javascript:;">报名</a>
                 </div>
@@ -435,6 +447,16 @@
                         </div>
                     </div>
                 </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="fa fa-phone fa-2x"></i></div>
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="role" placeholder="孩子/家长"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
                 <!--<li>-->
                     <!--<div class="item-content">-->
                         <!--<div class="item-media"><i class="fa fa-commenting-o fa-2x"></i></div>-->
@@ -512,13 +534,94 @@
 <script src="https://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js"></script>
 
 <script>
+    var actId;
+
+    function setId(id){
+        $("#activity").data("value",id);
+    }
+
     $(document).on("pageInit", function (e, pageId, $page) {
         if(pageId == 'activity'){
-            var actid = $("#activity").attr("data-value");
-            ajax_activity(actid);
+            actId = $("#activity").data("value");;
+            //界面信息初始化
+            ajax_activity(actId)
+            checkEnrol()
             getProfile();
+            //绑定事件
+            $("#add_submit").click(function () {
+                //alert(actId)
+                if(checkAdd()){
+                    $.ajax({
+                        type: 'POST',
+                        url: '/activity/add',
+                        data: {
+                            'name': $("#add_name").val(),
+                            'tel': $("#add_phone").val(),
+                            'actId': actId
+                        },
+                        async: false,
+                        contentType: "application/x-www-form-urlencoded",
+                        dataType: "json",
+                        success: function (res) {
+                            if (res.code) {
+                                $.toast(res.msg)
+                                $.closeModal(".popup-add");
+                            }else {
+                                if ($("#activity").data("status") == 3){
+                                    var modal = $.modal({
+                                        title: '报名信息添加成功！',
+                                        text: '是否还有其他人参与活动？',
+                                        buttons: [
+                                            {
+                                                text: '没有，开始报名',
+                                                bold: true,
+                                                onClick: function () {
+                                                    enrol();
+                                                    $.closeModal(".popup-add");
+                                                    $("#activity").data("status", 1)
+                                                }
+                                            },
+                                            {
+                                                text: '有，继续登记',
+                                                bold: true,
+                                                onClick: function () {
+                                                    resetPopup(".popup-add");
+                                                }
+                                            },
+                                        ]
+                                    })
+                                }else {
+                                    var modal = $.modal({
+                                        title: '信息添加成功',
+                                        text: '是否还有其参与人员？',
+                                        buttons: [
+                                            {
+                                                text: '没有了，完成',
+                                                bold: true,
+                                                onClick: function () {
+                                                    $.closeModal(".popup-add");
+                                                }
+                                            },
+                                            {
+                                                text: '有，继续登记',
+                                                bold: true,
+                                                onClick: function () {
+                                                    resetPopup(".popup-add");
+                                                }
+                                            },
+                                        ]
+                                    })
+
+                                }
+
+                            }
+                        }
+                    })
+                }
+            })
         }
         if(pageId == 'myinfo'){
+            //user的信息
             getProfile();
         }
 
@@ -538,34 +641,52 @@
         }
     })
   }
+    $("#role").picker({
+        toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-left">按钮</button>\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">家长/孩子</h1>\
+  </header>',
+        cols: [
+            {
+                textAlign: 'center',
+                values: ['家长', '孩子']
+            }
+        ]
+    });
+
+
     /*****************index-开始***********************************/
 //    var city = remote_ip_info['city'];
-
     $("#home").addClass("active");
+
     var loading = false;
     // 最多可加载的条目
-    var maxItems = 100;
+    var maxItems = 40;
     // 每次加载添加多少条目
-    var itemsPerLoad = 6;
+    var itemsPerLoad = 4;
     //预先加载x条
     try{
-        var map = new BMap.Map("bdMapBox");
+        //var map = new BMap.Map("bdMapBox");
         var nowCity = new BMap.LocalCity();
         nowCity.get(bdGetPosition);
     }catch (e){
         console.error(e)
     }
 
+    //初始值
+    var lastIndex=1;
     function bdGetPosition(result){
         var cityName = result.name; //当前的城市名
         /*自定义代码*/
         $(".mycity").text(cityName);
-        ajax_getItems(itemsPerLoad, 1, cityName);
+        //预先加载4条;同时会确定 maxItems
+        ajax_getItems(4, lastIndex, cityName);
+        $('#keyword').val(cityName)
 
     }
 
-    // 上次加载的序号
-    var lastIndex = 6;
+    // 接上次加载的序号，并注册
     $(document).on('infinite', '.infinite-scroll-bottom', function () {
         if (loading) return;
         loading = true;
@@ -581,9 +702,10 @@
                 return;
             }
             // 添加新条目
-            ajax_getItems(itemsPerLoad, lastIndex, $('#keyword').val());
-            // 更新最后加载的序号
-            lastIndex = $('.card-container .card').length;
+            lastIndex++;
+            ajax_getItems(itemsPerLoad,lastIndex,$('#keyword').val());
+            // 更新最后加载的页面
+            //lastIndex = $('.card-container .card').length;
             //容器发生改变,如果是js滚动，需要刷新滚动
             $.refreshScroller();
         }, 1000);
@@ -600,25 +722,28 @@
 
     });
 
-    function ajax_getItems(size, index, keyword) {
+    function ajax_getItems(size, index, kw) {
         var html = '';
         $.ajax({
-            type: 'POST',
+            type: 'GET',
             url: '/activity/getItems',
             data: {
                 'size': size,
-                'index': index,
-                'kw': keyword
+                'pageNow': index,
+                'kw': kw
             },
             async: false,
             contentType: "application/x-www-form-urlencoded",
             dataType: "json",
             success: function (res) {
                 if (!res.code) {
-                    $.each(res.data.content, function (index, activity) {
-                        html += '<a class="card animated pulse" href="#activity" onclick="ajax_activity(' + activity.id + ')"  data-value="' + activity.id + '" >' +
+                    if(res.data.content != []){
+                        $.each(res.data.content, function (index, activity) {
+                            maxItems = res.data.totalElements;
+                            //alert(maxItems)
+                            html = '<a class="card animated pulse" href="#activity" onclick="setId(' + activity.id + ')"  data-value="' + activity.id + '" >' +
                                 '<div class="card-header no-border no-padding">' +
-                                '<img class="card-cover" src=" ' + activity.bannerSrc + '"/>' +
+                                '<img class="card-cover" src=" ' + (activity.bannerSrc ? activity.bannerSrc : '/images/member/inform.jpg') + '"/>' +
                                 '</div>' +
                                 '<div class="card-content">' +
                                 '<div class="card-content-inner">' +
@@ -634,8 +759,9 @@
                                 '</div>' +
                                 '</div>' +
                                 '</a>';
-                    })
-                    $('.infinite-scroll-bottom .card-container').append(html);
+                            $('.infinite-scroll-bottom .card-container').append(html);
+                        })
+                    }
                     $.refreshScroller();
                 } else {
 //                    $.detachInfiniteScroll($('.infinite-scroll'));
@@ -685,7 +811,7 @@
     /*****************search-开始**********************************/
     function submitSearch() {
         $('.card-container .card').remove();
-        ajax_getItems(itemsPerLoad, 0, $('#keyword').val());
+        ajax_getItems(itemsPerLoad, 1, $('#keyword').val());
         $('#keyword').blur()
         $(".content").scrollTop(0);
         $.router.load("#home");
@@ -715,20 +841,23 @@
     $("#icon-like").on('click', function () {
         toggleLike();
     });
-    $("#pickerActivity").toggleClass("disabled");
-    $("#agree").on('change', function () {
-        var is_checked = $(this).prop("checked");
-        $("#pickerActivity").toggleClass("disabled");
-    })
 
-    $(".gym-apply").on('click', function () {
+
+
+    $(".icon.icon-edit").on('click', function () {
         var buttons1 = [
             {
                 text: '请选择',
                 label: true
             },
             {
-                text: '增加',
+                text: '修改',
+                onClick: function () {
+                    $.alert("你选择了“修改信息“");
+                }
+            },
+            {
+                text: '删除',
                 bold: true,
                 color: 'danger',
                 onClick: function () {
@@ -736,11 +865,13 @@
                 }
             },
             {
-                text: '修改',
+                text: '添加',
+                bold: true,
+                color: 'danger',
                 onClick: function () {
-                    $.alert("你选择了“修改信息“");
+                    $.popup('.popup-add');
                 }
-            }
+            },
         ];
         var buttons2 = [
             {
@@ -752,17 +883,73 @@
         $.actions(groups);
     });
 
+    $("#pickerActivity").toggleClass("disabled");
+    $("#agree").on('change', function () {
+        var is_checked = $(this).prop("checked");
+        $("#pickerActivity").toggleClass("disabled");
+    })
+
+
+
+
+    //1：报名；0：取消；3：预报名
     $("#pickerActivity").on('click', function () {
         if (!$(this).hasClass("disabled")) {
-            $.popup('.popup-add');
+            $("#activity").data("status",3);
+            if($(".gym-main").length == 0){
+                  $.confirm('请先填写报名信息', function () {
+                    $.popup('.popup-add');
+                  });
+//                html = ' <div class="gym-main">'+
+//                    '<i class="fa fa-user"></i>报名人：<label class="gym-person-name">刘翔</label>'+
+//                    '</div>';
+             }else {
+                enrol();
+             }
         } else {
-            $.alert("您必须同意小小运动馆相关条约和规定！")
+            $.alert("请先阅读活动内容及规则！")
         }
 
     });
 
-    function ajax_getlike(avtivity_name) {
 
+    function checkEnrol() {
+        $.ajax({
+            type: 'GET',
+            url: '/activity/checkEnrol',
+            data: {
+                'actId': actId
+            },
+            async: false,
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+                if(!res.code && res.data==1){
+                    if (!$("#pickerActivity").hasClass("disabled")){
+                        $("#pickerActivity").toggleClass("disabled");
+                    }
+                    $("#pickerActivity").text("我已报名").unbind();
+                    $("#agree").parent().hide();
+                }
+
+            }
+        });
+    }
+
+    function enrol() {
+        $.ajax({
+            type: 'POST',
+            url: '/activity/enrol',
+            data: {
+                'actId': actId
+            },
+            async: false,
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+              $.toast(res.msg);
+            }
+        });
     }
 
 
@@ -817,10 +1004,14 @@
             $.alert("请输入正确的名字");
             return false;
         }
-        if (!/^\d{4}$/.test(($.trim($("#add_num").val())))){
-            $.alert("验证码为4位数字");
+        if ($.trim($("#role").val())=="家长/孩子"||$.trim($("#role").val())=="") {
+            $.alert("请选择家长/孩子");
             return false;
         }
+//        if (!/^\d{4}$/.test(($.trim($("#add_num").val())))){
+//            $.alert("验证码为4位数字");
+//            return false;
+//        }
         return true;
     }
 

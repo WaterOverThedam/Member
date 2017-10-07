@@ -1,13 +1,14 @@
 package com.thelittlegym.mobile.service.impl;
 
 
+import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
 import com.thelittlegym.mobile.dao.ParticipatorDao;
-import com.thelittlegym.mobile.entity.Participator;
-import com.thelittlegym.mobile.entity.Result;
+import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.service.IParticipatorService;
 import com.thelittlegym.mobile.utils.ResultUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,23 +21,48 @@ import java.util.Map;
  * Created by hibernate on 2017/5/26.
  */
 @Service
+@Slf4j
 public class ParticipatorServiceImpl implements IParticipatorService {
     @Autowired
     private ParticipatorDao participatorDao;
+    @Autowired
+    private ActivityEnrollmentDao activityEnrollmentDao;
 
     @Override
-    public Result addPar(String tel, String name,  Integer actId) {
-        if (null != participatorDao.findOneByPhoneAndActivity_Id(tel,actId)) {
-            throw  new MyException(ResultEnum.ENROL_EXIST);
-        } else {
-            Participator p = new Participator();
+    public Result enroll(Integer actId,User user){
+        ActivityEnrollment activityEnrollment = new ActivityEnrollment();
+        try {
+        Activity activity = new Activity();
+        activity.setId(actId);
+        activityEnrollment.setUser(user);
+        activityEnrollment.setActivity(activity);
+        activityEnrollment.setStatus(1);
+        activityEnrollment.setCreateTime(new Date());
+        activityEnrollmentDao.save(activityEnrollment);
+        }catch (Exception e){
+            log.info("报名错误{}",e);
+            throw new MyException(ResultEnum.ENROL_ERR);
+        }
+        return ResultUtil.success(ResultEnum.ENROL_SUCCESS,activityEnrollment);
+    };
+    @Override
+    public Result addPar(String tel,String name,Integer actId,User user) {
+        Participator p = new Participator();
+        try {
+            Activity activity = new Activity();
+            activity.setId(actId);
             p.setPhone(tel);
             p.setName(name);
-
+            p.setActivity(activity);
+            p.setUser(user);
             p.setCreateTime(new Date());
             participatorDao.save(p);
-            return ResultUtil.success(ResultEnum.ENROL_SUCCESS,p);
+        }catch (Exception e){
+            log.info("添加名单错误{}",e);
+            throw new MyException(ResultEnum.SAVE_FAILURE);
         }
+        return ResultUtil.success(ResultEnum.SUCCESS,p);
+
     }
 
     @Override

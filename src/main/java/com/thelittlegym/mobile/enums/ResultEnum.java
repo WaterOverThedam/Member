@@ -25,6 +25,7 @@ public enum ResultEnum {
     ENROL_SUCCESS(0,"报名成功"),
     ENROL_EXIST(-21,"该用户已报名"),
     ENROL_CHECKSUM_ERR(-31,"报名失败:验证码错误或者失效"),
+    ENROL_ERR(-51,"报名失败:未知错误"),
     ENROL_CHECKSUM_OVERDUE(-41,"报名失败:验证码过期"),
     FEEDBACK_SUCCESS(0,"反馈成功"),
     FEEDBACK_FAILURE(-51,"反馈失败"),
