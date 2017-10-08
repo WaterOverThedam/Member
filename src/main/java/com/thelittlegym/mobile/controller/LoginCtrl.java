@@ -83,19 +83,19 @@ public class LoginCtrl {
         Map<String, Object> returnMap = new HashMap<String, Object>();
         Map valNumMap = new HashMap();
 
-        //验证码校验
-        if (session.getAttribute("valNumMap") != null) {
-            valNumMap = (HashMap) session.getAttribute("valNumMap");
-            if (valNumMap.get("valNum").equals(valnum) == false) {
-                throw new MyException(ResultEnum.CHECKSUM_WRONG);
-            }
-            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-            if (minsPass > 30) {
-                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
-            }
-        } else {
-            throw new MyException(ResultEnum.CHECKSUM_WRONG);
-        }
+//        //验证码校验
+//        if (session.getAttribute("valNumMap") != null) {
+//            valNumMap = (HashMap) session.getAttribute("valNumMap");
+//            if (valNumMap.get("valNum").equals(valnum) == false) {
+//                throw new MyException(ResultEnum.CHECKSUM_WRONG);
+//            }
+//            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+//            if (minsPass > 30) {
+//                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
+//            }
+//        } else {
+//            throw new MyException(ResultEnum.CHECKSUM_WRONG);
+//        }
 
 
         try {
@@ -257,8 +257,8 @@ public class LoginCtrl {
         } catch (Exception e) {
                 throw e;
         }
-        String sqlExist = "select top 1 jt.id from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx where zx.crmzdy_81611091_id=jt.id and isnull(zx.crmzdy_81802303,'')<>'' order by zx.id desc)zx where charindex('" +username+"',jt.crmzdy_81767199)>0";
-
+        String sqlExist = "select top 1 jt.id from crm_sj_238592 jt,crm_zdytable_238592_25111_238592 zx where zx.crmzdy_81611091_id=jt.id and isnull(zx.crmzdy_81802303,'')<>'' and charindex('username',jt.crmzdy_81767199)>0";
+        sqlExist = sqlExist.replace("username",username);
         if (oasisService.getResultJson(sqlExist) != null){
             BlackList black = blackListDao.findOne(username);
             if (black!=null){

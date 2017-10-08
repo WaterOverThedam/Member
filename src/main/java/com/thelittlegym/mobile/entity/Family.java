@@ -11,6 +11,7 @@ public class Family {
     private Integer id;
     private String name;
     private String tel;
+    private String familyName;
     private String childname;
     private String gym;
     private String idzx;

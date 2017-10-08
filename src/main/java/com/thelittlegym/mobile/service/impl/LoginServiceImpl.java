@@ -53,6 +53,7 @@ public class LoginServiceImpl implements ILoginService {
             user.setTel(family.getTel());
             user.setEmail(email);
             user.setIdFamily(family.getId());
+            user.setFamilyName(family.getFamilyName());
             user.setAddr(family.getAddr());
             user.setChildname(family.getChildname());
             user.setCity(family.getCity());

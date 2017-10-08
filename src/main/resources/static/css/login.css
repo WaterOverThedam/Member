@@ -472,3 +472,15 @@ label.error {
 	border-radius: 2px;
 	margin-top: .5rem;
 }
+
+
+.input_row {
+	position:relative;
+}
+
+.check_point {
+	position: absolute;
+	top: 50%;
+	right: 8px;
+	display:block;
+}

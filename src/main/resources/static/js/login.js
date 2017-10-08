@@ -1,4 +1,6 @@
 var loadingIndex;
+$(".check_point").hide()
+
 $.ajaxSetup({
     beforeSend: function () {
         loadingIndex = layer.open({
@@ -129,19 +131,11 @@ $("#btn_change").click(function () {
                 if (data.success == true) {
                     time($("#btn_change"));
                 } else {
-                    layer.open({
-                        content: '发送失败，请稍后再试'
-                        , skin: 'msg'
-                        , time: 2 //2秒后自动关闭
-                    });
+                    msg( '发送失败，请稍后再试')
                 }
             },
             error:function () {
-                layer.open({
-                    content: '发送异常，请稍后再试'
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
+                msg('发送异常，请稍后再试')
             }
         });
     }else{
@@ -151,6 +145,15 @@ $("#btn_change").click(function () {
 });
 
 var waitTime = 60;
+
+function msg(msg) {
+    layer.open({
+        content: msg
+        ,skin: 'msg'
+        ,time: 2 //2秒后自动关闭
+    });
+
+}
 function time(o) {
     if (waitTime == 0) {
         o.removeAttr("disabled");
@@ -231,11 +234,8 @@ function login_ajax(telephone, password) {
             if (!data.code) {
                 window.location.href = "/index";
             } else {
-                layer.open({
-                    content: data.msg?data.msg:"登陆异常，请重试"
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
+                 var  content = data.msg?data.msg:"登陆异常，请重试";
+                 msg(content)
             }
         },
     });
@@ -246,15 +246,7 @@ function regsister_ajax(username, valnum, password, email) {
     this.username = username;
     this.password = $.md5(password);
     this.email = email;
-    var check = $("#reg_tel").data("data");
-    if (check && check.code){
-        layer.open({
-            content: check.msg
-            , skin: 'msg'
-            , time: 2 //2秒后自动关闭
-        });
-    }else {
-      $.ajax({
+    $.ajax({
         type: "POST",
         url: "/login/register",
         data: {"username": this.username, "valnum": this.valnum, "password": this.password, "email": this.email},
@@ -262,26 +254,21 @@ function regsister_ajax(username, valnum, password, email) {
         dataType: "json",
         success: function (data) {
             //console.log(data);
-            if (!data.code) {
-                layer.open({
-                    content: data.msg
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
-                mySwiper.unlockSwipes();
-                mySwiper.slidePrev(fadeInClass());
-                mySwiper.lockSwipes();
-                $("#login_tel").val(username);
-            } else{
-                layer.open({
-                    content: data.msg
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
+            if(data){
+                msg(data.msg);
+                if (!data.code) {
+                    mySwiper.unlockSwipes();
+                    mySwiper.slidePrev(fadeInClass());
+                    mySwiper.lockSwipes();
+                    $("#login_tel").val(username);
+                }
+                $(".check_point").hide()
+            }else{
+                msg("注册异常");
             }
         }
       });
-    }
+
 }
 
 
@@ -293,9 +280,8 @@ function exist_ajax(telephone) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
-            if (data.code) {
-                $("#reg_tel").data("data",data);
-                if (data.msg == "该号码非会员"){
+            if(data.code) {
+                if (data.msg == "该号码非会员") {
                     layer.open({
                         content: '系统中没有显示此手机号码,点击是与我们联系'
                         , btn: ['是', '否']
@@ -308,20 +294,13 @@ function exist_ajax(telephone) {
                             layer.close(index);
                         }
                     });
-                }else{
-                    layer.open({
-                        content: data.msg
-                        , skin: 'msg'
-                        , time: 2//2秒后自动关闭
-                    });
+                } else {
+                    var content = data.msg ? data.msg : "注册异常，请重试";
+                    msg(content);
                 }
-
             }else{
-                layer.open({
-                    content: data.msg
-                    , skin: 'msg'
-                    , time: 2 //2秒后自动关闭
-                });
+                msg(data.msg);
+                $(".check_point").show()
             }
         }
     });

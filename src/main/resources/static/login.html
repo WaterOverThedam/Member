@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="css/login.css">
 <link rel="stylesheet" href="css/swiper-3.4.2.min.css">
 <link rel="stylesheet" href="css/animate.css">
+<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+
     <script>
         /*微信浏览器*/
         function isWeiXin(){
@@ -71,10 +73,10 @@
                 </div>
 
                 <div class="loginForm" id="registerForm">
-                    <div>
+                    <div class="input_row">
                         <input type="text" class="reg-tel input-control" id="reg_tel" placeholder="请输入您签约时绑定的手机号码"
                                autocomplete="off"/>
-
+                        <span class="check_point"><i class="fa fa-check" aria-hidden="true"></i></span>
                     </div>
 
                     <div>
@@ -87,14 +89,14 @@
                                placeholder="再次输入密码" oncontextmenu="return false"
                                 onpaste="return false"/>
                     </div>
-                    <div>
-                        <input type="email" class="reg_email input-control" id="reg_email" placeholder="输入邮箱地址"
-                               value="tangzi_123@163.com" oncontextmenu="return false" onpaste="return false"/>
-                    </div>
                     <div class="reg-group">
                         <input type="text" class="reg-valnum input-control" id="reg_valnum" placeholder="输入验证码"
                                autocomplete="off"/>
                         <button class="btn-valnum" id="btn-valnum" type="button">发送验证码</button>
+                    </div>
+                    <div>
+                        <input type="email" class="reg_email input-control" id="reg_email" placeholder="输入邮箱地址"
+                               value="tangzi_123@163.com" oncontextmenu="return false" onpaste="return false"/>
                     </div>
                     <div>
                         <button id="signUp">注 册</button>
