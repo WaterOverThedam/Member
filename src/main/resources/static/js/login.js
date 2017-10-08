@@ -299,8 +299,9 @@ function exist_ajax(telephone) {
                     msg(content);
                 }
             }else{
-                msg(data.msg);
+                //msg(data.msg);
                 $(".check_point").show()
+                return;
             }
         }
     });
