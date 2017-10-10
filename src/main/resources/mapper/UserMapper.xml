@@ -8,9 +8,14 @@
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="DATE" />
     </resultMap>
-
+    <resultMap id="participatorResultMap" type="com.thelittlegym.mobile.entity.User" >
+        <id column="userId" property="id" jdbcType="BIGINT" />
+        <result column="name" property="familyName" jdbcType="VARCHAR" />
+        <result column="familyTitle" property="familyTitle" jdbcType="VARCHAR" />
+        <result column="phone" property="tel" jdbcType="VARCHAR"/>
+    </resultMap>
     <sql id="Base_Column_List" >
-        id, username, password, email, create_time
+      id, username, password, email, familyName, familyTitle , create_time
     </sql>
 
     <select id="getAll" resultMap="BaseResultMap"  >
@@ -26,4 +31,17 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getParticipatorsTobe" resultMap="BaseResultMap">
+        select DISTINCT phone,name,familyTitle,userId
+        from(select phone,name,familyTitle,createTime,userId from participator union all select telephone,familyName,familyTitle,create_time,id from user)a
+        where userId=#{userId} and name not in
+        <foreach item="item" index="index" collection="array" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+
+        order by createTime desc
+    </select>
+
+    select phone,name,familyTitle,userId
 </mapper>

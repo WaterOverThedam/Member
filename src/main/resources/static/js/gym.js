@@ -89,3 +89,10 @@ function toDate(input){
         return ('00'+s).substr(-2);
     }
 }
+
+
+
+function checkTel(tel){
+    return /^1[34578]\d{9}$/.test($.trim(tel));
+}
+

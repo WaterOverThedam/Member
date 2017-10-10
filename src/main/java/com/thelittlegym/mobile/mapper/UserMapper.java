@@ -10,4 +10,6 @@ import java.util.List;
 public interface UserMapper {
     public List<User> getAll();
     public User getOne(Long id);
+    public User getParticipatorsTobe(Long userId,List participator);
+
 }

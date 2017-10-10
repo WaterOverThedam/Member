@@ -24,6 +24,7 @@ public class User {
     @Column(name="id_family")
     private Integer idFamily;
     private String familyName;
+    private String familyTitle;
     @Column(name="telephone")
     private String tel;
     private String childname;

@@ -4,6 +4,7 @@ import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IActivityService;
 import com.thelittlegym.mobile.service.IParticipatorService;
 
@@ -16,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 
 /**
@@ -33,6 +34,8 @@ public class ActivityCtrl {
     private IParticipatorService participatorService;
     @Autowired
     private ActivityEnrollmentDao activityEnrollmentDao;
+    @Autowired
+    private UserMapper userMapper;
 
 
 
@@ -56,10 +59,19 @@ public class ActivityCtrl {
         return ResultUtil.success(activityPages);
     }
 
-    @RequestMapping(value = "/view", method = RequestMethod.POST)
-    public Activity activityView(Integer id) throws Exception {
-        if (id!=null) {
-            return activityService.findOne(id);
+//    @RequestMapping(value = "/view", method = RequestMethod.POST)
+//    public Activity activityView(Integer id) throws Exception {
+//        if (id!=null) {
+//            return activityService.findOne(id);
+//        }else{
+//            return null;
+//        }
+//    }
+
+    @RequestMapping(value = "/getPar", method = RequestMethod.POST)
+    public User getPar(Long userId, List names) throws Exception {
+        if (userId!=null) {
+            return userMapper.getParticipatorsTobe(userId,names);
         }else{
             return null;
         }

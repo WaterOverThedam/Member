@@ -16,6 +16,7 @@ public class Participator {
     @GeneratedValue
     private Integer id;
     private String name;
+    private String familyTitle;
     private String phone;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = true)
