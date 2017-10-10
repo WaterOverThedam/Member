@@ -280,6 +280,7 @@ function exist_ajax(telephone) {
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         success: function (data) {
+            $(".check_point").hide()
             if(data.code) {
                 if (data.msg == "该号码非会员") {
                     layer.open({

@@ -83,19 +83,19 @@ public class LoginCtrl {
         Map<String, Object> returnMap = new HashMap<String, Object>();
         Map valNumMap = new HashMap();
 
-//        //验证码校验
-//        if (session.getAttribute("valNumMap") != null) {
-//            valNumMap = (HashMap) session.getAttribute("valNumMap");
-//            if (valNumMap.get("valNum").equals(valnum) == false) {
-//                throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//            }
-//            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-//            if (minsPass > 30) {
-//                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
-//            }
-//        } else {
-//            throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//        }
+        //验证码校验
+        if (session.getAttribute("valNumMap") != null) {
+            valNumMap = (HashMap) session.getAttribute("valNumMap");
+            if (valNumMap.get("valNum").equals(valnum) == false) {
+                throw new MyException(ResultEnum.CHECKSUM_WRONG);
+            }
+            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+            if (minsPass > 30) {
+                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
+            }
+        } else {
+            throw new MyException(ResultEnum.CHECKSUM_WRONG);
+        }
 
 
         try {
