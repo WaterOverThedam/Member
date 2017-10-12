@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.jsoup.nodes.Document;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,5 +97,12 @@ public class testCtrl  {
         return myConfig.toString();
     }
 
+    @GetMapping(value = "/getPar")
+    @ResponseBody
+    public User getPar(@RequestParam(value = "userId",defaultValue="",required = false) Long userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
 
+        return userMapper.getParticipatorsTobe(userId,names);
+
+
+    }
 }

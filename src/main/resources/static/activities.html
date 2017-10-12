@@ -882,7 +882,7 @@
             contentType: "application/x-www-form-urlencoded",
             dataType: "json",
             success: function (res) {
-                if(!res.code && res.data==1){
+                if(!res && res.code && res.data==1){
                     if (!$("#pickerActivity").hasClass("disabled")){
                         $("#pickerActivity").toggleClass("disabled");
                     }

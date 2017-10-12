@@ -518,11 +518,15 @@
 
     $.init()
     /*****************index-开始***********************************/
-    var map = new BMap.Map("bdMapBox");
-    var nowCity = map.LocalCity();
+    //var map = new BMap.Map("bdMapBox");
+    var nowCity = new BMap.LocalCity();
+
+
     // var total= document.getElementById("atCity2").innerHTML();
     nowCity.get(bdGetPosition);
+
     function bdGetPosition(result){
+        //alert(JSON.stringify(result))
         var cityName = result.name; //当前的城市名
         /*自定义代码*/
         $(".mycity").text(cityName);

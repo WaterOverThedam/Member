@@ -40,11 +40,15 @@ public class ActivityCtrl {
 
 
     @RequestMapping(value = "/checkEnrol")
-    public Result checkEnrolStatus (@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,@RequestParam(value = "actId",required = false) Integer actId) throws Exception {
+    public Result checkEnrolStatus (@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,@RequestParam(value = "actId",defaultValue = "") Integer actId) throws Exception {
         Activity activity = new Activity();
         activity.setId(actId);
-        ActivityEnrollment activityEnrollment = activityEnrollmentDao.findFirstByUserAndActivity(user,activity);
-        return ResultUtil.success(activityEnrollment.getStatus());
+        ActivityEnrollment activityEnrollment = activityEnrollmentDao.findFirstByUserAndActivity(user, activity);
+        if (activityEnrollment != null) {
+            return ResultUtil.success(activityEnrollment.getStatus());
+        } else {
+            return null;
+        }
     }
 
 
@@ -68,8 +72,8 @@ public class ActivityCtrl {
 //        }
 //    }
 
-    @RequestMapping(value = "/getPar", method = RequestMethod.POST)
-    public User getPar(Long userId, List names) throws Exception {
+    @RequestMapping(value = "/getPar")
+    public User getPar(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "names",required = false)List names) throws Exception {
         if (userId!=null) {
             return userMapper.getParticipatorsTobe(userId,names);
         }else{

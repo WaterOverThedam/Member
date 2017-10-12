@@ -12,6 +12,7 @@ import java.util.Date;
  */
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@SuppressWarnings("deprecation")
 public class PageLogGroup {
     @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private String pageURL;
