@@ -43,5 +43,4 @@
         order by createTime desc
     </select>
 
-    select phone,name,familyTitle,userId
 </mapper>

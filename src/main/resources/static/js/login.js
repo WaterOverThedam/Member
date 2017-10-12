@@ -145,15 +145,6 @@ $("#btn_change").click(function () {
 });
 
 var waitTime = 60;
-
-function msg(msg) {
-    layer.open({
-        content: msg
-        ,skin: 'msg'
-        ,time: 2 //2秒后自动关闭
-    });
-
-}
 function time(o) {
     if (waitTime == 0) {
         o.removeAttr("disabled");
@@ -170,7 +161,17 @@ function time(o) {
     }
 }
 
-$("#reg_tel").on('change', function () {
+
+function msg(msg) {
+    layer.open({
+        content: msg
+        ,skin: 'msg'
+        ,time: 2 //2秒后自动关闭
+    });
+
+}
+
+$("#reg_tel").on('input', function () {
     var reg_tel = $("#reg_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(reg_tel))) {
         this.focus();
@@ -180,7 +181,7 @@ $("#reg_tel").on('change', function () {
 })
 
 //修改密码
-$("#change_tel").on('change',function () {
+$("#change_tel").on('input',function () {
     var change_tel = $("#change_tel").val();
     if (/^1[34578]\d{9}$/.test($.trim(change_tel))) {
         this.focus();
@@ -293,11 +294,13 @@ function exist_ajax(telephone) {
                                 , anim: 'up'
                             });
                             layer.close(index);
+                            return;
                         }
                     });
                 } else {
                     var content = data.msg ? data.msg : "注册异常，请重试";
                     msg(content);
+                    return;
                 }
             }else{
                 //msg(data.msg);

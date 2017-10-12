@@ -201,8 +201,8 @@ public class LoginCtrl {
         submail.setProject("IkkGR1");
         submail.addVar("time", "30分钟");
         submail.addVar("code", valnum);
-        submail.xsend();
-
+        Boolean res = submail.xsend();
+        //System.out.println(res);
         try {
             //验证码map
             valnumMap.put("valNum", valnum);
