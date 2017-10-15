@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,7 +52,6 @@ public class ParticipatorServiceImpl implements IParticipatorService {
         try {
             Activity activity = new Activity();
             activity.setId(actId);
-            p.setPhone(tel);
             p.setName(name);
             p.setActivity(activity);
             p.setUser(user);
@@ -90,6 +90,7 @@ public class ParticipatorServiceImpl implements IParticipatorService {
 
         return flag;
     }
+
 
     /*
  时间比较，分钟

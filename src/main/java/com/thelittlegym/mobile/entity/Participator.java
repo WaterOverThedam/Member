@@ -17,7 +17,6 @@ public class Participator {
     private Integer id;
     private String name;
     private String familyTitle;
-    private String phone;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = true)
     private User user;

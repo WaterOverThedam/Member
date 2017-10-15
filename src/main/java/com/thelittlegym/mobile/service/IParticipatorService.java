@@ -1,9 +1,11 @@
 package com.thelittlegym.mobile.service;
 
+import com.thelittlegym.mobile.entity.Activity;
 import com.thelittlegym.mobile.entity.Participator;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,4 +19,5 @@ public interface IParticipatorService {
     public void updatePar(Participator p);
     //验证码是否通过
     public Boolean valPar(Map<String,Object> sendMap,String reqNum);
+
 }

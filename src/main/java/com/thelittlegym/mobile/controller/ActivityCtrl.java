@@ -2,8 +2,10 @@ package com.thelittlegym.mobile.controller;
 
 import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
+import com.thelittlegym.mobile.dao.ParticipatorDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.mapper.ParticipatorMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IActivityService;
 import com.thelittlegym.mobile.service.IParticipatorService;
@@ -35,8 +37,9 @@ public class ActivityCtrl {
     @Autowired
     private ActivityEnrollmentDao activityEnrollmentDao;
     @Autowired
+    private ParticipatorMapper participatorMapper;
+    @Autowired
     private UserMapper userMapper;
-
 
 
     @RequestMapping(value = "/checkEnrol")
@@ -63,22 +66,29 @@ public class ActivityCtrl {
         return ResultUtil.success(activityPages);
     }
 
-//    @RequestMapping(value = "/view", method = RequestMethod.POST)
-//    public Activity activityView(Integer id) throws Exception {
-//        if (id!=null) {
-//            return activityService.findOne(id);
-//        }else{
-//            return null;
-//        }
-//    }
-
-    @RequestMapping(value = "/getPar")
-    public User getPar(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "names",required = false)List names) throws Exception {
-        if (userId!=null) {
-            return userMapper.getParticipatorsTobe(userId,names);
+    @RequestMapping(value = "/view", method = RequestMethod.POST)
+    public Activity activityView(Integer id) throws Exception {
+        if (id!=null) {
+            return activityService.findOne(id);
         }else{
             return null;
         }
+    }
+
+    @RequestMapping(value = "/getCandidate")
+    public List<User> getCandidate(@RequestParam(value = "userId") Long userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
+
+        return userMapper.getParticipatorsTobe(userId,names);
+
+    }
+
+    @RequestMapping(value = "/getPar")
+    public List<Participator> getPar(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "actId",required = false)Integer actId) throws Exception {
+      if(actId==null){
+          return null;
+      }
+      return participatorMapper.getParticipatorByUserAndActivity(userId,actId);
+
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)

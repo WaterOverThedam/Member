@@ -254,3 +254,220 @@ function resetPopup(popup){
     val.text('获取验证码');
     clearTimeout(valTimer);//移除定时器
 }
+
+
+$("#role").picker({
+    toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-left">按钮</button>\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">家长/孩子</h1>\
+  </header>',
+    cols: [
+        {
+            textAlign: 'center',
+            values: ['家长', '孩子']
+        }
+    ]
+});
+
+
+function ajax_getItems(size, index, kw) {
+    var html = '';
+    $.ajax({
+        type: 'GET',
+        url: '/activity/getItems',
+        data: {
+            'size': size,
+            'pageNow': index,
+            'kw': kw
+        },
+        async: false,
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (res) {
+            if (!res.code) {
+                if(res.data.content != []){
+                    $.each(res.data.content, function (index, activity) {
+                        maxItems = res.data.totalElements;
+                        //alert(maxItems)
+                        html = '<a class="card animated pulse" href="#activity" onclick="setId(' + activity.id + ')"  data-value="' + activity.id + '" >' +
+                            '<div class="card-header no-border no-padding">' +
+                            '<img class="card-cover" src=" ' + (activity.bannerSrc ? activity.bannerSrc : '/images/member/inform.jpg') + '"/>' +
+                            '</div>' +
+                            '<div class="card-content">' +
+                            '<div class="card-content-inner">' +
+                            '<div class="gym-activity-title">' + activity.name +
+                            '</div>' +
+                            '<div class="gym-activity-item">' +
+                            '<div class="avitivity-text">' +
+                            '<p>日期: ' + toDate(activity.beginDate) + '~' + toDate(activity.endDate) + '</p>' +
+                            '<p>运动: ' + activity.type + '</p>' +
+                            '</div>' +
+                            '<i class="fa fa-bicycle fa-2x color-primary" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</a>';
+                        $('.infinite-scroll-bottom .card-container').append(html);
+                    })
+                }
+                $.refreshScroller();
+            } else {
+//                    $.detachInfiniteScroll($('.infinite-scroll'));
+                $('.infinite-scroll-preloader').text("没有了~");
+                return;
+            }
+        }
+    })
+
+}
+
+
+/*****************activity-开始*******************************/
+function ajax_activity(id) {
+
+    //loading 活动
+    $.ajax({
+        type: 'POST',
+        url: '/activity/view',
+        data: {
+            'id': id
+        },
+        async: false,
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (activity) {
+            //alert(JSON.stringify(activity))
+            if(activity){
+                $("#activity_name").text(activity.name);
+                $("#activity_type").text(activity.type);
+                $("#activity_chargeType").text(activity.chargeType);
+                $("#activity_crowd").text(activity.crowd);
+                $("#activity_strength").text(activity.strength);
+                $("#activity_beginDate").text(toDate(activity.beginDate));
+                $("#activity_detail").text(activity.detail);
+                if (activity.bannerSrc) {
+                    $("#activity_banner").css("backgroundImage", "url(" + activity.bannerSrc + ")");
+                } else {
+                    $("#activity_banner").css("backgroundImage", "url('/images/member/classThemeBanner.jpg')");
+                }
+            }
+        }
+    });
+}
+/*****************activity-结束*******************************/
+
+
+/*****************search-开始**********************************/
+function submitSearch() {
+    $('.card-container .card').remove();
+    ajax_getItems(itemsPerLoad, 1, $('#keyword').val());
+    $('#keyword').blur()
+    $(".content").scrollTop(0);
+    $.router.load("#home");
+    return false;
+}
+/*****************search-结束**********************************/
+
+
+
+function checkEnrol() {
+    $.ajax({
+        type: 'GET',
+        url: '/activity/checkEnrol',
+        data: {
+            'actId': actId
+        },
+        async: false,
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (res) {
+            if(res && res.code && res.data==1){
+                if (!$("#pickerActivity").hasClass("disabled")){
+                    $("#pickerActivity").toggleClass("disabled");
+                }
+                $("#pickerActivity").text("我已报名").unbind();
+                $("#agree").parent().hide();
+            }
+
+        }
+    });
+}
+
+function enrol() {
+    $.ajax({
+        type: 'POST',
+        url: '/activity/enrol',
+        data: {
+            'actId': actId
+        },
+        async: false,
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (res) {
+            $.toast(res.msg);
+        }
+    });
+}
+
+
+function ajax_val(tel) {
+    $.ajax({
+        type: "POST",
+        url: "/activity/val",
+        data: {"tel": tel},
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (data) {
+            if (data.success == true) {
+                console.info(data.message);
+                time($("#add_val"));
+            } else {
+                $.alert("发送失败，稍后再试");
+            }
+        }
+    });
+}
+
+
+
+function ajax_add(tel, name,actid,num) {
+    $.ajax({
+        type: "POST",
+        url: "/activity/add",
+        data: {"tel": tel,"name":name,"actId":actid,"num":num},
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (data) {
+            if ( data != null && data.success == true) {
+                $.alert(data.message);
+            }else{
+                $.alert(data.message);
+                var html = '<lable class="gym-person-name">、' + data.message + '</label>';
+                $('.gym-main').append(html);
+            }
+            $.closeModal(".popup-add");
+            resetPopup(".popup-add");
+        }
+    });
+}
+
+function ajax_update_par(id, actid,extraname) {
+    $.ajax({
+        type: "POST",
+        url: "/activity/update_par",
+        data: {"id": id,"actId":actid,"extraname":extraname},
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        success: function (data) {
+            $.alert('修改成功');
+        }
+    });
+}
+
+
+var actId;
+
+function setId(id){
+    $("#activity").data("value",id);
+}

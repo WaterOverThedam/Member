@@ -11,5 +11,5 @@ import java.util.List;
 public interface UserMapper {
     public List<User> getAll();
     public User getOne(Long id);
-    public User getParticipatorsTobe(@Param("userId") Long userId,@Param("names") List names);
+    public List<User> getParticipatorsTobe(@Param("userId") Long userId,@Param("names") List names);
 }
