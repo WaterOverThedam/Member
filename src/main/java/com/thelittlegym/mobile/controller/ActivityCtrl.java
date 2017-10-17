@@ -5,6 +5,7 @@ import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
 import com.thelittlegym.mobile.dao.ParticipatorDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.mapper.ParticipatorMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IActivityService;
@@ -35,23 +36,19 @@ public class ActivityCtrl {
     @Autowired
     private IParticipatorService participatorService;
     @Autowired
+    private ParticipatorDao participatorDao;
+    @Autowired
     private ActivityEnrollmentDao activityEnrollmentDao;
     @Autowired
     private ParticipatorMapper participatorMapper;
     @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private ActivityEnrollmentMapper activityEnrollmentMapper;
 
     @RequestMapping(value = "/checkEnrol")
-    public Result checkEnrolStatus (@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,@RequestParam(value = "actId",defaultValue = "") Integer actId) throws Exception {
-        Activity activity = new Activity();
-        activity.setId(actId);
-        ActivityEnrollment activityEnrollment = activityEnrollmentDao.findFirstByUserAndActivity(user, activity);
-        if (activityEnrollment != null) {
-            return ResultUtil.success(activityEnrollment.getStatus());
-        } else {
-            return null;
-        }
+    public Integer checkEnrolStatus (Integer userId,Integer actId) throws Exception {
+        return activityEnrollmentMapper.getEnrollStatus(userId, actId);
     }
 
 
@@ -76,7 +73,7 @@ public class ActivityCtrl {
     }
 
     @RequestMapping(value = "/getCandidate")
-    public List<User> getCandidate(@RequestParam(value = "userId") Long userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
+    public List<User> getCandidate(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
 
         return userMapper.getParticipatorsTobe(userId,names);
 
@@ -92,8 +89,15 @@ public class ActivityCtrl {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer actId, String name, String tel) throws Exception {
-           return participatorService.addPar(tel,name,actId,user);
+    public Result add(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer actId, String name, String tel, String familyTitle) throws Exception {
+        log.info(actId.toString());
+        return participatorService.addPar(tel,name,actId,user,familyTitle);
+    }
+
+    @RequestMapping(value = "/delPar")
+    public Result delPar(Integer idPar) throws Exception {
+        participatorDao.delete(idPar);
+        return ResultUtil.success();
     }
 
 

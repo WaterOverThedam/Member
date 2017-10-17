@@ -47,7 +47,7 @@ public class ParticipatorServiceImpl implements IParticipatorService {
         return ResultUtil.success(ResultEnum.ENROL_SUCCESS,activityEnrollment);
     };
     @Override
-    public Result addPar(String tel,String name,Integer actId,User user) {
+    public Result addPar(String tel,String name,Integer actId,User user,String familyTitle) {
         Participator p = new Participator();
         try {
             Activity activity = new Activity();
@@ -55,6 +55,7 @@ public class ParticipatorServiceImpl implements IParticipatorService {
             p.setName(name);
             p.setActivity(activity);
             p.setUser(user);
+            p.setFamilyTitle(familyTitle);
             p.setCreateTime(new Date());
             participatorDao.save(p);
         }catch (Exception e){

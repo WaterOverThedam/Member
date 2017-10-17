@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface IParticipatorService {
     //参与活动
-    public Result addPar(String tel, String name, Integer actid,User user);
+    public Result addPar(String tel, String name, Integer actid,User user,String familyTitle);
     public Result enroll(Integer actId,User user);
     //修改信息
     public void updatePar(Participator p);

@@ -26,6 +26,7 @@ function bdGetPosition(result){
     /*自定义代码*/
     $(".mycity").text(cityName);
     //预先加载4条;同时会确定 maxItems
+
     ajax_getItems(4, lastIndex, cityName);
     $('#keyword').val(cityName)
 
@@ -138,6 +139,10 @@ $("#info").on('click', function () {
     $.popup('.popup-profile');
 });
 
+$("#add").on('click',function () {
+    $.popup('.popup-add');
+})
+
 $("#city-picker").cityPicker({});
 $("#changeCity").on('click', function () {
     $("#city-picker").picker("open");
@@ -160,44 +165,6 @@ $("#icon-like").on('click', function () {
 
 
 
-$(".icon.icon-edit").on('click', function () {
-    var buttons1 = [
-        {
-            text: '请选择',
-            label: true
-        },
-        {
-            text: '修改',
-            onClick: function () {
-                $.alert("你选择了“修改信息“");
-            }
-        },
-        {
-            text: '删除',
-            bold: true,
-            color: 'danger',
-            onClick: function () {
-                $.popup('.popup-add');
-            }
-        },
-        {
-            text: '添加',
-            bold: true,
-            color: 'danger',
-            onClick: function () {
-                $.popup('.popup-add');
-            }
-        },
-    ];
-    var buttons2 = [
-        {
-            text: '取消',
-            bg: 'danger'
-        }
-    ];
-    var groups = [buttons1, buttons2];
-    $.actions(groups);
-});
 
 $("#pickerActivity").toggleClass("disabled");
 $("#agree").on('change', function () {
@@ -208,25 +175,6 @@ $("#agree").on('change', function () {
 
 
 
-//1：报名；0：取消；3：预报名
-$("#pickerActivity").on('click', function () {
-    if (!$(this).hasClass("disabled")) {
-        $("#activity").data("status",3);
-        if($(".gym-main").length == 0){
-            $.confirm('请先填写报名信息', function () {
-                $.popup('.popup-add');
-            });
-//                html = ' <div class="gym-main">'+
-//                    '<i class="fa fa-user"></i>报名人：<label class="gym-person-name">刘翔</label>'+
-//                    '</div>';
-        }else {
-            enrol();
-        }
-    } else {
-        $.alert("请先阅读活动内容及规则！")
-    }
-
-});
 
 
 
@@ -368,47 +316,6 @@ function submitSearch() {
     return false;
 }
 /*****************search-结束**********************************/
-
-
-
-function checkEnrol() {
-    $.ajax({
-        type: 'GET',
-        url: '/activity/checkEnrol',
-        data: {
-            'actId': actId
-        },
-        async: false,
-        contentType: "application/x-www-form-urlencoded",
-        dataType: "json",
-        success: function (res) {
-            if(res && res.code && res.data==1){
-                if (!$("#pickerActivity").hasClass("disabled")){
-                    $("#pickerActivity").toggleClass("disabled");
-                }
-                $("#pickerActivity").text("我已报名").unbind();
-                $("#agree").parent().hide();
-            }
-
-        }
-    });
-}
-
-function enrol() {
-    $.ajax({
-        type: 'POST',
-        url: '/activity/enrol',
-        data: {
-            'actId': actId
-        },
-        async: false,
-        contentType: "application/x-www-form-urlencoded",
-        dataType: "json",
-        success: function (res) {
-            $.toast(res.msg);
-        }
-    });
-}
 
 
 function ajax_val(tel) {

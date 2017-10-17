@@ -93,13 +93,12 @@ public class testCtrl  {
     @GetMapping(value = "/conf")
     @ResponseBody
     private String config(){
-
         return myConfig.toString();
     }
 
     @GetMapping(value = "/getCandidate")
     @ResponseBody
-    public List<User> getCandidate(@RequestParam(value = "userId",defaultValue="",required = false) Long userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
+    public List<User> getCandidate(@RequestParam(value = "userId",defaultValue="",required = false) Integer userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
 
         return userMapper.getParticipatorsTobe(userId,names);
 

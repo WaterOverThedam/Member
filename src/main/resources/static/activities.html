@@ -163,14 +163,18 @@
                     </div>
                 </div>
             </div>
-            <div class="content-block-title">报名名单</div>
+            <div class="content-block-title">
+                <a id="add" href="#"><i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;报名名单</a>
+            </div>
             <div class="card" id="apply">
                 <div class="card-content">
 
                     <div class="list-block">
                         <ul>
-                            <li  class="item-content item-link" v-for="p in participators">
-                                <div class="item-media"><i class="icon icon-edit"></i></div>
+                            <li  class="item-content item-link" v-for="p in participators" @click="edit(p.name,p.familyTitle,p.id)">
+                                <div class="item-media">
+                                    <i class="icon icon-edit"></i>
+                                </div>
                                 <div class="item-inner">
                                     <div class="item-title"><i class="fa fa-user"></i>{{p.name}}</div>
                                     <div class="item-after">{{p.familyTitle}}</div>
@@ -182,7 +186,7 @@
 
                 </div>
                 <div class="card-footer">
-                    <div class="gym-checkbox"><label><input id="agree" type="checkbox" />我已阅读活动内容及规则</label>
+                    <div v-show="enrollStatus==0" class="gym-checkbox"><label><input id="agree" type="checkbox" />我已阅读活动内容及规则</label>
                     </div>
                     <a class="button button-fill " id="pickerActivity" href="javascript:;">报名</a>
                 </div>
@@ -259,7 +263,7 @@
 <div class="popup popup-add box">
     <div class="content">
         <h3 class="apply-title text-center">
-            <i class="fa fa-plus-square-o" aria-hidden="true"></i>报名信息
+            报名信息
         </h3>
         <div class="list-block">
             <ul>
@@ -268,7 +272,7 @@
                         <div class="item-media"><i class="fa fa-user fa-2x"></i></div>
                         <div class="item-inner">
                             <div class="item-input">
-                                <input type="text" id="add_name" v-model="candidate" placeholder="姓名"/>
+                                <input type="text" id="add_name" v-model="candidate.name" placeholder="姓名"/>
                             </div>
                         </div>
                     </div>
@@ -278,24 +282,11 @@
                         <div class="item-media"><i class="fa fa-phone fa-2x"></i></div>
                         <div class="item-inner">
                             <div class="item-input">
-                                <input type="text" id="role" v-model="familyTitle" placeholder="孩子/家长"/>
+                                <input type="text" id="role" v-model="candidate.title" placeholder="孩子/家长"/>
                             </div>
                         </div>
                     </div>
                 </li>
-                <!--<li>-->
-                    <!--<div class="item-content">-->
-                        <!--<div class="item-media"><i class="fa fa-commenting-o fa-2x"></i></div>-->
-                        <!--<div class="item-inner">-->
-                            <!--<div class="item-input">-->
-                                <!--<input type="text" id="add_num" placeholder="验证码"/>-->
-                            <!--</div>-->
-                            <!--<div class="item-after">-->
-                                <!--<button type="button" id="add_val" class="button button-fill button-success">获取验证码</button>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</li>-->
             </ul>
         </div>
         <div class="content-block">
@@ -319,7 +310,17 @@
                         <div class="item-media"><i class="fa fa-user fa-2x"></i></div>
                         <div class="item-inner">
                             <div class="item-input">
-                                <input type="text" id="update_name" placeholder="姓名"/>
+                                <input type="text" id="update_name" data-id="" placeholder="姓名"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="fa fa-phone fa-2x"></i></div>
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="update_role" placeholder="孩子/家长"/>
                             </div>
                         </div>
                     </div>
@@ -425,8 +426,8 @@
                 actId:"",
                 user: {},
                 participators: [],
-                candidate: "",
-                familyTitle:""
+                candidate: {name:"",title:""},
+                enrollStatus:0
             },
             created: function () {
                 this.getProfile();
@@ -459,6 +460,27 @@
                 }
             },
             methods:{
+                //1：报名；0：取消/未报名；3：预报名
+                checkEnrollStatus:function () {
+                    //alert(this.user.id)
+                    this.$http.get('/activity/checkEnrol',
+                        {actId:this.actId, userId:this.user.id}
+                    ).then(function(res){
+                        this.enrollStatus = res.data;
+                        if(res.data==1){
+                            $("#pickerActivity").text("我已报名");
+                            if (!$("#pickerActivity").hasClass("disabled")){
+                                $("#pickerActivity").toggleClass("disabled");
+                            }
+                        }else{
+                            //$("#pickerActivity").removeClass("disabled");
+                            $("#pickerActivity").text("我要报名");
+                        }
+                    },function(res){
+                        console.log(res.status);
+                    });
+
+                },
                 getProfile:function(){
                     this.$http.get('/index/profile').then(function(res){
                         this.user = res.data
@@ -468,10 +490,13 @@
                 },
                 getCandidate:function(){
                     this.$http.get('/activity/getCandidate',{
-                        user: this.user,
+                        userId: this.user.id,
                         names: this.names
                     }).then(function(res){
-                      this.candidate = res.data[0].familyName;
+                        if(res.data){
+                           this.candidate.name = res.data[0].familyName;
+                           this.candidate.title = res.data[0].familyTitle;
+                        }
                     },function(res){
                         alert(res.status);
                     });
@@ -488,6 +513,62 @@
                     },function(res){
                         alert(res.status);
                     });
+                },
+                edit: function (name,title,id) {
+                    name = name||"";
+                    title =title||"";
+                    id =id||"";
+                    var buttons1 = [
+                        {
+                            text: '请选择',
+                            label: true
+                        },
+                        {
+                            text: '修改',
+                            onClick: function () {
+                                $("#update_name").val(name);
+                                $("#update_name").data("id",id);
+                                $("#update_role").val(title)
+                                $.popup('.popup-update');
+                            }
+                        },
+                        {
+                            text: '删除',
+                            bold: true,
+                            color: 'danger',
+                            onClick: function () {
+                                this.$http.get('/activity/delPar',{
+                                    idPar: id,
+                                }).then(function(res){
+                                    if(!res.code){
+                                        this.getPar();
+                                    }
+                                },function(res){
+                                    alert(res.status);
+                                });
+                            }
+                        }
+                    ];
+                    var buttons2 = [
+                        {
+                            text: '取消',
+                            bg: 'danger'
+                        }
+                    ];
+                    var groups = [buttons1, buttons2];
+                    $.actions(groups);
+                },
+                enroll:function () {
+                    this.$http.get('/activity/enrol',{
+                        actId: this.actId
+                    }).then(function(res){
+                        $.toast(res.msg);
+                        //alert(JSON.stringify(this.participators));
+                    },function(res){
+                        alert(res.status);
+                    });
+
+
                 }
 
             }
@@ -504,16 +585,38 @@
            // vm.getCandidate();
             vm.getPar();
             ajax_activity(actId)
-            checkEnrol()
+            //更新报名状态
+            vm.checkEnrollStatus();
+
+
+            //1：报名；0：取消；3：预报名
+            $("#pickerActivity").on('click', function () {
+                if(vm.enrollStatus==1){
+                    return false;
+                }
+                if (!$(this).hasClass("disabled")) {
+                    $("#activity").data("status",3);
+                    if(vm.participators.length == 0){
+                        $.confirm('请先填写报名信息', function () {
+                            vm.getCandidate();
+                            $.popup('.popup-add');
+                        });
+                    }else {
+                        vm.enrol();
+                    }
+                } else {
+                    //alert(1)
+                    $.alert("请先阅读活动内容及规则！")
+                }
+
+            });
             //绑定事件
             $("#add_submit").click(function () {
                 if(pageId == 'myinfo'){
                     //user的信息
                     alert(actId)
                     return 1;
-
                 }
-
                 if(checkAdd()){
                     $.ajax({
                         type: 'POST',
@@ -521,6 +624,7 @@
                         data: {
                             'name': $("#add_name").val(),
                             'tel': $("#add_phone").val(),
+                            'familyTitle': $("#role").val(),
                             'actId': actId
                         },
                         async: false,
@@ -531,6 +635,7 @@
                                 $.toast(res.msg)
                                 $.closeModal(".popup-add");
                             }else {
+                                vm.participators.push(res.data)
                                 if ($("#activity").data("status") == 3){
                                     var modal = $.modal({
                                         title: '报名信息添加成功！',
@@ -540,7 +645,9 @@
                                                 text: '没有，开始报名',
                                                 bold: true,
                                                 onClick: function () {
-                                                    enrol();
+                                                    vm.enroll();
+                                                    vm.getPar();
+                                                    $.closeModal(modal)
                                                     $.closeModal(".popup-add");
                                                     $("#activity").data("status", 1)
                                                 }
@@ -549,14 +656,16 @@
                                                 text: '有，继续登记',
                                                 bold: true,
                                                 onClick: function () {
-                                                    resetPopup(".popup-add");
+                                                    vm.getCandidate()
+                                                    $.popup('.popup-add');
+
                                                 }
                                             },
                                         ]
                                     })
                                 }else {
                                     var modal = $.modal({
-                                        title: '信息添加成功',
+                                        title: '报名信息添加成功',
                                         text: '是否还有其参与人员？',
                                         buttons: [
                                             {
@@ -570,7 +679,7 @@
                                                 text: '有，继续登记',
                                                 bold: true,
                                                 onClick: function () {
-                                                    resetPopup(".popup-add");
+                                                    $.popup('.popup-add');
                                                 }
                                             },
                                         ]
