@@ -6,6 +6,7 @@ import com.thelittlegym.mobile.dao.ParticipatorDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.service.IParticipatorService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +29,32 @@ public class ParticipatorServiceImpl implements IParticipatorService {
     private ParticipatorDao participatorDao;
     @Autowired
     private ActivityEnrollmentDao activityEnrollmentDao;
-
+    @Autowired
+    private ActivityEnrollmentMapper activityEnrollmentMapper;
     @Override
     public Result enroll(Integer actId,User user){
-        ActivityEnrollment activityEnrollment = new ActivityEnrollment();
-        try {
-        Activity activity = new Activity();
-        activity.setId(actId);
-        activityEnrollment.setUser(user);
-        activityEnrollment.setActivity(activity);
-        activityEnrollment.setStatus(1);
-        activityEnrollment.setCreateTime(new Date());
-        activityEnrollmentDao.save(activityEnrollment);
-        }catch (Exception e){
-            log.info("报名错误{}",e);
-            throw new MyException(ResultEnum.ENROL_ERR);
+
+        ActivityEnrollment activityEnrollment = activityEnrollmentMapper.getMyActivityEnrollment(user.getId(),actId);
+        if(activityEnrollment==null) {
+            activityEnrollment = new ActivityEnrollment();
+            try {
+                Activity activity = new Activity();
+                activity.setId(actId);
+                activityEnrollment.setUser(user);
+                activityEnrollment.setActivity(activity);
+                activityEnrollment.setStatus(1);
+                activityEnrollment.setCreateTime(new Date());
+                activityEnrollmentDao.save(activityEnrollment);
+            } catch (Exception e) {
+                log.info("报名错误{}", e);
+                throw new MyException(ResultEnum.ENROL_ERR);
+            }
+            return ResultUtil.success(ResultEnum.ENROL_SUCCESS,activityEnrollment);
+        }else{
+            activityEnrollmentMapper.updateEnrollStatus(activityEnrollment.getId());
+            return ResultUtil.success();
         }
-        return ResultUtil.success(ResultEnum.ENROL_SUCCESS,activityEnrollment);
+
     };
     @Override
     public Result addPar(String tel,String name,Integer actId,User user,String familyTitle) {

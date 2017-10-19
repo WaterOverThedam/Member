@@ -38,8 +38,6 @@ public class ActivityCtrl {
     @Autowired
     private ParticipatorDao participatorDao;
     @Autowired
-    private ActivityEnrollmentDao activityEnrollmentDao;
-    @Autowired
     private ParticipatorMapper participatorMapper;
     @Autowired
     private UserMapper userMapper;
@@ -96,13 +94,19 @@ public class ActivityCtrl {
 
     @RequestMapping(value = "/delPar")
     public Result delPar(Integer idPar) throws Exception {
-        participatorDao.delete(idPar);
+        Participator participator = participatorDao.findOne(idPar);
+        try {
+            participatorDao.delete(idPar);
+        }catch (Exception e){
+            return ResultUtil.error(e.getMessage());
+        }
+        activityEnrollmentMapper.updateStatusAll(participator.getActivity().getId());
         return ResultUtil.success();
     }
 
 
-    @RequestMapping(value = "/enrol", method = RequestMethod.POST)
-    public Result enrol(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer actId) throws Exception {
+    @RequestMapping(value = "/enroll")
+    public Result enroll(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer actId) throws Exception {
         return participatorService.enroll(actId,user);
     }
 

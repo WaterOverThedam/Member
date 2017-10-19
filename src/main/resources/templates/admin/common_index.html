@@ -21,7 +21,7 @@
             <div style="float: right">
                 <a class="ui image label" th:inline="text">
                     <img src="/images/admin/user.jpg"/>[[${session.admin.username}]]
-                    <div class="detail" th:utext="系统管理员"></div>
+                    <div class="detail" th:utext="${session.admin.role == null? '':session.admin.role.name}"></div>
                 </a>
             </div>
         </div>
@@ -194,7 +194,7 @@ alert(type)
         $.get("/admin/activityDel",{id:id}, function(res){
             if(res.code){
                 var dialog = $('.ui.mini.modal')
-                result(dialog,res.code,res.data);
+                showResult(dialog,res.code,res.data);
             }
         })
     }
@@ -380,7 +380,8 @@ alert(type)
     function del(id) {
         $.get("/admin/themeDel",{id:id}, function(data){
             if(data.code){
-                result();
+                var dialog = $('.ui.mini.modal');
+                showResult(dialog);
             }
         })
     }
@@ -391,7 +392,7 @@ alert(type)
         $.post("/admin/theme",{id:$(this).attr('data_id'),isShow:this.checked}, function(data){
             if(res.code){
                 var dialog = $('.ui.mini.modal');
-                result(dialog,res.code,res.data);
+                showResult(dialog,res.code,res.data);
             };
 
         })
@@ -450,7 +451,7 @@ alert(type)
                     success: function(res) {
                         if(re.code){
                             var dialog = $('.ui.mini.modal');
-                            result(dialog,res.code,res.data);
+                            showResult(dialog,res.code,res.data);
                         }else{
                            // window.location.reload();
                         }

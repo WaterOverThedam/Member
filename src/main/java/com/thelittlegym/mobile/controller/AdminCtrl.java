@@ -81,6 +81,8 @@ public class AdminCtrl {
     @ResponseBody
     public Result adminLogin(HttpServletRequest request, String username, String password) throws Exception {
         Result result = adminService.login(username, password);
+        log.info("shhit:{}",result.getData().toString());
+        log.info(result.toString());
         HttpSession session = request.getSession();
         session.setAttribute("admin", result.getData());
         return result;

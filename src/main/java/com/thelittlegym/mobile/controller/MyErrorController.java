@@ -30,7 +30,7 @@ public class MyErrorController implements ErrorController {
             return  "redirect:/404.html";
         }
         if(status.equals(HttpStatus.INTERNAL_SERVER_ERROR)){
-            return  "redirect:/500.html";
+            return  "redirect:/timeout.html";
         }
         if(status.equals(HttpStatus.GATEWAY_TIMEOUT)){
             return  "redirect:/timeout.html";

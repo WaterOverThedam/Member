@@ -15,7 +15,7 @@ function result(data) {
     return null;
 }
 
-function result(dialog,code,msg) {
+function showResult(dialog,code,msg) {
     if(code){
         msg = msg ? msg : "操作失败";
     }else {

@@ -40,15 +40,17 @@ $(document).on('infinite', '.infinite-scroll-bottom', function () {
     setTimeout(function () {
         // 重置加载flag
         loading = false;
-        if (lastIndex >= maxItems) {
+
+        // 添加新条目
+        lastIndex++;
+        if (lastIndex*itemsPerLoad >= maxItems) {
             // 加载完毕，则注销无限加载事件，以防不必要的加载
             $.detachInfiniteScroll($('.infinite-scroll'));
             // 删除加载提示符
             $('.infinite-scroll-preloader').remove();
             return;
         }
-        // 添加新条目
-        lastIndex++;
+
         ajax_getItems(itemsPerLoad,lastIndex,$('#keyword').val());
         // 更新最后加载的页面
         //lastIndex = $('.card-container .card').length;
@@ -220,6 +222,7 @@ $("#role").picker({
 
 
 function ajax_getItems(size, index, kw) {
+
     var html = '';
     $.ajax({
         type: 'GET',
@@ -234,10 +237,9 @@ function ajax_getItems(size, index, kw) {
         dataType: "json",
         success: function (res) {
             if (!res.code) {
-                if(res.data.content != []){
+                if (res.data.content.length > 0) {
                     $.each(res.data.content, function (index, activity) {
-                        maxItems = res.data.totalElements;
-                        //alert(maxItems)
+
                         html = '<a class="card animated pulse" href="#activity" onclick="setId(' + activity.id + ')"  data-value="' + activity.id + '" >' +
                             '<div class="card-header no-border no-padding">' +
                             '<img class="card-cover" src=" ' + (activity.bannerSrc ? activity.bannerSrc : '/images/member/inform.jpg') + '"/>' +
@@ -258,12 +260,15 @@ function ajax_getItems(size, index, kw) {
                             '</a>';
                         $('.infinite-scroll-bottom .card-container').append(html);
                     })
+                    $.refreshScroller();
+                } else {
+                    //
+                    $.detachInfiniteScroll($('.infinite-scroll'));
+                    $('.infinite-scroll-preloader').text("没有了~");
+                    //$('.infinite-scroll-preloader').remove();
+                    return;
                 }
-                $.refreshScroller();
-            } else {
-//                    $.detachInfiniteScroll($('.infinite-scroll'));
-                $('.infinite-scroll-preloader').text("没有了~");
-                return;
+
             }
         }
     })

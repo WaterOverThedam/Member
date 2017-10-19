@@ -489,6 +489,7 @@
                     });
                 },
                 getCandidate:function(){
+                    alert("getCandi")
                     this.$http.get('/activity/getCandidate',{
                         userId: this.user.id,
                         names: this.names
@@ -537,15 +538,22 @@
                             bold: true,
                             color: 'danger',
                             onClick: function () {
-                                this.$http.get('/activity/delPar',{
-                                    idPar: id,
-                                }).then(function(res){
-                                    if(!res.code){
-                                        this.getPar();
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/activity/delPar",
+                                    data: {idPar: id,},
+                                    dataType: "json",
+                                    success: function (res) {
+                                        if (!res.code) {
+                                            $.toast("删除成功");
+                                            vm.getPar();
+                                            vm.checkEnrollStatus()
+                                        } else {
+                                            $.alert("删除失败");
+                                        }
                                     }
-                                },function(res){
-                                    alert(res.status);
                                 });
+
                             }
                         }
                     ];
@@ -559,10 +567,11 @@
                     $.actions(groups);
                 },
                 enroll:function () {
-                    this.$http.get('/activity/enrol',{
+                    this.$http.get('/activity/enroll',{
                         actId: this.actId
                     }).then(function(res){
-                        $.toast(res.msg);
+                        $.toast(res.data.msg);
+                        this.checkEnrollStatus()
                         //alert(JSON.stringify(this.participators));
                     },function(res){
                         alert(res.status);
@@ -576,18 +585,22 @@
 
 
     $(document).on("pageInit", function (e, pageId, $page) {
+
         if(pageId == 'activity'){
             actId = $("#activity").data("value");
             if(actId && actId!=""){
                vm.actId = actId;
             }
+            if(!vm.actId){
+                //如果ID丢失，则回退
+                window.history.go(-1);
+            }
+
             //界面信息初始化
-           // vm.getCandidate();
             vm.getPar();
-            ajax_activity(actId)
+            ajax_activity(vm.actId )
             //更新报名状态
             vm.checkEnrollStatus();
-
 
             //1：报名；0：取消；3：预报名
             $("#pickerActivity").on('click', function () {
@@ -602,7 +615,8 @@
                             $.popup('.popup-add');
                         });
                     }else {
-                        vm.enrol();
+                        vm.enroll();
+                        vm.checkEnrollStatus();
                     }
                 } else {
                     //alert(1)
