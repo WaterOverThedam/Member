@@ -24,11 +24,13 @@ var lastIndex=1;
 function bdGetPosition(result){
     var cityName = result.name; //当前的城市名
     /*自定义代码*/
-    $(".mycity").text(cityName);
-    //预先加载4条;同时会确定 maxItems
+    if($("#keyword").val()==""){
+       $(".mycity").text(cityName);
+    }
 
+    //预先加载4条;同时会确定 maxItems
     ajax_getItems(4, lastIndex, cityName);
-    $('#keyword').val(cityName)
+
 
 }
 
@@ -141,9 +143,7 @@ $("#info").on('click', function () {
     $.popup('.popup-profile');
 });
 
-$("#add").on('click',function () {
-    $.popup('.popup-add');
-})
+
 
 $("#city-picker").cityPicker({});
 $("#changeCity").on('click', function () {
@@ -167,11 +167,19 @@ $("#icon-like").on('click', function () {
 
 
 
-
+//默认diable
 $("#pickerActivity").toggleClass("disabled");
 $("#agree").on('change', function () {
     var is_checked = $(this).prop("checked");
-    $("#pickerActivity").toggleClass("disabled");
+    if(is_checked){
+        if($("#pickerActivity").hasClass("disabled")){
+             $("#pickerActivity").removeClass("disabled");
+        }
+    }else{
+        if(!$("#pickerActivity").hasClass("disabled")) {
+            $("#pickerActivity").toggleClass("disabled");
+        }
+    }
 })
 
 
@@ -314,6 +322,7 @@ function ajax_activity(id) {
 /*****************search-开始**********************************/
 function submitSearch() {
     $('.card-container .card').remove();
+    $(".mycity").text($('#keyword').val());
     ajax_getItems(itemsPerLoad, 1, $('#keyword').val());
     $('#keyword').blur()
     $(".content").scrollTop(0);

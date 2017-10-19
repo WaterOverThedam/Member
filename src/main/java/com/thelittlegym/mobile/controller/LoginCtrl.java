@@ -114,8 +114,6 @@ public class LoginCtrl {
                 }
             }
 
-
-
             JSONObject familyObj = jsonArray.getJSONObject(0);
             Family family = JSONObject.toJavaObject(familyObj,Family.class);
             return  loginService.register(username, password,email,family);

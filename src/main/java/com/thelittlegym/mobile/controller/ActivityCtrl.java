@@ -71,7 +71,7 @@ public class ActivityCtrl {
     }
 
     @RequestMapping(value = "/getCandidate")
-    public List<User> getCandidate(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
+    public List<User> getCandidate(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "names[]") String[] names) throws Exception {
 
         return userMapper.getParticipatorsTobe(userId,names);
 

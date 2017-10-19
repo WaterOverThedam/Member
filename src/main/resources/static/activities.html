@@ -227,19 +227,19 @@
             <a class="button button-link  fa fa-home  pull-right " href="#home"></a>
         </header>
         <div class="content">
-            <div class="content-block-title">个人信息</div>
+            <div class="content-block-title">我的城市</div>
             <div class="list-block">
                 <ul>
-                    <li class="item-content item-link" id="info">
-                        <div class="item-inner">
-                            <div class="item-title">姓名</div>
-                            <div class="item-after">地址</div>
-                        </div>
-                    </li>
+                    <!--<li class="item-content item-link" id="info">-->
+                        <!--<div class="item-inner">-->
+                            <!--<div class="item-title">姓名</div>-->
+                            <!--<div class="item-after">个人信息</div>-->
+                        <!--</div>-->
+                    <!--</li>-->
                     <li class="item-content item-link">
                         <div class="item-inner">
                             <div class="item-input">
-                                <input type="text" placeholder="" value="上海 浦东新区" id="city-picker" readonly=""/></div>
+                                <input type="text" placeholder="" v-model="user.city" id="city-picker" readonly=""/></div>
                             <div class="item-after" id="changeCity">修改城市</div>
                         </div>
                     </li>
@@ -249,12 +249,14 @@
             <div class="content-block-title">已报名的活动，共<label class="text-danger">1</label>个活动</div>
             <div class="list-block">
                 <ul>
+                    <li>
                     <a class="item-content item-link" href="#activity">
                         <div class="item-inner">
                             <div class="item-title">植树节</div>
                             <div class="item-after">查看</div>
                         </div>
                     </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -489,7 +491,7 @@
                     });
                 },
                 getCandidate:function(){
-                    alert("getCandi")
+                    this.getPar();
                     this.$http.get('/activity/getCandidate',{
                         userId: this.user.id,
                         names: this.names
@@ -583,9 +585,16 @@
             }
     });
 
-
+   var pageNow="";
     $(document).on("pageInit", function (e, pageId, $page) {
-
+        alert(pageId)
+        if(pageId==pageNow=="home"){
+            alert(1)
+        }
+        pageNow = pageId;
+        if(pageId == 'search') {
+            alert($("#city-picker").val())
+        }
         if(pageId == 'activity'){
             actId = $("#activity").data("value");
             if(actId && actId!=""){
@@ -602,6 +611,10 @@
             //更新报名状态
             vm.checkEnrollStatus();
 
+            $("#add").on('click',function () {
+                vm.getCandidate();
+                $.popup('.popup-add');
+            })
             //1：报名；0：取消；3：预报名
             $("#pickerActivity").on('click', function () {
                 if(vm.enrollStatus==1){

@@ -96,12 +96,5 @@ public class testCtrl  {
         return myConfig.toString();
     }
 
-    @GetMapping(value = "/getCandidate")
-    @ResponseBody
-    public List<User> getCandidate(@RequestParam(value = "userId",defaultValue="",required = false) Integer userId, @RequestParam(value = "names",defaultValue ="", required = false)List names) throws Exception {
 
-        return userMapper.getParticipatorsTobe(userId,names);
-
-
-    }
 }
