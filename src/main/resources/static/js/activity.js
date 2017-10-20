@@ -24,9 +24,8 @@ var lastIndex=1;
 function bdGetPosition(result){
     var cityName = result.name; //当前的城市名
     /*自定义代码*/
-    if($("#keyword").val()==""){
-       $(".mycity").text(cityName);
-    }
+
+    $(".mycity").text(cityName);
 
     //预先加载4条;同时会确定 maxItems
     ajax_getItems(4, lastIndex, cityName);
@@ -228,9 +227,11 @@ $("#role").picker({
     ]
 });
 
+function setId(id){
+    $("#activity").data("value",id);
+}
 
 function ajax_getItems(size, index, kw) {
-
     var html = '';
     $.ajax({
         type: 'GET',
@@ -387,8 +388,5 @@ function ajax_update_par(id, actid,extraname) {
 }
 
 
-var actId;
 
-function setId(id){
-    $("#activity").data("value",id);
-}
+

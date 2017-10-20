@@ -35,10 +35,12 @@
         select DISTINCT phone,name,familyTitle,userId
         from(select phone,ifnull(name,'')name,familyTitle,createTime,userId from participator union all select telephone,ifnull(familyName,''),familyTitle,create_time,id from user)a
         where userId=${userId}
-        <foreach item="item" index="index" collection="names" open="and name not in("
+        <if test="names!=null">
+           <foreach item="item" index="index" collection="names" open="and name not in("
                  separator="," close=")">
-            #{item}
-        </foreach>
+                #{item}
+           </foreach>
+        </if>
         order by createTime desc
     </select>
 

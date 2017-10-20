@@ -3,6 +3,7 @@ package com.thelittlegym.mobile.controller;
 import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
 import com.thelittlegym.mobile.dao.ParticipatorDao;
+import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -43,7 +45,8 @@ public class ActivityCtrl {
     private UserMapper userMapper;
     @Autowired
     private ActivityEnrollmentMapper activityEnrollmentMapper;
-
+    @Autowired
+    private UserDao userDao;
     @RequestMapping(value = "/checkEnrol")
     public Integer checkEnrolStatus (Integer userId,Integer actId) throws Exception {
         return activityEnrollmentMapper.getEnrollStatus(userId, actId);
@@ -71,7 +74,7 @@ public class ActivityCtrl {
     }
 
     @RequestMapping(value = "/getCandidate")
-    public List<User> getCandidate(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "names[]") String[] names) throws Exception {
+    public List<User> getCandidate(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "names[]" ,required = false) String[] names) throws Exception {
 
         return userMapper.getParticipatorsTobe(userId,names);
 
@@ -104,10 +107,22 @@ public class ActivityCtrl {
         return ResultUtil.success();
     }
 
-
     @RequestMapping(value = "/enroll")
     public Result enroll(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer actId) throws Exception {
         return participatorService.enroll(actId,user);
+    }
+
+    @GetMapping(value = "/updateCity")
+    public Result saveUser(String city,Integer userId) throws Exception {
+
+         userMapper.updateCity(userId,city);
+        /// userDao.save(user);
+         return ResultUtil.success();
+    }
+
+    @GetMapping(value = "/getActEnroll")
+    public List<Activity> getActEnroll(Integer userId) throws Exception {
+        return activityEnrollmentMapper.getActEnroll(userId);
     }
 
 }

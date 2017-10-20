@@ -1,10 +1,9 @@
 package com.thelittlegym.mobile.mapper;
 
+import com.thelittlegym.mobile.entity.Activity;
 import com.thelittlegym.mobile.entity.ActivityEnrollment;
 import com.thelittlegym.mobile.entity.Participator;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -22,6 +21,12 @@ public interface ActivityEnrollmentMapper {
     @Update("update activity_enrollment ae set status=1 where id=${id}")
     public Integer updateEnrollStatus(@Param("id") Integer id);
 
+    @Select("select ifnull(a.name,'')name,a.id from activity_enrollment ae join activity a on a.id=ae.ActivityId where ae.userId=${userId} order by ae.createTime desc")
+    @Results({
+            @Result(id=true,property="id",column="id"),
+            @Result(property="name",column="name"),
+    })
+    public List<Activity> getActEnroll(@Param("userId") Integer userId);
 }
 
 
