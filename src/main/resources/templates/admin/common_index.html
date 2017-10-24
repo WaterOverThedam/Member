@@ -66,7 +66,7 @@
                                 <div class="content">
                                     <div class="center">
                                         <a  href="javascript:;"
-                                            th:data="${activity.id}"  class="ui inverted button viewActivity">查看</a>
+                                            th:attr="data-id=${activity.id}" th:href="@{/admin/activityView(id=${activity.id})}"  class="ui inverted button viewActivity">查看</a>
                                     </div>
                                 </div>
                             </div>

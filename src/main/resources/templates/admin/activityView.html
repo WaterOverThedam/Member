@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head th:substituteby="/admin/common_admin :: head">
+</head>
+
+
+<body>
+
+<div th:substituteby="/admin/common_admin :: menu"/>
+
+<div class="pusher">
+    <div class="ui masthead  segment">
+        <div class="ui container">
+            <div class="ui breadcrumb">
+                <a class="section" id="menu">Home</a>
+                <i class="right angle icon divider"></i>
+                <div class="active section">活动</div>
+            </div>
+        </div>
+    </div>
+    <div class="ui container">
+        <div class="ui segments">
+            <div class="ui segment">
+                <h2>活动详情</h2>
+            </div>
+            <div class="ui segments">
+                <div class="ui segment">
+                    <div class="ui four column stackable grid">
+                        <div class="column"><label>活动名称：</label><span th:utext="${activity.name}"></span></div>
+                        <div class="column"><label>活动地点：</label><span th:utext="${activity.city}"></span></div>
+                        <div class="column"><label>开始时间：</label><span th:utext="${activity.beginDate!=null? #calendars.format(activity.beginDate,'yyyy-MM-dd'):''}"></span></div>
+                        <div class="column"><label>结束时间：</label><span th:utext="${activity.endDate!=null? #calendars.format(activity.endDate,'yyyy-MM-dd'):''}"></span></div>
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <div class="ui message">
+                        <div class="header">
+                            活动内容
+                        </div>
+                        <p>We just updated our privacy policy here to better service our customers. We recommend reviewing the changes.</p>
+                    </div>
+                </div>
+
+                <div class="ui segment">
+                    <p><h3>报名情况</h3></p>
+                    <div class="ui label">
+                     报名家庭数
+                    <div class="detail" th:text="${page.total}"></div>
+                </div>
+                </div>
+                <div class="ui segment">
+                    <table class="ui selectable celled table">
+                        <thead>
+                        <tr class="positive">
+                            <th th:text="家长电话"></th>
+                            <th th:text="参加活动名单"></th>
+                            <th th:text="家庭地址"></th>
+                            <th th:text="中心"></th>
+                            <th th:text="报名活动日期"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr  th:unless="${#lists.isEmpty(page)}" th:each="p : ${page}">
+                            <td th:text="${p.phones}"></td>
+                            <td th:text="${p.participators}"></td>
+                            <td th:text="${p.addr}"></td>
+                            <td th:text="${p.gym}"></td>
+                            <td th:text="${#calendars.format(p.dt,'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(page)}">
+                            <td colspan="4" style="text-align: center">
+                                <div class="ui pointing blue  label">
+                                    OOPS! 暂时没人参加!
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="6">
+                                <div class="ui segment right aligned ">
+                                    <div class="ui buttons">
+                                        <a href="#" th:attr="data-id=1"
+                                           class="ui button item"> 首页</a>
+                                        <a href="#" th:attr="data-id=${page.pageNum}"
+                                           class="ui left labeled icon button item"
+                                           th:classappend="${page.pageNum-1&lt;= 0}?'disabled'"><i
+                                                class="left arrow icon"></i> 上一页 </a>
+                                        <a class="ui blue active button" th:text="${page.pageNum}"></a>
+                                        <a href="#" th:attr="data-id=${page.pageNum+1}"
+                                           class="ui right labeled icon button item"
+                                           th:classappend="${page.pageNum+1&gt; page.Pages}?'disabled'"><i
+                                                class="right arrow icon"></i> 下一页 </a>
+                                        <a href="#" th:attr="data-id=${page.Pages}"
+                                           class="ui button item"> 尾页</a>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+
+    var activity=[[${activity}]];
+
+    $('.ui.dropdown').dropdown();
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
+    $('.special.cards .image').dimmer({
+        on: 'hover'
+    });
+
+    $(".ui.button.item").click(function () {
+        var url = '/admin/activityView?'+$.param({pageNow:$(this).data('id'),id:activity.id});
+        window.location.href=url;
+    })
+
+    /*]]>*/
+</script>
+</body>
+
+</html>

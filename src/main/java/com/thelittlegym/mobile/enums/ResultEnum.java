@@ -21,6 +21,7 @@ public enum ResultEnum {
     REGISTER_ALLOW(0,"'该号码是会员帐号,可以注册√'"),
     REGISTER_NOT_ALLOW(-403,"该号码非会员"),
     REGISTER_FORBIDDEN(-404,"该会员信息已注销，不能注册"),
+    REGISTER_NO_KID(-405,"会员孩子信息未注册"),
 
     ENROL_SUCCESS(0,"报名成功"),
     ENROL_EXIST(-21,"该用户已报名"),

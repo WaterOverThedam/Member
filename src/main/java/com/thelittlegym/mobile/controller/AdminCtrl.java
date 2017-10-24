@@ -13,6 +13,7 @@ import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.mapper.PageLogMapper;
 import com.thelittlegym.mobile.service.IAdminService;
 import com.thelittlegym.mobile.service.IFeedbackService;
@@ -66,6 +67,8 @@ public class AdminCtrl {
     private PageLogMapper pageLogMapper;
     @Autowired
     private JsonService jsonService;
+    @Autowired
+    private ActivityEnrollmentMapper activityEnrollmentMapper;
     @Value("${filePath}")
     private String filePath;
 
@@ -330,21 +333,15 @@ public class AdminCtrl {
         return ResultUtil.error();
     }
 
-    @RequestMapping(value = "/activityView", method = RequestMethod.POST)
-    @ResponseBody
-    //TODO   很多判断，懒得写了
-    public JSONArray activityView(HttpServletRequest request, Integer id) throws Exception {
-        Activity activity = new Activity();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.hh HH:mm:ss");
-        activity = activityDao.findOne(id);
-        sdf.format(activity.getBeginDate());
-        JSONObject jsonObject = (JSONObject) JSON.toJSON(activity);
-        jsonObject.put("beginDate", sdf.format(activity.getBeginDate()));
-        jsonObject.put("endDate", sdf.format(activity.getEndDate()));
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.add(jsonObject);
-
-        return jsonArray;
+    @GetMapping(value = "/activityView")
+    public String activityView(HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1", required = false)Integer pageNow,Integer id,Model model) throws Exception {
+        Activity activity = activityDao.findOne(id);
+        PageHelper.startPage(pageNow, 2);
+        List<ParticipatorGroup> participatorGroups = activityEnrollmentMapper.getMyActivityEnrollmentByActId(id);
+        log.info(participatorGroups.toString());
+        model.addAttribute("page",participatorGroups);
+        model.addAttribute("activity",activity);
+        return "/admin/activityView";
     }
 
 

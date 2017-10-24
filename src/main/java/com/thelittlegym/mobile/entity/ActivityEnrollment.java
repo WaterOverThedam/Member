@@ -27,6 +27,6 @@ public class ActivityEnrollment {
     @JoinColumn(name = "activityId", nullable = true)
     private Activity activity;
     //1：报名；0：取消；3：预报名
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+    //@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private  Integer status;
 }

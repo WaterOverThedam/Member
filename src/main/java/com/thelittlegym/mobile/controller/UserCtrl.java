@@ -84,9 +84,38 @@ public class UserCtrl {
             }
 
 
-            //获孩子所有信息
+
             List<Child> listChild = new ArrayList<Child>();
+            GymSelected gymSelected = new GymSelected();
+            List<Gym> listGym = new ArrayList<Gym>();
+            Gym gym = new Gym();
+            String gymId;
+            String gymName;
+            String beginDate;
+            String endDate;;
+            beginDate = getInitDate().get(0);
+            endDate = getInitDate().get(1);
+
             Integer idFamily = user.getIdFamily();
+
+            //中心列表及所选中心
+            if (session.getAttribute("gymSelected")==null) {
+                String sqlGym = "select crmzdy_81620171 gymName,crmzdy_81620171_id gymId from crm_zdytable_238592_25111_238592_view where crmzdy_81611091_id =" + idFamily + " order by id desc";
+                JSONArray gymArray = oasisService.getResultJson(sqlGym);
+                listGym = JSONObject.parseArray(gymArray.toString(), Gym.class);
+                session.setAttribute("listGym", listGym);
+
+                gymId = listGym.get(0).getGymId();
+                gymName = listGym.get(0).getGymName();
+                gym.setGymId(gymId);
+                gym.setGymName(gymName);
+                gymSelected.setGym(gym);
+                gymSelected.setBeginDate(beginDate);
+                gymSelected.setEndDate(endDate);
+                session.setAttribute("gymSelected", gymSelected);
+            }
+
+           //获孩子所有信息
             String sqlUser = "declare @rest float=0,@dtend varchar(10)='',@gym varchar(50)='';select @gym =max(case when xh=1 then gym end),@rest =sum(kss),@dtend =convert(varchar(10),max(dtend),120) from(select top 6 row_number() over(order by bmksb.id desc)xh,case when ht.crmzdy_81733324<getdate() then 0 else bmksb.crmzdy_81739422 end kss,ht.crmzdy_81733324 dtend,crmzdy_81620171 gym from crm_zdytable_238592_25111_238592_view zx join crm_zdytable_238592_25115_238592_view bmksb on zx.crmzdy_81611091_id= idFamily and bmksb.crmzdy_81756836_id=zx.id  and bmksb.crmzdy_81733119='销售' and bmksb.crmzdy_81739422/*rest*/>0 join crm_zdytable_238592_23796_238592_view ht on ht.id =bmksb.crmzdy_81486464_id and datediff(d,getdate(),crmzdy_81733324/*dtDaoQi*/)>=0)bmksb;select hz.id  idhz,hz.crm_name name,hz.crmzdy_81497217 age,replace(isnull(hz.crmzdy_82017585,''),'''','\\\"')ranking,isnull(@rest,0) rest,isnull(@dtend,'无') dtend,@gym gym from crm_zdytable_238592_23893_238592_view hz where crmzdy_80653840_id=idFamily order by hz.id desc";
             sqlUser = sqlUser.replace("idFamily",idFamily.toString());
             //log.info(sqlUser);
@@ -94,46 +123,14 @@ public class UserCtrl {
             String str = childArray.toJSONString().replace("\\", "").replace("}\"", "}").replace("ranking\":\"\"", "ranking\":{}");
             str = "[" + str.replace(":\"{", ":{").replace("[", "").replace("]", "") + "]";
             List<Child> children = JSON.parseArray(str, Child.class);
-           //log.info(children.toString());
-            List<Gym> listGym = new ArrayList<Gym>();
-            GymSelected gymSelected = new GymSelected();
 
             if (children != null) {
-                Gym gym = new Gym();
-                String beginDate;
-                String endDate;
-                String gymId;
-                String gymName;
-                beginDate = getInitDate().get(0);
-                endDate = getInitDate().get(1);
-
-                //中心列表及所选中心
-                if (null == session.getAttribute("listGym")) {
-                    String sqlGym = "select crmzdy_81620171 gymName,crmzdy_81620171_id gymId from crm_zdytable_238592_25111_238592_view where crmzdy_81611091_id =" + idFamily + " order by id desc";
-                    JSONArray gymArray = oasisService.getResultJson(sqlGym);
-                    listGym = JSONObject.parseArray(gymArray.toString(), Gym.class);
-                } else {
-                    listGym = (List<Gym>) session.getAttribute("listGym");
-                }
-
-                if (session.getAttribute("gymSelected") == null) {
-                    gymId = listGym.get(0).getGymId();
-                    gymName = listGym.get(0).getGymName();
-                    gym.setGymId(gymId);
-                    gym.setGymName(gymName);
-                    gymSelected.setGym(gym);
-                    gymSelected.setBeginDate(beginDate);
-                    gymSelected.setEndDate(endDate);
-                } else {
-                    gymSelected = (GymSelected) session.getAttribute("gymSelected");
-                }
-
-
                 //根据中心显示孩子课程及考勤
                 List<GymClass> listGymClass = new ArrayList<GymClass>();
-                gymId = gymSelected.getGym().getGymId();
-                beginDate = gymSelected.getBeginDate();
-                endDate = gymSelected.getEndDate();
+                GymSelected gymSelected1 = (GymSelected) session.getAttribute("gymSelected");
+                gymId = gymSelected1.getGym().getGymId();
+                beginDate = gymSelected1.getBeginDate();
+                endDate = gymSelected1.getEndDate();
                 String sqlClass = "select bj.crmzdy_80620202_id idgym,idChild,case when rq.crm_name>convert(varchar(5),getdate(),120)+'10-01' then rq.crmzdy_80695562-1 else rq.crmzdy_80695562 end weekNum,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select bmks.crmzdy_81618215_id idChild,crmzdy_81486481 kq,crmzdy_81486480_id idrq from " +
                         "crm_zdytable_238592_25118_238592_view bmks where crmzdy_81618569_id=idjt and bmks.crmzdy_81636525>='beginDate'/*dtbegin*/ and bmks.crmzdy_81636525<='endDate'/*dtend*/ and crmzdy_81619234='已报名' union all select crmzdy_80658051_id idChild,crmzdy_80652349,crmzdy_80652340_id from crm_zdytable_238592_23696_238592_view bk where crmzdy_80631324_id=idjt and bk.crmzdy_81761865>='beginDate'/*dtbegin*/ and bk.crmzdy_81761865<='endDate'/*dtend*/)ks join crm_zdytable_238592_23870_238592_view rq on ks.idrq=rq.id join crm_zdytable_238592_23583_238592_view bj on rq.crmzdy_80650267_id=bj.id and bj.crmzdy_80620202_id='idGym'/*idgym*/order by date desc";
                 sqlClass = sqlClass.replace("idjt",idFamily.toString()).replace("beginDate",beginDate).replace("endDate",endDate).replace("idGym",gymId);
@@ -159,9 +156,7 @@ public class UserCtrl {
             //新人注册优惠活动
             //Boolean in3000 = userService.isNum(user.getTel(), 3000);
             //model.addAttribute("in3000", in3000);
-            session.setAttribute("gymSelected", gymSelected);
-            session.setAttribute("listGym", listGym);
-            //log.info(gymSelected.toString());
+
             model.addAttribute("listChild", listChild);
             model.addAttribute("weixinMap", weixinMap);
         }catch (Exception e){
@@ -243,27 +238,21 @@ public class UserCtrl {
     @ResponseBody
     public Result getAttend(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String idGym, String nameGym, Integer idChild, String beginDate, String endDate, Integer child_index) {
         HttpSession session = request.getSession();
-        JSONObject jsonObject = new JSONObject();
-        JSONArray classArray = new JSONArray();
-        List<GymSelected> listGymSelected = new ArrayList<GymSelected>();
+
         if (user == null) {
             throw new MyException(ResultEnum.FAILURE);
         }
         //session更新GymSelected
-        Object listGymSelectedSession = session.getAttribute("listGymSelectedSession");
-        if (listGymSelectedSession != null) {
-            listGymSelected = (List<GymSelected>) listGymSelectedSession;
-            GymSelected gymSelected = new GymSelected();
-            Gym gym = new Gym();
-            gym.setGymId(idGym);
-            gym.setGymName(nameGym);
-            gymSelected.setGym(gym);
-            gymSelected.setBeginDate(beginDate);
-            gymSelected.setEndDate(endDate);
-            listGymSelected.set(child_index, gymSelected);
-        }
-        session.setAttribute("gymSelected", listGymSelectedSession);
+        GymSelected gymSelected = new GymSelected();
+        Gym gym = new Gym();
+        gym.setGymId(idGym);
+        gym.setGymName(nameGym);
+        gymSelected.setGym(gym);
+        gymSelected.setBeginDate(beginDate);
+        gymSelected.setEndDate(endDate);
+        session.setAttribute("gymSelected", gymSelected);
 
+        JSONArray classArray = new JSONArray();
         String sqlClass = "select bj.crmzdy_80620202_id idgym,case when rq.crm_name>convert(varchar(5),getdate(),120)+'10-01' then rq.crmzdy_80695562-1 else rq.crmzdy_80695562 end weekNum,rq.crm_name date,bj.crmzdy_80612384 time,bj.crmzdy_80612382 course,case when kq='未考勤' then '尚未开课' else kq  end kq from(select crmzdy_81486481 kq,crmzdy_81486480_id idrq " +
                 "from crm_zdytable_238592_25118_238592_view bmks where bmks.crmzdy_81618215_id=" + idChild + " /*idhz*/ and bmks.crmzdy_81636525>='" + beginDate + "'/*dtbegin*/ and bmks.crmzdy_81636525<='" + endDate + "'/*dtend*/ and crmzdy_81619234='已报名' union all select crmzdy_80652349,crmzdy_80652340_id from crm_zdytable_238592_23696_238592_view bk where crmzdy_80658051_id=" + idChild + "  and bk.crmzdy_81761865>='" + beginDate + "'/*dtbegin*/ and bk.crmzdy_81761865<='" + endDate + "'/*dtend*/)ks join crm_zdytable_238592_23870_238592_view rq on ks.idrq=rq.id join crm_zdytable_238592_23583_238592_view bj on rq.crmzdy_80650267_id=bj.id and bj.crmzdy_80620202_id=" + idGym + "/*idgym*/order by date desc";
         classArray = oasisService.getResultJson(sqlClass);

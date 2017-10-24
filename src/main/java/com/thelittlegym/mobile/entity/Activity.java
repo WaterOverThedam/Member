@@ -4,7 +4,9 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hibernate on 2017/5/17.

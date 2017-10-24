@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.pagehelper.PageHelper;
 import com.thelittlegym.mobile.config.MyConfig;
+import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.mapper.AdminMapper;
 import com.thelittlegym.mobile.mapper.PageLogMapper;
@@ -47,6 +48,8 @@ public class testCtrl  {
     private IUserService userService;
     @Autowired
     private MyConfig myConfig;
+    @Autowired
+    private UserDao userDao;
     @GetMapping(value = "/say")
     private String say(ModelMap map){
         ClassPathResource res = new ClassPathResource("static/common_admin.html");
@@ -76,6 +79,7 @@ public class testCtrl  {
 
         return p;
     }
+
     @GetMapping(value = "/user")
     @ResponseBody
     private  List <User>  you(){
