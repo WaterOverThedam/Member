@@ -42,11 +42,7 @@
                                 <i class="dropdown icon"></i>
                                 <div class="default text">请选择城市</div>
                                 <div class="menu">
-                                    <div class="item" data-value="上海市">上海市</div>
-                                    <div class="item" data-value="北京市">北京市</div>
-                                    <div class="item" data-value="杭州市">杭州市</div>
-                                    <div class="item" data-value="江苏市">江苏市</div>
-                                </div>
+                                    <div class="item"  th:each="item : ${session.citys}" th:attr="value=${item.city}" th:text="${item.city}"></div>                                </div>
                             </div>
                         </div>
                     </div>

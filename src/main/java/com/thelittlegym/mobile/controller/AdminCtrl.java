@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.thelittlegym.mobile.Convertor.DateConvert;
 import com.thelittlegym.mobile.common.JsonService;
+import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.PageLogDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
@@ -71,6 +72,8 @@ public class AdminCtrl {
     private ActivityEnrollmentMapper activityEnrollmentMapper;
     @Value("${filePath}")
     private String filePath;
+    @Autowired
+    private OasisService oasisService;
 
 
     @GetMapping(value = "/login")
@@ -83,42 +86,49 @@ public class AdminCtrl {
     @PostMapping(value = "/login")
     @ResponseBody
     public Result adminLogin(HttpServletRequest request, String username, String password) throws Exception {
-        Result result = adminService.login(username, password);
-        log.info("shhit:{}",result.getData().toString());
-        log.info(result.toString());
-        HttpSession session = request.getSession();
-        session.setAttribute("admin", result.getData());
-        return result;
+        try {
+            Result result = adminService.login(username, password);
+            HttpSession session = request.getSession();
+            session.setAttribute("admin", result.getData());
+            return result;
+        }catch (Exception e){
+            throw new MyException(e.getMessage());
+        }
+
     }
 
     @RequestMapping(value = {"", "/index", "/activity"}, method = RequestMethod.GET)
     public String adminIndex(HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
-                             @RequestParam(value = "city", defaultValue = "") Integer city,
+                             @RequestParam(value = "city", defaultValue = "") String city,
                              Model model) throws Exception {
         HttpSession session = request.getSession();
         session.setAttribute("menuId", "activity");
 
+        String sql_citys = "select distinct crmzdy_81744959 city from crm_zdytable_238592_23594_238592_view gym order by city";
+        JSONArray cityArr= oasisService.getResultJson(sql_citys);
+
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow - 1, size, sort);
-        Page<Activity> pages = activityDao.findAll(pageable);
+        Page<Activity> pages;
+        if(city.equals("")) {
+            pages = activityDao.findAllByIsDelete(false, pageable);
+        }else{
+            pages = activityDao.findAllByIsDeleteAndSearchLike(false,city, pageable);
+        }
+        session.setAttribute("citys",cityArr);
         model.addAttribute("page", pages);
         return "/admin/index";
     }
 
     @GetMapping(value = "/theme")
-    public String adminIndex(HttpServletRequest request,
+    public String getTheme(HttpServletRequest request,
                              @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
                              @RequestParam(value = "kw", defaultValue = "") String keyword,
                              Model model) throws Exception {
 
         HttpSession session = request.getSession();
-        //Json同步数据
-        //        List<Theme> themes =jsonService.getThemeData();
-        //        if(themes!=null){
-        //            themeDao.save(themes);
-        //        }
         session.setAttribute("menuId", "theme");
 
         keyword = "%" + keyword + "%";
@@ -251,7 +261,9 @@ public class AdminCtrl {
     @ResponseBody
     public Result activityDel(Integer id) throws Exception {
         try {
-            activityDao.delete(id);
+            Activity activity = activityDao.findOne(id);
+            activity.setIsDelete(true);
+            activityDao.save(activity);
         } catch (Exception e) {
             throw new MyException(e.getMessage());
         }

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
@@ -113,10 +114,13 @@ public class ActivityCtrl {
     }
 
     @GetMapping(value = "/updateCity")
-    public Result saveUser(String city,Integer userId) throws Exception {
-
+    public Result saveUser(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,String city,Integer userId) throws Exception {
+        //更新session
+         HttpSession session = request.getSession();
+         user.setCity(city);
+         session.setAttribute(WebSecurityConfig.SESSION_KEY,user);
+         //更新表
          userMapper.updateCity(userId,city);
-        /// userDao.save(user);
          return ResultUtil.success();
     }
 

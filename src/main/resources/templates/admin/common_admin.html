@@ -37,7 +37,7 @@
     </a>
     <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'theme') || session.admin.role.id==1)}" href="/admin/theme" class="item">家庭作业</a>
     <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'feedback') || session.admin.role.id==1)}" href="/admin/feedback" class="item">会员反馈</a>
-    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'enrollist') || session.admin.role.id==1)}" href="/admin/enrollist" class="item">活动名单</a>
+    <!--<a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'enrollist') || session.admin.role.id==1)}" href="/admin/enrollist" class="item">活动名单</a>-->
     <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'simulation') || session.admin.role.id==1)}" href="/admin/simulation" class="item">会员登录</a>
     <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'pageLog') || session.admin.role.id==1)}" href="/admin/pageLog" class="item">访问统计</a>
     <a href="/admin/exit" class="item">退出</a>

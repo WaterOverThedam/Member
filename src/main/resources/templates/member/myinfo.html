@@ -302,7 +302,8 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-
+    //调试模式
+    var admin =[[${session.admin}]];
     $("#feedback_sub").on('click', function () {
         var feedbackName = $('#feedback_name').val();
         var feedFs = $('#feedback_fs').val();
@@ -326,9 +327,12 @@
         $.popup('.popup-avatar');
     });
     $(".activity").on('click', function () {
+        if(!admin){
+            $.alert("敬请期待...");
+            return;
+        }
         window.location.href="/activities.html";
-        //$.alert("敬请期待...");
-        return;
+
     });
 
     $("#cancelUpdate").on('click', function () {

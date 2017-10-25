@@ -11,4 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ActivityDao extends JpaRepository<Activity,Integer> {
     public Page<Activity> findAllByIsDeleteAndSearchLike(Boolean isDelete, String search, Pageable pageable);
+    public Page<Activity> findAllByIsDelete(Boolean isDelete,Pageable pageable);
 }

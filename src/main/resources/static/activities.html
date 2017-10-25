@@ -430,10 +430,11 @@
 
 <script>
   var url_add = "https://bbk.800app.com/uploadfile/staticresource/238592/279833/dataInterface_jsonp.aspx";
-  var url_edit = "https://bbk.800app.com/uploadfile/staticresource/238592/279833/dataInterface_jsonp.aspx";
-
+  var referrer;
   window.onload=function(){
-      var referrer = document.referrer;
+        if (!referrer) {
+            referrer = document.referrer;
+        }
         var vm = new Vue({
             el:'#box',
             data:{
@@ -508,7 +509,6 @@
                     });
                 },
                 getCandidate:function(){
-                    alert(this.names);
                     this.getPar();
                     this.$http.get('/activity/getCandidate',{
                         userId: this.user.id,
@@ -520,7 +520,6 @@
                         }else{
                            this.candidate = {name:"",title:""}
                         }
-                        alert(this.candidate)
                     },function(res){
                         alert(res.status);
                     });
@@ -605,9 +604,11 @@
                         city: this.user.city,
                         userId: this.user.id
                     }).then(function(res){
+                        window.location.href=referrer;
                         //$.toast(res.data.msg);
                     },function(res){
-                        alert(res.status);
+                        window.location.href=referrer;
+                       // alert(res.status);
                     });
                 },
                 getActEnroll:function () {
@@ -628,7 +629,6 @@
     //返回时更新City
     $("#return").click(function () {
           vm.saveUser();
-          //window.location.href=referrer;
     })
 
     $(document).on("pageInit", function (e, pageId, $page) {
@@ -643,7 +643,7 @@
             vm.actId = $("#activity").data("value");;
             if(!vm.actId){
                 //如果ID丢失，则回退
-                window.history.go(-1);
+                window.location.href="/activities.html";
             }
 
             //界面信息初始化
@@ -684,7 +684,7 @@
                             'name': $("#add_name").val(),
                             'tel': $("#add_phone").val(),
                             'familyTitle': $("#role").val(),
-                            'actId': actId
+                            'actId': vm.actId
                         },
                         async: false,
                         contentType: "application/x-www-form-urlencoded",

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,8 @@ public class ParticipatorServiceImpl implements IParticipatorService {
     private ActivityEnrollmentDao activityEnrollmentDao;
     @Autowired
     private ActivityEnrollmentMapper activityEnrollmentMapper;
+
+    @Transactional
     @Override
     public Result enroll(Integer actId,User user){
 
