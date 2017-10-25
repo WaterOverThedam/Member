@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/css/activities.css"/>
     <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
     <script src="/js/gym.js" type="text/javascript"></script>
-    <script src="http://api.map.baidu.com/api?v=1.5&ak=PYOyYyKG6YV0kCbhf4F8uDpVSHDCc2HI" type="text/javascript"></script>
+    <script src="https://api.map.baidu.com/api?v=1.5&ak=PYOyYyKG6YV0kCbhf4F8uDpVSHDCc2HI" type="text/javascript"></script>
     <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
 
 </head>
@@ -729,6 +729,7 @@
                                                 text: '没有了，完成',
                                                 bold: true,
                                                 onClick: function () {
+                                                    vm.getCandidate();
                                                 }
                                             },
                                             {
