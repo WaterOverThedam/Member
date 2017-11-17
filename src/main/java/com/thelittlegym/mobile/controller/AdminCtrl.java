@@ -97,7 +97,7 @@ public class AdminCtrl {
 
     }
 
-    @RequestMapping(value = {"", "/index", "/activity"}, method = RequestMethod.GET)
+    @GetMapping(value = {"", "/index", "/activity"})
     public String adminIndex(HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
                              @RequestParam(value = "city", defaultValue = "") String city,
@@ -106,17 +106,17 @@ public class AdminCtrl {
         session.setAttribute("menuId", "activity");
 
         String sql_citys = "select distinct crmzdy_81744959 city from crm_zdytable_238592_23594_238592_view gym order by city";
-        JSONArray cityArr= oasisService.getResultJson(sql_citys);
+        JSONArray cityArr = oasisService.getResultJson(sql_citys);
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow - 1, size, sort);
         Page<Activity> pages;
-        if(city.equals("")) {
+        if (city.equals("")) {
             pages = activityDao.findAllByIsDelete(false, pageable);
-        }else{
-            pages = activityDao.findAllByIsDeleteAndSearchLike(false,city, pageable);
+        } else {
+            pages = activityDao.findAllByIsDeleteAndSearchLike(false, city, pageable);
         }
-        session.setAttribute("citys",cityArr);
+        session.setAttribute("citys", cityArr);
         model.addAttribute("page", pages);
         return "/admin/index";
     }

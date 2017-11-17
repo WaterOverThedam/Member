@@ -4,34 +4,15 @@
 
 /****************动态加载开始***********************************/
 $("#home").addClass("active");
-
 var loading = false;
 // 最多可加载的条目
 var maxItems = 40;
 // 每次加载添加多少条目
 var itemsPerLoad = 4;
-//预先加载x条
-try{
-    //var map = new BMap.Map("bdMapBox");
-    var nowCity = new BMap.LocalCity();
-    nowCity.get(bdGetPosition);
-}catch (e){
-    console.error(e)
-}
-
 //初始值
 var lastIndex=1;
-function bdGetPosition(result){
-    var cityName = result.name; //当前的城市名
-    /*自定义代码*/
-
-    $(".mycity").text(cityName);
-
-    //预先加载4条;同时会确定 maxItems
-    ajax_getItems(4, lastIndex, cityName);
 
 
-}
 
 // 接上次加载的序号，并注册
 $(document).on('infinite', '.infinite-scroll-bottom', function () {
@@ -270,11 +251,14 @@ function ajax_getItems(size, index, kw) {
                         $('.infinite-scroll-bottom .card-container').append(html);
                     })
                     $.refreshScroller();
+                    if(res.data.last){
+                        $('.infinite-scroll-preloader').remove();
+                    }
                 } else {
-                    //
                     $.detachInfiniteScroll($('.infinite-scroll'));
-                    $('.infinite-scroll-preloader').text("没有了~");
-                    //$('.infinite-scroll-preloader').remove();
+                    //$('.infinite-scroll-preloader').text("没有了~");
+                    $('.infinite-scroll-preloader').remove();
+                    $.toast("没有记录了~")
                     return;
                 }
 
