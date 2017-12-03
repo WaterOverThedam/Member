@@ -7,7 +7,8 @@ spring:
       naming:
         strategy: org.hibernate.cfg.DefaultNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
+  jackson:
+    default-property-inclusion: non_null
 mybatis:
   config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:mapper/*.xml

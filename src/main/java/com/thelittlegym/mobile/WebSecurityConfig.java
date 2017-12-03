@@ -106,8 +106,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
                 //后台
                 Object admin = session.getAttribute("admin");
                 if(admin==null) {
-                    String url = "/admin/login";
-                    response.sendRedirect(url);
+                    response.sendRedirect("/admin/login");
                     return false;
                 }
             }

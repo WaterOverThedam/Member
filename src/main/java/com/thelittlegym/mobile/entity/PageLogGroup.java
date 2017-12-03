@@ -10,19 +10,14 @@ import java.util.Date;
 /**
  * Created by TONY on 2017/10/1.
  */
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @Data
-@SuppressWarnings("deprecation")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PageLogGroup {
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private String pageURL;
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private String requestType;
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private String userName;
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     @DateTimeFormat( pattern = "yyyy-MM-dd" )
     private Date createTime;
-    @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private Integer ci;
 }

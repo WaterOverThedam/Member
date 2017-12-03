@@ -1,5 +1,6 @@
 package com.thelittlegym.mobile.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.thelittlegym.mobile.Convertor.DateConvert;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name="activity_enrollment")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityEnrollment {
     @Id
     @GeneratedValue
@@ -27,6 +29,5 @@ public class ActivityEnrollment {
     @JoinColumn(name = "activityId", nullable = true)
     private Activity activity;
     //1：报名；0：取消；3：预报名
-    //@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
     private  Integer status;
 }

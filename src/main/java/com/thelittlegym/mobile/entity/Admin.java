@@ -1,5 +1,6 @@
 package com.thelittlegym.mobile.entity;
 
+
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,7 +22,8 @@ public class Admin {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId", nullable = true)
     private Role role;
-    private Date createTime;
+    //默认值
+    private Date createTime = new Date();
     private boolean isDelete;
 
 }
