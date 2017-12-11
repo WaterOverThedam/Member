@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.thelittlegym.mobile.Convertor.DateConvert;
+import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.JsonService;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.ActivityDao;
@@ -16,6 +17,8 @@ import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.mapper.PageLogMapper;
+import com.thelittlegym.mobile.mapper.SettingMapper;
+import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IAdminService;
 import com.thelittlegym.mobile.service.IFeedbackService;
 import com.thelittlegym.mobile.service.ILoginService;
@@ -74,7 +77,10 @@ public class AdminCtrl {
     private String filePath;
     @Autowired
     private OasisService oasisService;
-
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private SettingMapper settingMapper;
 
     @GetMapping(value = "/login")
     public String adminToLogin(HttpServletRequest request) throws Exception {
@@ -82,6 +88,26 @@ public class AdminCtrl {
         return "/admin/login";
 
     }
+
+    @GetMapping("/getUsers")
+    @ResponseBody
+    public Result getUsers(@RequestParam(value = "pageNow",defaultValue = "1") Integer pageNow,
+                           @RequestParam(value = "size",defaultValue = "10") Integer size,
+                           @RequestParam(value = "search",defaultValue = "") String search) throws Exception {
+        PageHelper.startPage(pageNow,size);
+        List<User> users = userMapper.getAll(search);
+        PageInfo<User> info = new PageInfo<>(users);
+        return ResultUtil.success(info);
+    }
+
+    @GetMapping("/getStats")
+    @ResponseBody
+    public Result getStats() throws Exception {
+        List <HashMap> s = userMapper.getStats();
+        return ResultUtil.success(s);
+    }
+
+
 
     @PostMapping(value = "/login")
     @ResponseBody
@@ -97,13 +123,13 @@ public class AdminCtrl {
 
     }
 
-    @GetMapping(value = {"", "/index", "/activity"})
+    @GetMapping(value = "/activity")
     public String adminIndex(HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
                              @RequestParam(value = "size", defaultValue = "10") Integer size,
                              @RequestParam(value = "city", defaultValue = "") String city,
                              Model model) throws Exception {
         HttpSession session = request.getSession();
-        session.setAttribute("menuId", "activity");
+        model.addAttribute("menuId", "activity");
 
         String sql_citys = "select distinct crmzdy_81744959 city from crm_zdytable_238592_23594_238592_view gym order by city";
         JSONArray cityArr = oasisService.getResultJson(sql_citys);
@@ -129,7 +155,7 @@ public class AdminCtrl {
                              Model model) throws Exception {
 
         HttpSession session = request.getSession();
-        session.setAttribute("menuId", "theme");
+        model.addAttribute("menuId", "theme");
 
         keyword = "%" + keyword + "%";
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
@@ -297,23 +323,42 @@ public class AdminCtrl {
 
 
 
-
-
-    @RequestMapping(value = "/simulation", method = RequestMethod.GET)
-    public String simulation(HttpServletRequest request, Model model) throws Exception {
-
-        String tel = request.getParameter("tel");
+    @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
+    public String userInfo(HttpServletRequest request, Model model) throws Exception {
+        model.addAttribute("menuId", "userInfo");
         Long totalMember = userService.getTotal();
-
-        if (null != tel) {
-            model.addAttribute("tel", tel);
-        }
         if (null != totalMember) {
             model.addAttribute("totalMember", totalMember);
         }
-        return "/admin/simulation";
+        return "/admin/userInfo";
     }
 
+
+    @GetMapping(value = "/setting")
+    public String setting(HttpServletRequest request, Model model) throws Exception {
+        model.addAttribute("menuId", "setting");
+        return "/admin/setting";
+    }
+
+    @GetMapping(value = "/getSetting")
+    @ResponseBody
+    public Result getSetting (@RequestParam(value = "name") String name) throws Exception {
+        Setting setting = settingMapper.getSettingByName(name);
+        return  ResultUtil.success(setting);
+    }
+
+    @PostMapping(value = "/saveSetting")
+    @ResponseBody
+    public Result saveSetting (@RequestBody Setting setting) throws Exception {
+        Setting s = settingMapper.getSettingByName(setting.getName());
+        Integer num;
+        if (s==null){
+            num = settingMapper.insert(setting);
+        }else {
+            num = settingMapper.update(setting);
+        }
+        return  ResultUtil.success(num);
+    }
     @RequestMapping(value = "/member", method = RequestMethod.POST)
     @ResponseBody
     public Result member(HttpServletRequest request, String tel) {
@@ -362,10 +407,10 @@ public class AdminCtrl {
                            @RequestParam(value = "size", defaultValue = "8", required = false) Integer size,
                            @RequestParam(value = "type", defaultValue = "0", required = false) Integer type,
                            Model model) throws Exception {
-
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow - 1, size, sort);
         Page<Feedback> feedbackPages = feedbackService.findAllByHandled(type, pageable);
+        model.addAttribute("menuId", "feedback");
         model.addAttribute("page", feedbackPages);
         return "/admin/feedback";
     }
@@ -400,7 +445,7 @@ public class AdminCtrl {
         }
     }
 
-    @GetMapping(value = "/pageLog")
+    @GetMapping(value ={"", "/index", "/pageLog"})
     public String statView(HttpServletRequest request, @RequestParam(value = "pageNow", defaultValue = "1", required = false) Integer pageNow,
                            @RequestParam(value = "kw", required = false) String keyWord, @RequestParam(value = "size", defaultValue = "16", required = false) Integer size,
                            @RequestParam(value = "dtBegin", required = false) String dtBegin, @RequestParam(value = "dtEnd", required = false) String dtEnd,
@@ -408,8 +453,7 @@ public class AdminCtrl {
 
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(pageNow - 1, size, sort);
-        HttpSession session = request.getSession();
-        session.setAttribute("menuId", "pageLog");
+        model.addAttribute("menuId", "pageLog");
 
         Page<PageLog> page;
         if (dtBegin != null) {
@@ -429,8 +473,7 @@ public class AdminCtrl {
                                 @RequestParam(value = "dtBegin", required = false) String dtBegin, @RequestParam(value = "dtEnd", required = false) String dtEnd,
                                 Model model) throws Exception {
 
-        HttpSession session = request.getSession();
-        session.setAttribute("menuId", "pageLog");
+        model.addAttribute("menuId", "pageLog");
 
         if (groups == null || groups == "") {
             groups = "pageURL,requestType";
@@ -447,9 +490,7 @@ public class AdminCtrl {
         model.addAttribute("page", page);
         model.addAttribute("groups", groups);
 
-
         return "/admin/index";
-
     }
 
     @PostMapping(value = "/pageLog")

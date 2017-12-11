@@ -8,11 +8,18 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>后台</title>
     <link rel="stylesheet" href="/ui/semantic/semantic.min.css"/>
+    <link rel="stylesheet" href="/ui/layer_mobile/need/layer.css"/>
     <script type='text/javascript' src='/js/jquery-1.11.3.min.js' charset='utf-8'></script>
     <script type='text/javascript' src='/js/gym.js' charset='utf-8'></script>
     <script type='text/javascript' src='/ui/semantic/semantic.min.js' charset='utf-8'></script>
     <script type='text/javascript' src='/ui/laydate/laydate.js'></script>
+    <script type='text/javascript' src='/js/vue.js' charset='utf-8'></script>
+    <script type='text/javascript' src='/js/vue-resource.js' charset='utf-8'></script>
+    <script src="/ui/layer_mobile/layer.js"></script>
     <style>
+        .disabled {
+            background-color: lightgray!important;
+        }
         .ui.mini.modal {
             width: 300px;
             height: 70px;
@@ -25,22 +32,21 @@
         .dt-input{padding-left: 10px; height: 38px; min-width: 100px; line-height: 38px; border: 1px solid #e6e6e6;  background-color: #fff;  border-radius: 3px;}
     </style>
 
+
 </head>
 
 <div  th:fragment="menu" class="ui  thin sidebar left inverted vertical menu">
     <div class="header item">
         <img class="logo" src="/images/admin/logo.jpg"/>
     </div>
-
-    <a href="/admin/activity" class="item">中心活动
-        <i class="browser icon"></i>
-    </a>
-    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'theme') || session.admin.role.id==1)}" href="/admin/theme" class="item">家庭作业</a>
-    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'feedback') || session.admin.role.id==1)}" href="/admin/feedback" class="item">会员反馈</a>
+    <a  href="/admin/pageLog" class="item">访问统计</a>
+    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'setting') || session.admin.role.id==1)}" href="/admin/setting" class="item">系统设置<i th:if="${menuId=='setting'}" class="browser icon"></i></a>
+    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'userInfo') || session.admin.role.id==1)}" href="/admin/userInfo" class="item">会员管理<i th:if="${menuId=='userInfo'}" class="browser icon"></i></a>
+    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'activity') || session.admin.role.id==1)}" href="/admin/activity" class="item">中心活动<i th:if="${menuId=='activity'}" class="browser icon"></i></a>
+    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'theme') || session.admin.role.id==1)}" href="/admin/theme" class="item">家庭作业<i th:if="${menuId=='theme'}" class="browser icon"></i></a>
+    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'feedback') || session.admin.role.id==1)}" href="/admin/feedback" class="item">会员反馈<i th:if="${menuId=='feedback'}" class="browser icon"></i></a>
     <!--<a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'enrollist') || session.admin.role.id==1)}" href="/admin/enrollist" class="item">活动名单</a>-->
-    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'simulation') || session.admin.role.id==1)}" href="/admin/simulation" class="item">会员登录</a>
-    <a th:if="${session.admin.role!=null and (#strings.contains(session.admin.role.acl,'pageLog') || session.admin.role.id==1)}" href="/admin/pageLog" class="item">访问统计</a>
-    <a href="/admin/exit" class="item">退出</a>
+   <a href="/admin/exit" class="item">退出</a>
 
 </div>
 

@@ -89,10 +89,157 @@ function toDate(input){
         return ('00'+s).substr(-2);
     }
 }
+//五种参数
+//new Date("month dd,yyyy hh:mm:ss");
+//new Date("month dd,yyyy");
+//new Date(yyyy,mth,dd,hh,mm,ss);
+//new Date(yyyy,mth,dd);
+//new Date(ms);
 
 
+function get_data_json(url,data,async) {
+    var res;
+    var async = async||false;
+    $.ajax({
+        url: url,
+        dataType : "json",
+        data: data,
+        async: async,
+        cache: false,
+        type: "get",
+        success: function(data) { //string;dom
+            try{
+                if(!data.code){
+                    res = data.data;
+                }else{
+                    res = null;
+                }
+            }catch(e){
+                alert(e.message)
+            }
+        }
+    });
+    return res
+}
+
+
+function post_data_json(url,data,async) {
+    var res;
+    var async = async||false;
+    $.ajax({
+        url: url,
+        dataType : "json",
+        data: data,
+        async: async,
+        cache: false,
+        type: "post",
+        success: function(data) { //string;dom
+            try{
+                if(!data.code){
+                    res = data.data;
+                }else{
+                    res = null;
+                }
+            }catch(e){
+                alert(e.message)
+            }
+        }
+    });
+    return res
+}
 
 function checkTel(tel){
     return /^1[34578]\d{9}$/.test($.trim(tel));
 }
 
+function CurTimeStamp(){
+    return Date.parse(new Date())/1000;
+}
+
+/*
+ 当前日期 CurTime().substr(0,10)
+ 当前时间 CurTime().substr(10)
+ */
+function CurTime(type){
+    var type = type||"d";
+    type = type.toLowerCase();
+    CurTimeStamp = Date.parse(new Date())/1000;
+    dt = TimeStampToDate(CurTimeStamp);
+    switch(type){
+        case "d":
+            return dt.substr(0,10);
+        case "h":
+            return dt.substr(10);
+        case "f":
+            return dt
+        default:
+            return dt.substr(0,10)
+    }
+}
+/*
+ day(d) - 86400
+ hour(h) - 3600
+ min(m) -60
+ */
+function DateAdd(dt,num,type){
+    if (IsDate(dt)){
+        var tp = DateToTimeStamp(dt)
+        var num = num||0;
+        var type = type||"d";
+        type = type.toLowerCase();
+        var second;
+        switch(type){
+            case "d":
+                s=86400*num;
+                break;
+            case "h":
+                s=3600*num;
+                break;
+            case "m":
+                s=60*num;
+                break;
+            default:
+                s=num;
+        }
+        tp = tp + s;
+        return TimeStampToDate(tp).substr(0,10)
+    }else{
+        return "dateformat:yyyy-mm-dd";
+    }
+}
+function IsDate(dt){
+    var regexp = /^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1])$/g;
+    // 日期范围:1700-01-01 ----2099-01-01
+    return regexp.test(dt);
+}
+function DateToTimeStamp(string) {
+    var f = string.split(' ', 2);
+    var d = (f[0] ? f[0] : '').split(/[-/]/, 3);
+    var t = (f[1] ? f[1] : '').split(':', 3);
+    return (new Date(
+            parseInt(d[0], 10) || null,
+            (parseInt(d[1], 10) || 1) - 1,
+            parseInt(d[2], 10) || null,
+            parseInt(t[0], 10) || null,
+            parseInt(t[1], 10) || null,
+            parseInt(t[2], 10) || null
+        )).getTime()/1000 ;
+}
+function add0(m){return m<10?'0'+m:m };
+function TimeStampToDate(shijianchuo,sperator) {
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo*1000);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate();
+    var h = time.getHours();
+    var mm = time.getMinutes();
+    var s = time.getSeconds();
+    sperator  =  (typeof(sperator)=="undefined")? "-":sperator;
+    return y+sperator+add0(m)+sperator+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+};
+function IsDate(num){
+    var regexp = /^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])(\-)([0][1-9]|[1][0-2])(\-)([0-2][1-9]|[3][0-1])$/g;
+    // 日期范围：1700-01-01 -2099-01-01
+    return regexp.test(num)
+}

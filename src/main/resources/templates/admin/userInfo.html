@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head th:substituteby="/admin/common_admin :: head"/>
+
+<body>
+<div th:substituteby="/admin/common_admin :: menu"/>
+
+<div class="pusher" id="box">
+    <div class="ui masthead  segment">
+        <div class="ui container">
+            <div class="ui breadcrumb">
+                <a class="section" id="menu">Home</a>
+                <i class="right angle icon divider"></i>
+                <div class="active section">会员管理</div>
+            </div>
+        </div>
+    </div>
+    <div class="ui container">
+        <div class="ui segments">
+            <div class="ui segment">
+                <div class="ui one column stackable grid">
+                    <div class="column">
+                        <div class="ui tabular menu">
+                            <a class="active item" data-id="home">
+                                会员清单
+                            </a>
+                            <a class="item" data-id="hz">
+                                会员统计
+                            </a>
+                            <a class="item" data-id="login">
+                                会员登陆
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui segment">
+                <div class="ui blue statistic">
+                    <div class="value" th:text="${totalMember}">
+                    </div>
+                    <div class="label">
+                        已注册会员数量
+                    </div>
+                </div>
+            </div>
+            <component :is="menu" :get_gym_jsonp='get_gym_jsonp' :gyms='gyms'>
+            </component>
+        </div>
+    </div>
+</div>
+<template id="login">
+    <div class="ui segment">
+        <div class="ui form">
+            <div class="ui fluid action input">
+                <input  v-model="tel" type="text" placeholder="输入会员手机号"/>
+                <button v-on:click="login" class="ui teal small right labeled icon button">
+                    <i class="hand pointer icon"></i>
+                    以该会员身份进入
+                </button>
+            </div>
+            <div class="ui error message"></div>
+        </div>
+    </div>
+</template>
+<template id="home">
+    <div class="ui segment">
+        <div class="ui two column stackable grid">
+            <div class="column right aligned">
+                <div class="ui search">
+                    <a class="ui icon input" id="1">
+                        <input class="prompt" type="text" v-model="search" placeholder="关键字"/>
+                        <i style="cursor:pointer" class="search icon"></i>
+                    </a>
+                </div>
+                <div class="results"></div>
+            </div>
+            <div class="column left aligned">
+                <div>
+                    <a id="query" href="#" class="ui primary button" v-on:click="getUsers">搜索</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui segment" v-if="users">
+        <table class="ui selectable celled table">
+            <thead>
+            <tr class="positive">
+                <th>家长姓名</th>
+                <th>孩子姓名</th>
+                <th>家长手机</th>
+                <th>邮箱</th>
+                <th>所属中心</th>
+                <th>注册日期</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="user in users.list">
+                <td v-text="user.familyName"></td>
+                <td v-text="user.childName"></td>
+                <td v-text="user.username"></td>
+                <td v-text="user.email"></td>
+                <td v-text="user.gym"></td>
+                <td v-text="user.createTime|formatDate"></td>
+            </tr>
+            <tr v-if="users.size==0">
+                <td colspan="6" style="text-align: center">
+                    <div  class="ui pointing red  label">
+                        OOPS! No Record!
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr><th colspan="6">
+                <div class="ui compact menu">
+                    <a class="item">
+                        <i class="icon users"></i> 记录总数
+                        <div class="floating ui red label" v-text="users.total"></div>
+                    </a>
+                    <a class="item">
+                        <i class="icon user"></i> 当前记录数
+                        <div class="floating ui teal label" v-text="users.size"></div>
+                    </a>
+                </div>
+                <div class="ui right floated pagination menu" >
+                    <a href="javascript:void(0)" class="icon item pager" v-on:click="turnToPage(users.pageNum-1)"><i class="left chevron icon"></i></a>
+                    <a href="javascript:void(0)" v-for="i in navSize" :class="{'disabled':i+users.pageNum==users.pageNum}" class="item pager" v-text="i+users.pageNum" v-on:click="turnToPage(i+users.pageNum)"></a>
+                    <a href="javascript:void(0)" class="icon item pager" v-on:click="turnToPage(users.pageNum+1)"><i class="right chevron icon"></i></a>
+                </div>
+            </th></tr>
+            </tfoot>
+        </table>
+    </div>
+</template>
+<template id="hz">
+    <div class="ui segment">
+        <table class="ui selectable celled table">
+             <thead>
+                <tr>
+                    <th>人数</th><th>中心</th><th>中心地址</th><th>中心电话</th>
+                </tr>
+             </thead>
+             <tbody>
+                <tr v-for="s in stats">
+                    <td v-text="s.num"></td>
+                    <td v-text="s.gym"></td>
+                    <td v-for ="(k,g) in gymFilter(s.gymcode)[0]" v-if="k!='code'" v-text="g" ></td>
+                </tr>
+             </tbody>
+        </table>
+    </div>
+</template>
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
+
+
+
+    function ajax_admin_member(tel) {
+        $.ajax({
+            type: "POST",
+            url: "/admin/member",
+            data: {
+                "tel": tel
+            },
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+                if (!res.code) {
+                    location.href="/index";
+                } else {
+                    var errmessage = '<ul><li>' +  res.msg + '</li></ul>'
+                    $(".ui.error.message").html(errmessage);
+                    $(".ui.error.message").fadeIn();
+                }
+            }
+        })
+    }
+
+    var url_jsonp = "https://bbk.800app.com/uploadfile/staticresource/238592/279833/dataInterface_jsonp.aspx";
+    var sql_getGym = "select crmzdy_80620116 code,crmzdy_80616967 phone,crmzdy_81744958+crmzdy_81744959+crmzdy_81744960+crmzdy_80616968 addr from crm_zdytable_238592_23594_238592_view where crmzdy_80620116 between 500005 and 600005";
+
+    var Home=Vue.extend({
+        template:'#home',
+        data: function () {
+            return {
+                users: {},
+                pageNow:1,
+                size:14,
+                search:""
+            }
+        },
+        props:['get_gym_jsonp','gyms'],
+        computed:{
+            navSize:function () {
+                //console.log(this.users.length)
+                return  this.users.pages>6 ? 6:this.users.pages
+            }
+        },
+        filters: {
+            formatDate:function(date) {
+                var date = new Date(date);
+                return date.Format("yyyy-MM-dd");
+            }
+        },
+        methods:{
+            turnToPage:function (pageNum) {
+                this.pageNow = pageNum;
+                //alert(this.pageNow)
+                this.getUsers();
+            },
+            getUsers:function(){
+                this.$http.get('/admin/getUsers',
+                    {pageNow: this.pageNow,size:this.size,search:this.search}
+                ).then(function(res) {
+                    if (res.data && !res.data.code){
+                        this.users = res.data.data;
+                    }
+                    //alert(JSON.stringify(this.users));
+                },function(res){
+                    alert(res.status);
+                });
+            }
+        },
+        ready: function () {
+                this.getUsers();
+        }
+    });
+
+    var Hz=Vue.extend({
+        template:'#hz',
+        data: function () {
+            return {
+                stats: []
+            }
+        },
+        props:['get_gym_jsonp','gyms'],
+        methods:{
+            getStats:function(){
+                this.$http.get('/admin/getStats'
+                ).then(function(res) {
+                    if (res.data && !res.data.code){
+                        this.stats = res.data.data;
+                    }
+                    //alert(JSON.stringify(this.stats));
+                },function(res){
+                    alert(res.status);
+                });
+            },
+            gymFilter:function (code) {
+                return this.gyms.filter(function (gym) {
+                    //console.log(gym.code+"vs"+code)
+                    return gym.code==code;
+                })
+            }
+        },
+        ready: function () {
+            this.get_gym_jsonp()
+            this.getStats();
+        }
+    });
+
+    var Login=Vue.extend({
+        template:'#login',
+        data: function () {
+            return { tel:""}
+        },
+        props:['get_gym_jsonp','gyms'],
+        methods:{
+            login:function () {
+                if (/^1[34578]\d{9}$/.test($.trim(this.tel))) {
+                    ajax_admin_member(this.tel);
+                }else{
+                    var errmessage = '<ul><li>' +  '手机号格式错误' + '</li></ul>'
+                    $(".ui.error.message").html(errmessage);
+                    $(".ui.error.message").fadeIn();
+                }
+            }
+        }
+    });
+
+    var vm=new Vue({
+        el:'#box',
+        data:{
+            menu:"home",
+            gyms:[]
+        },
+        components:{
+            'home':Home,
+            'hz':Hz,
+            'login':Login
+        },
+        filters: {
+            maximum: function (value) {
+                return Math.max.apply(null,value.split(","));
+            },
+            minimum: function (value) {
+                return Math.min.apply(null,value.split(","));
+            }
+        },
+        computed:{
+
+        },
+        created: function () {
+
+        },
+        methods:{
+            get_gym_jsonp:function(){
+                this.$http.jsonp(url_jsonp,{
+                    sql1: sql_getGym
+                },{
+                    jsonp:'callback'
+                }).then(function(res){
+                    this.gyms = res.data.info[0].rec;
+                    //alert(JSON.stringify(this.gyms))
+                },function(res){
+                    alert(res.status);
+                });
+            }
+        }
+    });
+
+    $(".tabular.menu .item").click(function () {
+        vm.menu = $(this).data("id");
+        $(".menu .item").removeClass("active");
+        $(this).addClass("active");
+    })
+
+
+    /*]]>*/
+</script>
+</body>
+</html>

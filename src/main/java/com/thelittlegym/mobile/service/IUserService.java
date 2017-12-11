@@ -32,7 +32,7 @@ public interface IUserService {
 
     public Boolean isReged(String tel);
     //前多少名是否存在此号码
-    public Boolean isNum(String tel, Integer num);
+    public Integer isNum(String tel, Integer num);
 
     public User getByTel(String tel);
 

@@ -33,6 +33,7 @@ public class OasisService {
         try {
             httpResultUser = httpService.doPost(POST_URL, hashMap);
             JSONObject jsonResult = JSONObject.parseObject(httpResultUser.getData());
+
 //            System.out.print("1b");
 //            System.out.println(jsonResult.toJSONString());
             if (jsonResult != null) {

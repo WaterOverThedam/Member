@@ -18,7 +18,6 @@ public class Admin {
     private Integer id;
     private String username;
     private String password;
-    private String name;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId", nullable = true)
     private Role role;

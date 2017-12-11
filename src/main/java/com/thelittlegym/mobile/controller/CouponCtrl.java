@@ -5,6 +5,7 @@ import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.service.ICouponService;
 import com.thelittlegym.mobile.service.IPointsService;
+import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 
 /**
@@ -31,11 +33,15 @@ public class CouponCtrl {
 
         Result couponMap = couponService.getCoupon_http(tel);
         Result pointAdd =pointsService.updatePoints_http(tel,pointed);
-
-        //注册优惠券
-        Result coupon2Map = couponService.addCoupon3000(tel);
-        model.addAttribute("coupon",couponMap);
+        HttpSession session = request.getSession();
+       //注册优惠券
+        Integer in3000 =(Integer) session.getAttribute("in3000");
+        Result coupon2Map = ResultUtil.success();
+        if(in3000>0) {
+             coupon2Map = couponService.getCoupon3000(tel);
+        }
         model.addAttribute("coupon2",coupon2Map);
+        model.addAttribute("coupon",couponMap);
         model.addAttribute("pointAdd",pointAdd);
         return "/member/coupon";
     }

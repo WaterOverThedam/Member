@@ -98,7 +98,7 @@ public class LoginCtrl {
         }
 
 
-        String sql = "select top 1 isnull(crmzdy_81802271,'')kids,jt.crm_surname familyName,jt.crmzdy_81802271 childname,jt.crmzdy_80620120 tel,jt.id,jt.crmzdy_81486429 addr,zx.gym,jt.crmzdy_81486367 +'|'+zx.city city,zx.idzx from crm_sj_238592_view jt cross apply(select top 1 crmzdy_81620171 gym,zx.id idzx,gym.crmzdy_81744959 city from crm_zdytable_238592_25111_238592_view zx,crm_zdytable_238592_23594_238592_view gym where gym.id=zx.crmzdy_81620171_id  and isnull(zx.crmzdy_81802303,'')<>'' and zx.crmzdy_81611091_id=jt.id)zx where charindex('username',jt.crmzdy_81767199)>0";
+        String sql = "select top 1 isnull(crmzdy_81802271,'')kids,jt.crm_surname familyName,jt.crmzdy_81802271 childname,jt.crmzdy_80620120 tel,jt.id,jt.crmzdy_81486429 addr,zx.gym,zx.gymcode,jt.crmzdy_81486367 +'|'+zx.city city,zx.idzx from crm_sj_238592_view jt cross apply(select top 1 crmzdy_80620116 gymcode,crmzdy_81620171 gym,zx.id idzx,gym.crmzdy_81744959 city from crm_zdytable_238592_25111_238592_view zx,crm_zdytable_238592_23594_238592_view gym where gym.id=zx.crmzdy_81620171_id  and isnull(zx.crmzdy_81802303,'')<>'' and zx.crmzdy_81611091_id=jt.id)zx where charindex('username',jt.crmzdy_81767199)>0";
         sql = sql.replace("username", username);
         //log.info(sql);
         JSONObject jsonObject = oasisService.getObject(sql, 0);
@@ -115,10 +115,8 @@ public class LoginCtrl {
                 throw new MyException(ResultEnum.REGISTER_FORBIDDEN);
             }
         }
-
         Family family = JSONObject.toJavaObject(jsonObject, Family.class);
         return loginService.register(username, password, email, family);
-
 
     }
 

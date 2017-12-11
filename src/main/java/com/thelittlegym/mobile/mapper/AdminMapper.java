@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface AdminMapper {
 
-    @Select("select * from admin where username=#{username} and isDelete=0 limit 1")
+    @Select("select id,username,password,roleId from admin where username=#{username} and isDelete=0 limit 1")
     @Results({
             @Result(id=true,property="id",column="id"),
             @Result(property="username",column="username"),

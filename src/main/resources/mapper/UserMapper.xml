@@ -15,15 +15,22 @@
         <result column="phone" property="tel" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List" >
-      id, username, password, email, familyName, familyTitle , create_time
+      id, username, password, email, familyName, childName, familyTitle, gym, create_time
     </sql>
 
-    <select id="getAll" resultMap="BaseResultMap"  >
+    <select id="getAll" parameterType="java.lang.String" resultMap="BaseResultMap"  >
         SELECT
         <include refid="Base_Column_List" />
-        FROM user
+        FROM user where gym not like '月球%' and gym not like '测试%' and gym like '%中心'
+        <if test="search!=null and search!=''">
+         and CONCAT(username,familyName,childname,gym,create_time,email) like '%${search}%'
+        </if>
+        order by create_time desc
     </select>
-
+    <select id="getStats" parameterType="int" resultType="hashmap">
+        select gym,gymcode,count(1)num FROM user
+        where gym not like '月球%' and gym not like '火星%' and gym not like 'head%' and gym not like '测试%' and gym like '%中心' group by gym,gymcode order by num desc
+    </select>
     <select id="getOne" parameterType="java.lang.Long" resultMap="BaseResultMap" >
         SELECT
         <include refid="Base_Column_List" />

@@ -95,23 +95,13 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    public Result addCoupon3000(String tel) throws Exception {
-
+    public Result getCoupon3000(String tel) throws Exception {
+        log.info("coupon save1");
         Coupon coupon = couponDao.findOneByTelAndType(tel, "2");
         if (null != coupon) {
             return ResultUtil.success(ResultEnum.COUPON_EXISTS,coupon);
         }
 
-        //临时添加  活动开始时间为8-17 8点
-        Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String beginDateStr = "2017-08-17 08:00:00";
-        String endDateStr = "2017-09-10 23:59:59";
-        Date beginDate = sdf.parse(beginDateStr);
-        Date endDate = sdf.parse(endDateStr);
-        if (now.getTime() < beginDate.getTime() || now.getTime() > endDate.getTime()) {
-            return  ResultUtil.error();
-        }
         coupon = new Coupon();
         coupon.setCreate_time(new Date());
         coupon.setMoney(0.0f);
@@ -120,6 +110,7 @@ public class CouponServiceImpl implements ICouponService {
         coupon.setType("2");
         coupon.setUsed(false);
         coupon.setTel(tel);
+        log.info("coupon save2");
         coupon = couponDao.save(coupon);
         if (coupon != null) {
             return ResultUtil.success(ResultEnum.COUPON_SUCCESS_GET,coupon);

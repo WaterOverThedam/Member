@@ -1,11 +1,15 @@
 package com.thelittlegym.mobile.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.dao.CouponDao;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.Coupon;
 import com.thelittlegym.mobile.entity.Result;
+import com.thelittlegym.mobile.entity.Setting;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
+import com.thelittlegym.mobile.mapper.SettingMapper;
+import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IUserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +34,10 @@ public class UserServiceImpl implements IUserService {
     private UserDao userDao;
     @Autowired
     private CouponDao couponDao;
-
+    @Autowired
+    private SettingMapper settingMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Override
     public List<User> getUserList() {
         return userDao.findAll();
@@ -97,33 +104,40 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Boolean isNum(String tel,Integer num) {
+    public Integer isNum(String tel,Integer num) {
         //临时添加  活动开始时间为8-17 8点
         try {
             Date now = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String beginDateStr = "2017-08-17 08:00:00";
-            String endDateStr = "2017-09-10 23:59:59";
-            Date beginDate = sdf.parse(beginDateStr);
-            Date endDate = sdf.parse(endDateStr);
-            if ( now.getTime() < beginDate.getTime() || now.getTime() > endDate.getTime()){
-                return false;
+            Setting s =settingMapper.getSettingByName("reg");
+            JSONObject jsonResult = JSONObject.parseObject(s.getContent());
+            JSONObject param = jsonResult.getJSONObject("gift");
+
+            Boolean enable = param.getBoolean("enable");
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            String beginDateStr = "2017-08-17 08:00:00";
+//            String endDateStr = "2017-09-10 23:59:59";
+            Date beginDate = param.getDate("dtBegin");
+            Date endDate = param.getDate("dtEnd");
+            //System.out.println(beginDate);
+            //System.out.println(enable && now.getTime() >= beginDate.getTime() && now.getTime() <= endDate.getTime());
+            if (enable && now.getTime() >= beginDate.getTime() && now.getTime() <= endDate.getTime()) {
+                //1.是否已领取
+                Coupon coupon = couponDao.findOneByTelAndType(tel, "2");
+                if (null != coupon) {
+                    return 2;
+                }
+                //2.是否待领（前num名会员）
+                BigInteger count = userMapper.getTopReg(num, tel, param.getString("dtBegin"));
+                BigInteger c0 = new BigInteger("0");
+                if (count.compareTo(c0) == 1) {
+                    return 1;
+                }
             }
         }catch (Exception e){
             log.error(e.getMessage());
         }
-        //1.是否已领取
-        Coupon coupon = couponDao.findOneByTelAndType(tel,"2");
-        if (null != coupon){
-            return false;
-        }
-        //2.是否前num名会员
-        BigInteger count = userDao.findCountBySql(num,tel);
-        BigInteger c0 = new BigInteger("0");
-        if (count.compareTo(c0) == 1){
-            return true;
-        }
-        return false;
+        //默认false;活动关闭
+        return  0;
     }
 
     @Override

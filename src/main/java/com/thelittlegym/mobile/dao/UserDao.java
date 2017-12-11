@@ -19,10 +19,8 @@ public interface UserDao extends JpaRepository<User,Integer> {
     @Query(value="select user from User user where user.isDelete=0 and user.createTime <= :dtEnd and user.createTime >= :dtBegin AND user.tel <> '18917353367' AND user.tel <> '15949190026' ")
     Page<User> getUserPageListByDate(@Param("dtBegin") Date dtBegin,@Param("dtEnd") Date dtEnd,Pageable pageable);
 
-    @Query(value="select count(1) from User u where u.username != '15949190026' and u.username != '18917353367'",nativeQuery = true)
+    @Query(value="select count(1) from User u where gym not like '月球%'and gym not like '火星%' and gym not like 'head%' and gym not like '测试%' and gym like '%中心'",nativeQuery = true)
     Long findCount();
-    @Query(value ="SELECT count(id) total FROM (SELECT @ROW := @ROW + 1 AS ROW,u.* FROM (SELECT * FROM USER u WHERE  AND telephone != '15949190026' AND telephone != '18917353367' ORDER BY create_time) u, (SELECT @ROW := 0) r WHERE @ROW < :num) res WHERE res.telephone = :tel",nativeQuery=true)
-    BigInteger findCountBySql(@Param("num") Integer num,@Param("tel") String  tel);
 
     public Page<User> findAllByUsernameLike(String keyWord,Pageable pageable);
     public User findOneByUsername(String username);

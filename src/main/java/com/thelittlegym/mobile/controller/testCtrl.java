@@ -28,6 +28,7 @@ import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -50,6 +51,7 @@ public class testCtrl  {
     private MyConfig myConfig;
     @Autowired
     private UserDao userDao;
+
     @GetMapping(value = "/say")
     private String say(ModelMap map){
         ClassPathResource res = new ClassPathResource("static/common_admin.html");
@@ -71,6 +73,13 @@ public class testCtrl  {
 
     }
 
+    @GetMapping(value = "/test")
+    @ResponseBody
+    private  List <HashMap>  test(){
+        List <HashMap> p = userMapper.getStats();
+        return p;
+    }
+
     @GetMapping(value = "/tell")
     @ResponseBody
     private  List <PageLogGroup>  tell(){
@@ -84,7 +93,7 @@ public class testCtrl  {
     @ResponseBody
     private  List <User>  you(){
         PageHelper.startPage(3,2);
-        List<User> u = userMapper.getAll();
+        List<User> u = userMapper.getAll(null);
         return u;
     }
 

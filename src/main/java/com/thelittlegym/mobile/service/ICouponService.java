@@ -13,5 +13,5 @@ public interface ICouponService {
 
     public Result useCoupon(String tel,String code,String type) ;
 
-    public Result addCoupon3000(String tel) throws Exception ;
+    public Result getCoupon3000(String tel) throws Exception ;
 }

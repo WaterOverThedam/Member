@@ -1,10 +1,13 @@
 package com.thelittlegym.mobile.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.thelittlegym.mobile.utils.serializer.Date2LongSerializer;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+
 
 @Entity
 @Data
@@ -17,6 +20,7 @@ public class User {
     private String password;
     private String email;
     @Column(name="create_time")
+    //@JsonSerialize(using = Date2LongSerializer.class)
     private Date createTime;
     @Column(name="isdelete")
     private Boolean isDelete;
@@ -28,8 +32,9 @@ public class User {
     private String familyTitle;
     @Column(name="telephone")
     private String tel;
-    private String childname;
+    private String childName;
     private String gym;
+    private String gymcode;
     private String idzx;
     private String city;
     private String addr;

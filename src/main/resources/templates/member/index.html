@@ -176,7 +176,7 @@
         </div>
     </div>
 </div>
-<input type="hidden"  value = "${in3000==true}？1" id="in3000"/>
+<input type="hidden" th:value="${session.in3000}"  id="in3000"/>
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
 <script src="/js/swiper-3.4.2.jquery.min.js"></script>
@@ -477,7 +477,6 @@
                                 }
                             ]
                         })
-
                 }
             },
             error: function(xhr, errorType, error){
@@ -501,7 +500,9 @@
         return params;
     }
 
-    if ($("#in3000").val() == 1 ){
+    if ($("#in3000").val()==1){
+        //只刷新时弹出一次
+        $("#in3000").val(2);
         $.modal({
             text: '<a class="external" href="/coupon"><img src="/images/member/act3000.jpg" style="display:block" width="100%"/></a>',
             buttons: [
@@ -515,8 +516,6 @@
         })
         var modal = $(".modal.modal-in");
         modal.css("margin-top","-10rem");
-        //只刷新时弹出一次
-        $("#in3000").val("");
     }
 
 

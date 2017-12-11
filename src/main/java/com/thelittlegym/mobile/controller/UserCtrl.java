@@ -10,6 +10,7 @@ import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IUserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.test.InTesting;
@@ -52,8 +53,10 @@ public class UserCtrl {
     @RequestMapping("/profile")
     @ResponseBody
     public User profile(@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user) throws Exception {
-       return user;
+        return user;
     }
+
+
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(HttpServletRequest request,@SessionAttribute(WebSecurityConfig.SESSION_KEY) User user, Model model) throws Exception {
         try {
@@ -153,9 +156,10 @@ public class UserCtrl {
                 }
 
             }
-            //新人注册优惠活动
-            //Boolean in3000 = userService.isNum(user.getTel(), 3000);
-            //model.addAttribute("in3000", in3000);
+            //新人注册优惠活动[读取开启配置;计算前3000名]
+            Integer in3000 = userService.isNum(user.getTel(), 3000);
+            //System.out.println(in3000);
+            session.setAttribute("in3000", in3000);
 
             model.addAttribute("listChild", listChild);
             model.addAttribute("weixinMap", weixinMap);

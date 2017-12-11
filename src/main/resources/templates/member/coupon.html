@@ -111,9 +111,14 @@
 
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='/js/gym.js' charset='utf-8'></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+
+    //读取系统设置
+    var s  = get_data_json('/admin/getSetting',{name:'reg'});
+    s = JSON.parse(s.content);
 
     var isPointed = [[${pointAdd.code}]];
     var point=  [[${pointAdd.data}]];
@@ -126,10 +131,11 @@
             return;
         }
         var type = $(this).data("type");
-        if (type == "2" && !timeLimit("2017-09-23","2017-10-17")){
-            $.alert("不在兑换日期内，详情参考兑换券说明");
-            return;
+        if (type == "2" && !timeLimit(s.usebegin,s.useend)) {
+                $.alert("不在兑换日期内，详情参考兑换券说明");
+                return;
         }
+
         $.prompt('请输入核销码', function (value) {
                     if ($.trim(value) == "") {
                         $.alert("核销码值不能为空");
@@ -181,7 +187,7 @@
             alertText = '<div class="content-block"><p class="coupon-rule-detail">1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>' +
                     '<p class="coupon-rule-detail">2、此券不与其他优惠共享</p><p class="coupon-rule-detail">3、不支持兑换现金</p> </div>';
         } else {
-            alertText = '<div class="content-block"><p class="coupon-rule-detail">1、此券使用时间：2017.9.23-10.17</p>' +
+            alertText = '<div class="content-block"><p class="coupon-rule-detail">1、此券使用时间：'+s.usebegin+'-'+s.useend+'</p>' +
                     '<p class="coupon-rule-detail">2、请向中心工作人员领取“核销码”</p><p class="coupon-rule-detail">3、此券不与其他优惠共享</p><p class="coupon-rule-detail">4、不支持兑换现金</p><p class="coupon-rule-detail">5、此券领取截止时间：2017.9.10</p></div>';
         }
         $.modal({
