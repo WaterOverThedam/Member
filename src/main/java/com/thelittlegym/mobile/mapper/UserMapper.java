@@ -27,4 +27,8 @@ public interface UserMapper {
     BigInteger getTopReg(@Param("num") Integer num, @Param("tel") String  tel, @Param("dtstart") String dtstart);
 
     public List<HashMap> getStats();
+
+    @Select("select u.username,u.familyName,u.childName,u.gym,u.create_time createTime from coupon c,user u where u.username=c.tel and c.create_time>#{dtbegin} and c.type=2 and c.used=0")
+    public List<User> getWinners(@Param("dtbegin") String dtbegin);
+
 }

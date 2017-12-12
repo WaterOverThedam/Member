@@ -157,8 +157,7 @@ public class UserCtrl {
 
             }
             //新人注册优惠活动[读取开启配置;计算前3000名]
-            Integer in3000 = userService.isNum(user.getTel(), 3000);
-            //System.out.println(in3000);
+            Integer in3000 = userService.isNum(user.getTel(), 3000);;
             session.setAttribute("in3000", in3000);
 
             model.addAttribute("listChild", listChild);

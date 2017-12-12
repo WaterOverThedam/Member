@@ -347,6 +347,13 @@ public class AdminCtrl {
         return  ResultUtil.success(setting);
     }
 
+    @GetMapping(value = "/getWinners")
+    @ResponseBody
+    public Result getWinners (@RequestParam(value = "dtbegin") String dtbegin) throws Exception {
+        List<User> userList= userMapper.getWinners(dtbegin);
+        return  ResultUtil.success(userList);
+    }
+
     @PostMapping(value = "/saveSetting")
     @ResponseBody
     public Result saveSetting (@RequestBody Setting setting) throws Exception {

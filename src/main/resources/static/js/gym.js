@@ -243,3 +243,23 @@ function IsDate(num){
     // 日期范围：1700-01-01 -2099-01-01
     return regexp.test(num)
 }
+
+function isIE() { //ie?
+    if (!!window.ActiveXObject || "ActiveXObject" in window)
+        return true;
+    else
+        return false;
+}
+function clipForIE()
+{
+    var el = document.getElementById('result');
+    el.contentEditable = 'true';
+    var controlRange;
+    if (document.body.createControlRange) {
+        controlRange = document.body.createControlRange();
+        controlRange.addElement(el);
+        controlRange.execCommand('Copy');
+    }
+    el.contentEditable = 'false';
+    alert("已复制好，可贴粘到excel!");
+}

@@ -57,6 +57,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/timeout.html");
         addInterceptor.excludePathPatterns("/admin/login");
         addInterceptor.excludePathPatterns("/admin/exit");
+        addInterceptor.excludePathPatterns("/admin/getSetting");
         addInterceptor.excludePathPatterns("/admin/login/**");
         addInterceptor.excludePathPatterns("/exit");
         addInterceptor.excludePathPatterns("/test/**");

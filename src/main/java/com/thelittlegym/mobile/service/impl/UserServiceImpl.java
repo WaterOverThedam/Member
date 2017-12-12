@@ -118,11 +118,11 @@ public class UserServiceImpl implements IUserService {
 //            String endDateStr = "2017-09-10 23:59:59";
             Date beginDate = param.getDate("dtBegin");
             Date endDate = param.getDate("dtEnd");
-            //System.out.println(beginDate);
-            //System.out.println(enable && now.getTime() >= beginDate.getTime() && now.getTime() <= endDate.getTime());
+
             if (enable && now.getTime() >= beginDate.getTime() && now.getTime() <= endDate.getTime()) {
                 //1.是否已领取
                 Coupon coupon = couponDao.findOneByTelAndType(tel, "2");
+
                 if (null != coupon) {
                     return 2;
                 }

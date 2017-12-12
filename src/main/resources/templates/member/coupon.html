@@ -116,40 +116,68 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
 
-    //读取系统设置
-    var s  = get_data_json('/admin/getSetting',{name:'reg'});
-    s = JSON.parse(s.content);
-
     var isPointed = [[${pointAdd.code}]];
     var point=  [[${pointAdd.data}]];
 
     if(!isPointed){
         $.alert("恭喜你获赠"+point+"积分！");
     }
-    $(".coupon").on('click', function () {
-        if ($(this).data("value") == "0") {
-            return;
-        }
-        var type = $(this).data("type");
-        if (type == "2" && !timeLimit(s.usebegin,s.useend)) {
-                $.alert("不在兑换日期内，详情参考兑换券说明");
-                return;
-        }
 
-        $.prompt('请输入核销码', function (value) {
+    //读取系统设置
+    $.getJSON('/admin/getSetting?name=reg', function (data) {
+        s = JSON.parse(data.data.content);
+        s = s.gift;
+
+        $(".coupon").on('click', function () {
+            if ($(this).data("value") == "0") {
+                return;
+            }
+            var type = $(this).data("type");
+            if (type == "2") {
+                if (!s.enable) {
+                    $.alert("活动已截止");
+                    return;
+                }else if(!timeLimit(s.usebegin, s.useend)) {
+                    $.alert("不在兑换日期内，详情参考兑换券说明");
+                    return;
+                }
+            }
+            $.prompt('请输入核销码', function (value) {
                     if ($.trim(value) == "") {
                         $.alert("核销码值不能为空");
                         return;
                     }
                     ajax_useCoupon(value, type);
                 }
-        );
-    })
+            );
+        })
 
+        $(".coupon-rule").on('click', function () {
+            var type = $(this).data("value");
+            var alertText = "";
+            if (type == 1) {
+                alertText = '<div class="content-block"><p class="coupon-rule-detail">1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>' +
+                    '<p class="coupon-rule-detail">2、此券不与其他优惠共享</p><p class="coupon-rule-detail">3、不支持兑换现金</p> </div>';
+            } else if(s.enable) {
+                alertText = '<style> .content-block{padding: 0}</style><div class="content-block"><p class="coupon-rule-detail"><br/>1、兑换日期：'+s.usebegin+'~'+s.useend+'</p>' +
+                    '<p class="coupon-rule-detail">2、请向中心工作人员领取“核销码”</p><p class="coupon-rule-detail">3、此券不与其他优惠共享</p><p class="coupon-rule-detail">4、不支持兑换现金</p><p class="coupon-rule-detail">5、领券截止日期：'+s.dtEnd+'</p></div>';
+            }
+            if (alertText != "") {
+                $.modal({
+                    title: '<h1 class="title">活动规则</h1>',
+                    text: alertText,
+                    buttons: [
+                        {
+                            text: '我知道了',
+                        }
+                    ]
+                })
+            }
+        });
+    });
     function ajax_useCoupon(code, type) {
         this.code = code;
         this.type = type;
-
         $.ajax({
             url: '/coupon/use',
             type: 'POST',
@@ -180,26 +208,7 @@
         });
     }
 
-    $(".coupon-rule").on('click', function () {
-        var type = $(this).data("value");
-        var alertText = "";
-        if (type == 1) {
-            alertText = '<div class="content-block"><p class="coupon-rule-detail">1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>' +
-                    '<p class="coupon-rule-detail">2、此券不与其他优惠共享</p><p class="coupon-rule-detail">3、不支持兑换现金</p> </div>';
-        } else {
-            alertText = '<div class="content-block"><p class="coupon-rule-detail">1、此券使用时间：'+s.usebegin+'-'+s.useend+'</p>' +
-                    '<p class="coupon-rule-detail">2、请向中心工作人员领取“核销码”</p><p class="coupon-rule-detail">3、此券不与其他优惠共享</p><p class="coupon-rule-detail">4、不支持兑换现金</p><p class="coupon-rule-detail">5、此券领取截止时间：2017.9.10</p></div>';
-        }
-        $.modal({
-            title: '<h1 class="title">活动规则</h1>',
-            text: alertText,
-            buttons: [
-                {
-                    text: '我知道了',
-                }
-            ]
-        })
-    });
+
 
     //兑换券活动领取时间
     function timeLimit(begin,end){
