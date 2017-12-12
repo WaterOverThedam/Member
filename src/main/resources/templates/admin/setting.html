@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head th:substituteby="/admin/common_admin :: head"/>
+
+<body>
+<div th:substituteby="/admin/common_admin :: menu"/>
+
+<div class="pusher" id="box">
+    <div class="ui masthead  segment">
+        <div class="ui container">
+            <div class="ui breadcrumb">
+                <a class="section" id="menu">Home</a>
+                <i class="right angle icon divider"></i>
+                <div class="active section">系统设置</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ui container">
+        <div class="ui segments">
+            <div class="ui segment">
+            </div>
+            <div class="ui segment">
+                <div class="ui two column stackable grid">
+                    <div class="column">
+                        <div class="ui tabular menu">
+                            <a class="active item" data-id="reg">
+                                注册设置
+                            </a>
+                        </div>
+                    </div>
+                    <div class="column right aligned">
+                        <div>
+                            <button class="ui green basic button"  v-on:click="saveSetting">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <component :is="menu"  :menu='menu' :params="params" :save-setting="saveSetting" :get-setting="getSetting" >
+            </component>
+        </div>
+    </div>
+</div>
+
+<template id="reg">
+    <div class="ui fullscreen modal">
+        <i class="close icon"></i>
+        <div class="header" v-text="'获赠名单（'+winners.length+')人'">
+        </div>
+        <div class="content">
+            <h4 class="ui dividing header" >
+                  <button class="btn" data-clipboard-action="copy" data-clipboard-target="#result"><i class="copy icon"></i>复制内容</button>
+            </h4>
+            <div class="ui segment" v-if="winners">
+                <table class="ui selectable celled table" id="result">
+                    <thead>
+                    <tr class="positive">
+                        <th>家长姓名</th>
+                        <th>孩子姓名</th>
+                        <th>家长手机</th>
+                        <th>所属中心</th>
+                        <th>注册日期</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="user in winners">
+                        <td v-text="user.familyName"></td>
+                        <td v-text="user.childName"></td>
+                        <td v-text="user.username"></td>
+                        <td v-text="user.gym"></td>
+                        <td v-text="user.createTime|formatDate"></td>
+                    </tr>
+                    <tr v-if="winners.size==0">
+                        <td colspan="6" style="text-align: center">
+                            <div  class="ui pointing red  label">
+                                OOPS! No Record!
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="html ui top attached segment" >
+        <div class="ui grid">
+            <div class="three column row">
+                <div class="column"><a class="ui teal tag label">注册送礼物活动</a></div>
+                <div class="column"></div>
+                <div class="column">
+                    <button class="ui basic button"  v-on:click="getWiners">
+                     <i class="icon user"></i>获赠会员名单
+                   </button>
+                </div>
+            </div>
+        </div>
+
+       <!--<div class="ui top attached label"></div>-->
+        <div class="ui divider"></div>
+            <div class="ui toggle animation checkbox">
+                <input id="toggle" type="checkbox" name="animation" v-model="params.gift.enable" :checked="params.gift.enable"/>
+                <label>是否开启</label>
+            </div>
+        <div class="ui divider"></div>
+        <form class="ui fluid form">
+            <div class="inline field">
+                <div class="ui  label">
+                    活动时间：
+                </div>
+                <input :class="{ 'dt-input':true,'disabled':!params.gift.enable}" type="text"  v-model="params.gift.dtBegin" placeholder="开始日期" id="begin"/> -
+                <input :class="{ 'dt-input':true,'disabled':!params.gift.enable}" type="text"  v-model="params.gift.dtEnd" placeholder="结束日期" id="end"/>
+            </div>
+            <div class="ui simple divider"></div>
+            <div class="inline field">
+                <div class="ui  label">
+                    兑换时间：
+                </div>
+                <input :class="{ 'dt-input':true,'disabled':!params.gift.enable}" type="text"  v-model="params.gift.usebegin" placeholder="开始日期" id="usebegin"/> -
+                <input :class="{ 'dt-input':true,'disabled':!params.gift.enable}" type="text"  v-model="params.gift.useend" placeholder="结束日期" id="useend"/>
+
+            </div>
+        </form>
+    </div>
+</template>
+
+<script th:inline="JavaScript">
+    /*<![CDATA[*/
+
+    if(isIE()){
+        $(".btn").click(function () {
+            clipForIE()
+        })
+    }else{
+        var clipboard = new Clipboard('.btn');
+        clipboard.on('success', function(e) {
+            alert("已复制好，可贴粘到excel!");
+            console.log(e);
+        });
+        clipboard.on('error', function(e) {
+            console.log(e);;
+        })
+    }
+    function msg(text) {
+        layer.open({
+            content: text
+            , skin: 'msg'
+            , time: 2 //2秒后自动关闭
+        });
+    }
+
+    $("#menu").on('click', function () {
+        $(".ui.sidebar").sidebar('toggle');
+    })
+
+    var Reg=Vue.extend({
+        template:'#reg',
+        data: function () {
+            return {
+                winners:[],
+                default: {"gift":{"enable": true,"dtBegin": CurTime().substr(0,10),"dtEnd": CurTime().substr(0,10)},"usebegin":"","useend":""}
+            }
+        },
+        props:['menu','params','get-setting','save-setting'],
+        computed: {
+        },
+        filters: {
+            formatDate:function(date) {
+                var date = new Date(date);
+                return date.Format("yyyy-MM-dd");
+            }
+        },
+        methods:{
+            getWiners:function () {
+                this.$http.get('/admin/getWinners',
+                    {dtbegin:this.params.gift.dtBegin}
+                ).then(function(res){
+                    if(!res.data.code && res.data.data) {
+                        this.winners = res.data.data;
+                        $('.fullscreen.modal').modal('show');
+                    }else{
+                        console.error(res.data.msg)
+                        msg("保存失败");
+                    }
+                },function(res){
+                    console.log(res.status);
+                });
+            },
+            startDate:function(obj) {
+                laydate.render({
+                    elem: '#begin' //指定元素
+                    ,mark: {
+                        '0-10-01': '国庆节'
+                        ,'0-12-31': '跨年' //每年12月31日
+                        ,'0-0-10': '发工资' //每个月10号
+                    }
+                    ,done: function(value, date){ //监听日期被切换
+                        obj.params.gift.dtBegin=value;
+                    }
+                });
+                laydate.render({
+                    elem: '#end' //指定元素
+                    ,mark: {
+                        '0-10-01': '国庆节'
+                        ,'0-12-31': '跨年' //每年12月31日
+                        ,'0-0-10': '发工资' //每个月10号
+                    }
+                    ,done: function(value, date){ //监听日期被切换
+                        //alert(1)
+                        obj.params.gift.dtEnd=value;
+                    }
+                });
+                laydate.render({
+                    elem: '#usebegin' //指定元素
+                    ,mark: {
+                        '0-10-01': '国庆节'
+                        ,'0-12-31': '跨年' //每年12月31日
+                        ,'0-0-10': '发工资' //每个月10号
+                    }
+                    ,done: function(value, date){ //监听日期被切换
+                        obj.params.gift.usebegin=value;
+                    }
+                });
+                laydate.render({
+                    elem: '#useend' //指定元素
+                    ,mark: {
+                        '0-10-01': '国庆节'
+                        ,'0-12-31': '跨年' //每年12月31日
+                        ,'0-0-10': '发工资' //每个月10号
+                    }
+                    ,done: function(value, date){ //监听日期被切换
+                        //alert(1)
+                        obj.params.gift.useend=value;
+                    }
+                });
+            },
+            test:function () {
+           //    alert(JSON.stringify(this.params))
+            }
+        },
+        ready: function () {
+            //alert(JSON.stringify(this.params))
+            this.getSetting();
+            this.startDate(this);
+        }
+    });
+
+
+    var vm=new Vue({
+        el:'#box',
+        data:{
+            menu:"reg",
+            params:{gift:{}},
+            default: {
+                reg:'{"gift":{"enable":true,"dtBegin":"'+CurTime().substr(0,10)+'","dtEnd":"'+CurTime().substr(0,10)+'"}}'
+            }
+        },
+        components:{
+            'reg':Reg
+        },
+        filters: {
+            maximum: function (value) {
+                return Math.max.apply(null,value.split(","));
+            }
+        },
+        computed:{
+
+        },
+        created: function () {
+        },
+        methods:{
+            saveSetting:function () {
+              this.$http.post('/admin/saveSetting',
+                  {name:this.menu,content:JSON.stringify(this.params)}
+              ).then(function(res){
+                  msg(res.data.msg)
+              },function(res){
+                  console.log(res.status);
+              });
+            },
+            getSetting:function () {
+                this.$http.get('/admin/getSetting',
+                    {name:this.menu}
+                ).then(function(res){
+                    if(!res.data.code && res.data.data) {
+                        this.params = JSON.parse(res.data.data.content);
+                    }else{
+                        this.params = JSON.parse(this.default[this.menu]);
+                    }
+                },function(res){
+                    console.log(res.status);
+                });
+            }
+        }
+    });
+
+    $(".tabular.menu .item").click(function () {
+        vm.menu = $(this).data("id");
+        $(".menu .item").removeClass("active");
+        $(this).addClass("active");
+    })
+
+
+    /*]]>*/
+</script>
+</body>
+</html>
