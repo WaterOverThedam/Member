@@ -4,6 +4,7 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.pagehelper.PageHelper;
+import com.thelittlegym.mobile.config.CouponConfig;
 import com.thelittlegym.mobile.config.MyConfig;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
@@ -49,6 +50,9 @@ public class testCtrl  {
     private IUserService userService;
     @Autowired
     private MyConfig myConfig;
+
+    @Autowired
+    private CouponConfig couponConfig;
     @Autowired
     private UserDao userDao;
 
@@ -106,7 +110,8 @@ public class testCtrl  {
     @GetMapping(value = "/conf")
     @ResponseBody
     private String config(){
-        return myConfig.toString();
+        log.info(couponConfig.toString());
+        return "hello";
     }
 
 

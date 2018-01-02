@@ -2,6 +2,7 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.thelittlegym.mobile.common.H5Service;
+import com.thelittlegym.mobile.config.CouponConfig;
 import com.thelittlegym.mobile.dao.CouponDao;
 import com.thelittlegym.mobile.entity.Coupon;
 import com.thelittlegym.mobile.entity.Result;
@@ -24,12 +25,12 @@ import java.util.Map;
 @Service
 @Slf4j
 public class CouponServiceImpl implements ICouponService {
-    private static final String useCode = "Sw6cWT88";
-    private static final String useCode_2 = "Jag2xG6D";
     @Autowired
     private H5Service h5Service;
     @Autowired
     private CouponDao couponDao;
+    @Autowired
+    private CouponConfig couponConfig;
 
     @Override
     public Result getCoupon_http(String tel) {
@@ -74,7 +75,7 @@ public class CouponServiceImpl implements ICouponService {
     public Result useCoupon(String tel, String code,String type) {
         Coupon coupon = couponDao.findOneByTelAndTypeAndUsed(tel,type,false);
         //种类
-        String nowCode = coupon.getType().equals("1")?useCode:useCode_2;
+        String nowCode = coupon.getType().equals("1")?couponConfig.getUseCode():couponConfig.getUseCode_2();
         if (nowCode.equals(code)) {
                 if (null != coupon) {
                     coupon.setUsed(true);

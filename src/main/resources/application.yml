@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: dev
 
   jpa:
     hibernate:
@@ -49,6 +49,12 @@ http:
 server:
   session:
     timeout: -1
+
+
+coupon:
+  useCode: Sw6cWT88
+  useCode_2: TLG520
+
 
 
 

@@ -7,7 +7,7 @@ import com.thelittlegym.mobile.entity.Coupon;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.Setting;
 import com.thelittlegym.mobile.entity.User;
-import com.thelittlegym.mobile.enums.ResultEnum;
+
 import com.thelittlegym.mobile.mapper.SettingMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IUserService;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -119,7 +120,12 @@ public class UserServiceImpl implements IUserService {
             Date beginDate = param.getDate("dtBegin");
             Date endDate = param.getDate("dtEnd");
 
-            if (enable && now.getTime() >= beginDate.getTime() && now.getTime() <= endDate.getTime()) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(endDate);
+            c.add(Calendar.DAY_OF_MONTH, 1);// +1天
+            endDate = c.getTime();
+
+            if (enable && now.getTime() >= beginDate.getTime() && now.getTime() < endDate.getTime()) {
                 //1.是否已领取
                 Coupon coupon = couponDao.findOneByTelAndType(tel, "2");
 

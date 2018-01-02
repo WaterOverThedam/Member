@@ -276,7 +276,7 @@
               this.$http.post('/admin/saveSetting',
                   {name:this.menu,content:JSON.stringify(this.params)}
               ).then(function(res){
-                  msg(res.data.msg)
+                  msg(res.data.msg||"保存失败！请重新登陆")
               },function(res){
                   console.log(res.status);
               });

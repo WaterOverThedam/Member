@@ -22,8 +22,8 @@
         </header>
         <div class="content">
             <div class="buttons-tab">
-                <a href="#coupon_1" class="tab-link button">优惠券</a>
-                <a href="#coupon_2" class="tab-link active button">兑换券</a>
+                <a href="#coupon_1" id="show_1" class="tab-link button" >优惠券</a>
+                <a href="#coupon_2" id="show_2" class="tab-link active button">兑换券</a>
             </div>
             <div class="content-block">
                 <div class="tabs">
@@ -122,22 +122,26 @@
     if(!isPointed){
         $.alert("恭喜你获赠"+point+"积分！");
     }
+   //var type=getUrlParam("type");
 
     //读取系统设置
     $.getJSON('/admin/getSetting?name=reg', function (data) {
-        s = JSON.parse(data.data.content);
-        s = s.gift;
+        var s = data.data;
+        if(s){
+          s = JSON.parse(s.content);
+          s = s.gift;
+        }
 
         $(".coupon").on('click', function () {
             if ($(this).data("value") == "0") {
                 return;
             }
             var type = $(this).data("type");
+            //alert();
             if (type == "2") {
-                if (!s.enable) {
-                    $.alert("活动已截止");
-                    return;
-                }else if(!timeLimit(s.usebegin, s.useend)) {
+                if (!s) {
+                    $.alert("活动未开始");
+                }else if(!s.usebegin || !s.useend || !timeLimit(s.usebegin, s.useend)) {
                     $.alert("不在兑换日期内，详情参考兑换券说明");
                     return;
                 }
@@ -158,7 +162,7 @@
             if (type == 1) {
                 alertText = '<div class="content-block"><p class="coupon-rule-detail">1、获得优惠券之日起，有限期为一年，用于会员本人续报课程</p>' +
                     '<p class="coupon-rule-detail">2、此券不与其他优惠共享</p><p class="coupon-rule-detail">3、不支持兑换现金</p> </div>';
-            } else if(s.enable) {
+            } else if(s && s.enable && s.usebegin && s.useend) {
                 alertText = '<style> .content-block{padding: 0}</style><div class="content-block"><p class="coupon-rule-detail"><br/>1、兑换日期：'+s.usebegin+'~'+s.useend+'</p>' +
                     '<p class="coupon-rule-detail">2、请向中心工作人员领取“核销码”</p><p class="coupon-rule-detail">3、此券不与其他优惠共享</p><p class="coupon-rule-detail">4、不支持兑换现金</p><p class="coupon-rule-detail">5、领券截止日期：'+s.dtEnd+'</p></div>';
             }
@@ -192,7 +196,7 @@
                 if (!result.code) {
                     $.toast(result.msg);
                     setTimeout(function () {
-                                location.reload();
+                            self.location.reload();
                             },
                             2000);
                 } else  {
@@ -212,10 +216,12 @@
 
     //兑换券活动领取时间
     function timeLimit(begin,end){
-        var today = new Date();
-        var beginDate = new Date(begin.replace(/-/g,"\/"));
-        var endDate = new Date(end.replace(/-/g,"\/"));
-        if (today < beginDate || today > endDate){
+        var today = new Date().getTime();
+        var beginDate = new Date(begin.replace(/-/g,"\/")).getTime();
+        var endDate = (new Date(end.replace(/-/g,"\/"))).getTime()+24*60*60*1000;
+        //alert(today+"vs"+beginDate+"vs"+endDate);
+
+        if (today < beginDate || today >= endDate){
             return false;
         }
         return true;
