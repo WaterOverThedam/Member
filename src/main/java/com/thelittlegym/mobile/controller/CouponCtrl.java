@@ -3,7 +3,6 @@ package com.thelittlegym.mobile.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.H5Service;
-import com.thelittlegym.mobile.entity.GymClass;
 import com.thelittlegym.mobile.entity.Prize;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
@@ -12,7 +11,6 @@ import com.thelittlegym.mobile.service.ICouponService;
 import com.thelittlegym.mobile.service.IPointsService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,13 +46,13 @@ public class CouponCtrl {
         Map<String, Object> res = h5Service.getAll(tel);
         //System.out.println(res);
         if(res.get("coupon")!=null) {
-            String num = (String)res.get("coupon");
-            if( Integer.parseInt(num)>0) {
+            Integer num = (Integer)res.get("coupon");
+            if(num>0) {
                 Result couponMap = couponService.updateCoupon_http(tel);
                 model.addAttribute("coupon", couponMap);
             }
         }
-        if(res.get("points")!=null && Integer.parseInt((String) res.get("points"))>0) {
+        if(res.get("points")!=null && (Integer) res.get("points")>0) {
             Result pointAdd = pointsService.updatePoints_http(tel, pointed, (String) res.get("zx"));
             model.addAttribute("pointAdd",pointAdd);
         }else {

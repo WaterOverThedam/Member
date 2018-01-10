@@ -66,10 +66,10 @@ public class H5Service {
                         returnMap.put("zx",j.getString("val"));
                     }
                     if (type.equals("keshi")) {
-                        returnMap.put("keshi",j.getString("total"));
+                        returnMap.put("keshi",j.getInteger("total"));
                     }
                     if (type.equals("coupon")) {
-                        returnMap.put("coupon",j.getString("total"));
+                        returnMap.put("coupon",j.getInteger("total"));
                     }
                     if (type.equals("prize")) {
                         returnMap.put("prize",j.getString("total"));

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.PropertySource;
 public class CouponConfig {
   private String useCode;
   private String useCode_2;
+  private String useCode_3;
 
 }
 
