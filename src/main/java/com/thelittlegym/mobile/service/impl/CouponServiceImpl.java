@@ -25,46 +25,35 @@ import java.util.Map;
 @Service
 @Slf4j
 public class CouponServiceImpl implements ICouponService {
-    @Autowired
-    private H5Service h5Service;
+
     @Autowired
     private CouponDao couponDao;
     @Autowired
     private CouponConfig couponConfig;
 
     @Override
-    public Result getCoupon_http(String tel) {
+    public Result updateCoupon_http(String tel) {
         try {
             //是否已存一次记录，已存则不去调接口
             Coupon c = couponDao.findOneByTelAndType(tel,"1");
             if (null != c) {
                 return ResultUtil.success(ResultEnum.COUPON_EXISTS,c);
             }
-            tel = tel.trim();
-            JSONArray couponArr = h5Service.getByType(tel, "coupon");
-
-//          JSONObject couponObject = couponArr.getJSONObject(0);
-            if (null != couponArr ) {
-                //优惠券
-                Coupon coupon = new Coupon();
-                coupon.setCreate_time(new Date());
-                coupon.setMoney(500.0f);
-                coupon.setName("好朋友转介绍优惠券");
-                coupon.setType("1");
-                coupon.setUsed(false);
-                coupon.setTel(tel);
-                Coupon res = couponDao.save(coupon);
-
-                if(res!=null) {
-                    return ResultUtil.success(ResultEnum.COUPON_SYNC_SUCCESS, res);
-                }else {
-                    return ResultUtil.error(ResultEnum.SAVE_FAILURE);
-                }
-            } else {;
-                return ResultUtil.error(ResultEnum.COUPON_SYNC_EMPTY);
+            //保存优惠券
+            Coupon coupon = new Coupon();
+            coupon.setCreate_time(new Date());
+            coupon.setMoney(500.0f);
+            coupon.setName("好朋友转介绍优惠券");
+            coupon.setType("1");
+            coupon.setUsed(false);
+            coupon.setTel(tel);
+            Coupon res = couponDao.save(coupon);
+            if (res != null) {
+                return ResultUtil.success(ResultEnum.COUPON_SYNC_SUCCESS, res);
+            } else {
+                return ResultUtil.error(ResultEnum.SAVE_FAILURE);
             }
-        } catch (IOException e) {
-            log.error("系统错误{}",e);
+
         } catch (Exception e) {
             log.error("系统错误{}",e);
         }

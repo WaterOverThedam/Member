@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public interface ICouponService {
     //查询外部接口是否有优惠券，有则查询本地是否存储，存储则查询是否使用
-    public Result getCoupon_http(String tel) ;
+    public Result updateCoupon_http(String tel) ;
 
     public Result useCoupon(String tel,String code,String type) ;
 

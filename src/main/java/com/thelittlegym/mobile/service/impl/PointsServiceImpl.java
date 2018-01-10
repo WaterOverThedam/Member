@@ -29,46 +29,32 @@ public class PointsServiceImpl implements IPointsService {
     @Autowired
     private UserDao userDao;
     @Autowired
-    private H5Service h5Service;
-    @Autowired
     private OasisService oasisService;
 
-    public Result updatePoints_http(String tel, Integer pointed) throws Exception {
+    public Result updatePoints_http(String tel, Integer http_num,String zx) throws Exception {
         Integer addPoints;
         Points p = pointsDao.findOneByTel(tel);
-        JSONArray resArr = h5Service.getByType(tel, "points");
-        Integer http_num = 0;
-        String zx = "";
-
-        if (resArr != null) {
-            for (Object jObject : resArr) {
-                JSONObject item = (JSONObject) jObject;
-                if ("zx".equals(item.getString("type"))) {
-                    zx = item.getString("val");
-
-                }
-                if ("points".equals(item.getString("type"))) {
-                    http_num = item.getInteger("total") ;
-                }
-            }
-        }
-
+        Integer pointed;
         //本地留存
         if (null == p) {
-            //本地不存在创建
+           //本地不存在创建
             Points p2 = new Points();
             p2.setNum(http_num);
             p2.setZx(zx);
             p2.setType("活动转介绍");
             p2.setCreateTime(new Date());
             p2.setTel(tel);
+            //保存原积分
+            pointed = http_num;
             pointsDao.save(p2);
         }else{
-            //更新积分
+         //更新积分
+            //保存原积分
+            pointed = p.getNum();
             p.setNum(http_num);
             pointsDao.save(p);
         }
-
+        //oasis同步
         if (pointed!=null && http_num > pointed) {
             addPoints = (http_num - pointed)* 2000;
             //TODO 增加积分
@@ -81,7 +67,6 @@ public class PointsServiceImpl implements IPointsService {
         }
 
     }
-
 
 
 }

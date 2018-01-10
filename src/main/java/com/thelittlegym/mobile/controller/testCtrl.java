@@ -2,6 +2,8 @@ package com.thelittlegym.mobile.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.pagehelper.PageHelper;
 import com.thelittlegym.mobile.config.CouponConfig;
@@ -24,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletContext;
@@ -55,6 +58,22 @@ public class testCtrl  {
     private CouponConfig couponConfig;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    RestTemplate restTemplate;
+
+
+    @GetMapping("/rest")
+    @ResponseBody
+    public String hello2(){
+        String url = "http://h5.qq125.com/2018/01/coupon/loadcoupon.php?tel=15618373270";
+        String str=restTemplate.getForObject(url,String.class);
+        JSONArray returnArr = new JSONArray();
+        JSONObject jsonObject = JSONObject.parseObject(str);
+        JSONArray jsonArray = jsonObject.getJSONArray("result");
+        System.out.println(jsonArray);
+         //JSONObject json = restTemplate.getForEntity(url, JSONObject.class).getBody();
+        return str;
+    }
 
     @GetMapping(value = "/say")
     private String say(ModelMap map){
@@ -110,6 +129,7 @@ public class testCtrl  {
     @GetMapping(value = "/conf")
     @ResponseBody
     private String config(){
+
         log.info(couponConfig.toString());
         return "hello";
     }
