@@ -15,12 +15,13 @@ import java.util.Map;
  */
 @Service
 public class H5Service {
-    //http://h5.qq125.com/2018/01/coupon/loadcoupon.php?tel=15618373270
-    //private static final String URL = "http://wx.qq125.com/2017/06/coupon/loadcoupon.php?tel=";
-    private static final String URL = "http://h5.qq125.com/2018/01/coupon/loadcoupon.php?tel=";
-    //private static final String URL ="http://tlgc.oss-cn-shanghai.aliyuncs.com/assert/json/coupon.json?tel=";
     //18825257804
     //13341608522
+    //private static final String URL ="http://tlgc.oss-cn-shanghai.aliyuncs.com/assert/json/coupon.json?tel=";
+    //http://h5.qq125.com/2018/01/coupon/loadcoupon.php?tel=15618373270
+    //private static final String URL ="http://h5.qq125.com/2018/01/coupon/loadcoupon.php?tel=";
+    private static final String URL = "http://wx.qq125.com/2018/coupon/loadcoupon.php?tel=";
+
     @Autowired
     private HttpService httpService;
 
@@ -66,10 +67,10 @@ public class H5Service {
                         returnMap.put("zx",j.getString("val"));
                     }
                     if (type.equals("keshi")) {
-                        returnMap.put("keshi",j.getInteger("total"));
+                        returnMap.put("keshi",j.getString("total"));
                     }
                     if (type.equals("coupon")) {
-                        returnMap.put("coupon",j.getInteger("total"));
+                        returnMap.put("coupon",j.getString("total"));
                     }
                     if (type.equals("prize")) {
                         returnMap.put("prize",j.getString("total"));

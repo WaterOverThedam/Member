@@ -18,5 +18,6 @@ public class Prize {
     private Integer id;
     private String name;
     private String tel;
+    private Boolean used;
     private Date createTime=new Date();
 }

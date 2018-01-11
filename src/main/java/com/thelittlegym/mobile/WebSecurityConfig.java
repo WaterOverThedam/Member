@@ -47,6 +47,7 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         InterceptorRegistration addInterceptor = registry.addInterceptor(getSecurityInterceptor());
 
         // 排除配置
+        addInterceptor.excludePathPatterns("/exit");
         addInterceptor.excludePathPatterns("/noaccess.html");
         addInterceptor.excludePathPatterns("/forgetPass.html");
         addInterceptor.excludePathPatterns("/wxbrowser.html");
@@ -59,7 +60,6 @@ public class WebSecurityConfig extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns("/admin/exit");
         addInterceptor.excludePathPatterns("/admin/getSetting");
         addInterceptor.excludePathPatterns("/admin/login/**");
-        addInterceptor.excludePathPatterns("/exit");
         addInterceptor.excludePathPatterns("/test/**");
         addInterceptor.excludePathPatterns("/activities.html");
         addInterceptor.excludePathPatterns("/activity/**");

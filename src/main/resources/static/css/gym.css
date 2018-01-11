@@ -539,6 +539,15 @@
     box-shadow: 0 4px 12px 0 rgba(7, 17, 27, .1);
 }
 
+.caption{
+    position:absolute;
+    font-weight: bold;
+    top:58%;
+    left:30%;
+    color: white;
+    font-size: 70px;
+}
+
 .coupon-rule {
     /*position: absolute;*/
     top: 2.5rem;

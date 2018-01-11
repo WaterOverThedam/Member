@@ -25,7 +25,7 @@ public class ExitCtrl {
         //后台登录，退出到入口界面
         if (null != adminSession){
             session.setAttribute("user",null);
-            return "redirect:/admin/simulation";
+            return "redirect:/admin/userInfo";
         }
 
         //退出判断是否linkId进入

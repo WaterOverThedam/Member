@@ -62,7 +62,7 @@
                             <p class="avatar-detail" th:text="'年龄：'+ ${child.age}"></p>
                         </div>
                     </div>
-                    <a href="/exit" class="button">退出登录</a>
+                    <a href="javascript:void(0)" class="button exit" >退出登录</a>
                 </div>
 
                 <div class="card-content" >
@@ -314,7 +314,9 @@
 
     })
 
-
+    $(".exit").click(function () {
+        window.location.href = "/exit";
+    })
 
 
 

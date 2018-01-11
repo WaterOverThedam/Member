@@ -40,55 +40,64 @@ public class CouponCtrl {
     private PrizeMapper prizeMapper;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    @ResponseBody
     public String index(HttpServletRequest request, @SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer pointed, Model model) throws Exception {
         String tel = user.getTel();
         Map<String, Object> res = h5Service.getAll(tel);
+        Result pointMap = ResultUtil.error();
         //System.out.println(res);
-        if(res.get("coupon")!=null) {
-            Integer num = (Integer)res.get("coupon");
-            if(num>0) {
-                Result couponMap = couponService.updateCoupon_http(tel);
-                model.addAttribute("coupon", couponMap);
+        if(res!=null) {
+            if (res.get("coupon") != null) {
+                Integer num = Integer.parseInt((String) res.get("coupon"));
+                if (num > 0) {
+                    couponService.updateCoupon_http(tel);
+                }
+            }
+            if (res.get("points") != null && Integer.parseInt((String) res.get("points")) > 0) {
+                Integer http_num = Integer.parseInt((String) res.get("points"));
+                Integer diff = http_num - pointed;
+                //log.info("diff:{}",diff.toString());
+                if (diff > 0) {
+                    Result pointAdd = pointsService.updatePoints_http(tel, http_num, pointed, (String) res.get("zx"));
+                    model.addAttribute("pointAdd", pointAdd);
+                }
+            }
+            if (res.get("prize") != null) {
+                String str = (String) res.get("prize");
+                log.info("shit:{}",str);
+                if (str != null && !str.equals("") && !str.equals("[]")) {
+                    List<Prize> prizeList = JSONObject.parseArray(str, Prize.class);
+                    //JSONObject jsonObject = JSONObject.parseObject(str);
+                    prizeList.stream().map(item -> {
+                        item.setTel(tel);
+                        item.setUsed(false);
+                        return item;
+                    }).collect(Collectors.toList());
+                    prizeMapper.addPrizeBatch(prizeList);
+                }
             }
         }
-        if(res.get("points")!=null && (Integer) res.get("points")>0) {
-            Result pointAdd = pointsService.updatePoints_http(tel, pointed, (String) res.get("zx"));
-            model.addAttribute("pointAdd",pointAdd);
-        }else {
-            model.addAttribute("pointAdd",ResultUtil.error());
-        }
-
-        if(res.get("prize")!=null) {
-             String str = (String)res.get("prize");
-             if(str != null && !str.equals("")){
-                 List<Prize> prizeList = JSONObject.parseArray(str, Prize.class);
-                 //JSONObject jsonObject = JSONObject.parseObject(str);
-                 prizeList.stream().map(item -> {
-                     item.setTel(tel);
-                     return item;
-                 }).collect(Collectors.toList());
-                 System.out.println(prizeList);
-                 prizeMapper.addPrizeBatch(prizeList);
-
-             }
-        }
+        List<Prize> prizeList = prizeMapper.getPrizes(tel);
+        //抵用券
+        Result couponMap = couponService.getCoupon(tel,"1");
+        model.addAttribute("coupon", couponMap);
+        //积分
+        model.addAttribute("pointAdd",pointMap);
+        //注册优惠券
         HttpSession session = request.getSession();
-       //注册优惠券
         Integer in3000 =(Integer) session.getAttribute("in3000");
         Result coupon2Map = ResultUtil.success();
         if(in3000>0) {
              coupon2Map = couponService.getCoupon3000(tel);
         }
-
+        System.out.println(prizeList);
+        model.addAttribute("coupon3",prizeList);
         model.addAttribute("coupon2",coupon2Map);
-return "abc";
-        //return "/member/coupon";
+        return "/member/coupon";
     }
 
     @RequestMapping(value = "/use", method = RequestMethod.POST)
     @ResponseBody
-    public Result useCoupon(HttpServletRequest request,@SessionAttribute("user") User user,String code,String type) throws Exception {
-        return couponService.useCoupon(user.getTel(), code,type);
+    public Result useCoupon(HttpServletRequest request,@SessionAttribute("user") User user,String code,String type,Integer id) throws Exception {
+        return couponService.useCoupon(user.getTel(), code,type,id);
     }
 }

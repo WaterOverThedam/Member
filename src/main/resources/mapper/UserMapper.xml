@@ -17,19 +17,24 @@
     <sql id="Base_Column_List" >
       id, username, password, email, familyName, childName, familyTitle, gym, create_time
     </sql>
+    <sql id="gymWhere" >
+        where gym not like '月球%' and gym not like '火星%' and gym not like 'head%' and gym not like '测试%' and gym like '%中心'
+    </sql>
 
     <select id="getAll" parameterType="java.lang.String" resultMap="BaseResultMap"  >
         SELECT
         <include refid="Base_Column_List" />
-        FROM user where gym not like '月球%' and gym not like '测试%' and gym like '%中心'
+        FROM user
+        <include refid="gymWhere" />
         <if test="search!=null and search!=''">
-         and CONCAT(username,familyName,childname,gym,create_time,email) like '%${search}%'
+          and CONCAT(username,familyName,childname,gym,create_time,email) like '%${search}%'
         </if>
         order by create_time desc
     </select>
     <select id="getStats" parameterType="int" resultType="hashmap">
         select gym,gymcode,count(1)num FROM user
-        where gym not like '月球%' and gym not like '火星%' and gym not like 'head%' and gym not like '测试%' and gym like '%中心' group by gym,gymcode order by num desc
+        <include refid="gymWhere" />
+         group by gym,gymcode order by num desc
     </select>
     <select id="getOne" parameterType="java.lang.Long" resultMap="BaseResultMap" >
         SELECT

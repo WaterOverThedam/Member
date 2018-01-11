@@ -402,7 +402,7 @@ public class AdminCtrl {
         Activity activity = activityDao.findOne(id);
         PageHelper.startPage(pageNow, 2);
         List<ParticipatorGroup> participatorGroups = activityEnrollmentMapper.getMyActivityEnrollmentByActId(id);
-        log.info(participatorGroups.toString());
+        //log.info(participatorGroups.toString());
         model.addAttribute("page",participatorGroups);
         model.addAttribute("activity",activity);
         return "/admin/activityView";

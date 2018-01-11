@@ -31,10 +31,8 @@ public class PointsServiceImpl implements IPointsService {
     @Autowired
     private OasisService oasisService;
 
-    public Result updatePoints_http(String tel, Integer http_num,String zx) throws Exception {
-        Integer addPoints;
+    public Result updatePoints_http(String tel, Integer http_num, Integer pointed,String zx) throws Exception {
         Points p = pointsDao.findOneByTel(tel);
-        Integer pointed;
         //本地留存
         if (null == p) {
            //本地不存在创建
@@ -44,19 +42,15 @@ public class PointsServiceImpl implements IPointsService {
             p2.setType("活动转介绍");
             p2.setCreateTime(new Date());
             p2.setTel(tel);
-            //保存原积分
-            pointed = http_num;
             pointsDao.save(p2);
         }else{
          //更新积分
-            //保存原积分
-            pointed = p.getNum();
             p.setNum(http_num);
             pointsDao.save(p);
         }
         //oasis同步
-        if (pointed!=null && http_num > pointed) {
-            addPoints = (http_num - pointed)* 2000;
+        if (http_num > pointed) {
+            Integer addPoints = (http_num - pointed)* 2000;
             //TODO 增加积分
             User u = userDao.findOneByTel(tel);
             Integer idjt = u.getIdFamily();

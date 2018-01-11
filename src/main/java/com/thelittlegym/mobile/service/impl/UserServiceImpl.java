@@ -107,6 +107,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Integer isNum(String tel,Integer num) {
         //临时添加  活动开始时间为8-17 8点
+        //0 无， 1 待领， 2 已领
         try {
             Date now = new Date();
             Setting s =settingMapper.getSettingByName("reg");
