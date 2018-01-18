@@ -302,8 +302,8 @@ public class AdminCtrl {
     public Result themeAdd(HttpServletRequest request) throws Exception {
 
         String course = request.getParameter("course");
-        log.info(course);
         String course_id = request.getParameter("course_id");
+        Integer id = Integer.parseInt(course_id);
         String weekNum = request.getParameter("weekNum");
         String videoSrc = request.getParameter("videoSrc");;
         String name = request.getParameter("name");
@@ -319,6 +319,9 @@ public class AdminCtrl {
         theme.setVideoSrc(videoSrc);
         theme.setCreateTime(new Date());
         theme.setSearch(theme.toString());
+        if(id>0){
+            theme.setId(id);
+        }
         themeDao.save(theme);
         return ResultUtil.success();
     }

@@ -256,15 +256,15 @@
                     <th>视频名称</th>
                     <th>视频URL</th>
                     <th>是否启用</th>
-                    <th>删除</th>
+                    <th>记录操作</th>
                 </tr></thead>
                 <tbody>
                 <tr th:unless="${#lists.isEmpty(page.content)}" th:each="theme : ${page.content}">
-                    <td th:text="${theme.course}"></td>
-                    <td id="dt" th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
+                    <td class="course" th:text="${theme.course}" ></td>
+                    <td class="dt" th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
                     <td class="tip"  data-position="top left" th:text="${theme.weekNum}"></td>
-                    <td th:text="${theme.name}"></td>
-                    <td th:text="${theme.videoSrc}"></td>
+                    <td class="name" th:text="${theme.name}"></td>
+                    <td class="videoSrc" th:text="${theme.videoSrc}"></td>
                     <td>
                         <div  class="ui toggle checkbox">
                             <input class="isShow" th:attr="data_id=${theme.id}" th:checked="${theme.isShow}" type="checkbox" name="public"/>
@@ -273,7 +273,10 @@
                         </div>
 
                     </td>
-                    <td><a class="del" href="#" th:attr="data_id=${theme.id}">删除</a></td>
+                    <td>
+                        <a class="edit" href="#" th:attr="data-id=${theme.id}">编辑</a>
+                        <a class="del" href="#" th:attr="data-id=${theme.id}">删除</a>
+                     </td>
 
                 </tr>
                 <tr  th:if="${#lists.isEmpty(page.content)}"><td colspan="4" style="text-align: center">
@@ -319,33 +322,33 @@
 <div id="formAdd" class="ui modal">
     <i class="close icon"></i>
     <div class="header">
-        新增
+        添加和修改
     </div>
     <div class="content">
         <form class="ui form segment">
             <div class="fields">
                 <div class="field">
                     <label>主题课程</label>
-                    <input name="course_id" type="hidden" value="funnyBug"/>
-                    <input name="course" type="text" value="趣味小虫"/>
+                    <input id="course_id" name="course_id" type="hidden" value="funnyBug"/>
+                    <input id="course" name="course" type="text" value="趣味小虫"/>
                 </div>
                 <div class="field">
                     <label>学期开始日期</label>
-                    <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
+                    <input id="dtBegin" name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
                 </div>
                 <div class="field">
                     <label>学期第几周</label>
-                    <input name="weekNum" type="text" placeholder="输入数字" value=""/>
+                    <input id="weekNum" name="weekNum" type="text" placeholder="输入数字" value=""/>
                 </div>
             </div>
             <div class="fields">
                 <div class="field">
                     <label>视频名称</label>
-                    <input name="name" type="text" placeholder="输入数字" value=""/>
+                    <input id="name" name="name" type="text" placeholder="输入数字" value=""/>
                 </div>
                 <div class="eight wide field">
                     <label>视频URL</label>
-                    <input name="videoSrc" type="text" placeholder="输入数字" value=""/>
+                    <input id="videoSrc" name="videoSrc" type="text" placeholder="输入数字" value=""/>
                 </div>
             </div>
             <div class="ui blue submit button">Submit</div>
@@ -376,11 +379,12 @@
 
     $(".tip").each(function () {
         var weekNum = parseInt($(this).text());
-        dtFirst = ($(this).parent().find("#dt").text())
-        tip = date_start(dtFirst,weekNum)+" - "+date_end(dtFirst,weekNum+1)
+        var dtFirst = ($(this).parent().find(".dt").text())
+        var tip = date_start(dtFirst,weekNum-1)+" - "+date_end(dtFirst,weekNum)
         $(this).attr("data-tooltip",tip)
         $(this).next().attr("data-tooltip",tip)
     })
+
 
 
     if(kw=getUrlParam('kw')){
@@ -391,10 +395,21 @@
         $('#formAdd').modal('show');
     });
     $(".del").click(function(){
-        $('#sure').attr('onclick','del('+$(this).attr("data_id")+')')
+        $('#sure').attr('onclick','del('+$(this).attr("data-id")+')')
         $('.ui.tiny.modal').modal('show');
         $(this).parent().parent().hide();
     });
+
+    $(".edit").click(function () {
+        $("#course_id").val($(this).data('id'));
+        $("#course").val($(this).parent().parent().find(".course").text())
+        $("#name").val($(this).parent().parent().find(".name").text())
+        $("#dtBegin").val($(this).parent().parent().find(".dt").text())
+        $("#weekNum").val($(this).parent().parent().find(".tip").text())
+        $("#videoSrc").val($(this).parent().parent().find(".videoSrc").text())
+        $('#formAdd').modal('show');
+    })
+
     function del(id) {
         $.get("/admin/themeDel",{id:id}, function(data){
             if(data.code){
@@ -461,17 +476,16 @@
             },
 
             onSuccess: function(e) {
-                alert('submit')
                 $.ajax({
                     type: 'post',
                     url: '/admin/themeAdd',
                     data:  $(".ui.form").serialize(),
                     success: function(res) {
-                        if(re.code){
+                        if(res.code){
                             var dialog = $('.ui.mini.modal');
                             showResult(dialog,res.code,res.data);
                         }else{
-                           // window.location.reload();
+                            window.location.reload();
                         }
                   }
                 });
@@ -579,13 +593,6 @@
 
     $('.ui.dropdown').dropdown();
 
-    $(".tip").each(function () {
-        var weekNum = parseInt($(this).text());
-        dtFirst = ($(this).parent().find("#dt").text())
-        tip = date_start(dtFirst,weekNum)+" - "+date_end(dtFirst,weekNum+1)
-        $(this).attr("data-tooltip",tip)
-        $(this).next().attr("data-tooltip",tip)
-    })
 
 
     if(kw=getUrlParam('kw')){
