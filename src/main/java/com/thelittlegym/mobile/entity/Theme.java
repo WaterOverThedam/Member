@@ -20,6 +20,7 @@ public class Theme {
     private Date createTime;
     private Date beginDate;
     private String course;
+    private String name;
     private Integer weekNum;
     private String videoSrc;
     private Boolean isShow;
@@ -28,8 +29,8 @@ public class Theme {
     @Override
     public String toString() {
         return "Theme{" +
-                "course='" + course + '\'' +
-                ", weekNum=" + weekNum.toString() +"周"+
+                "name='" + name + '\'' +
+                ", url=" + videoSrc+
                 '}';
     }
 }

@@ -150,7 +150,7 @@ public class AdminCtrl {
     @GetMapping(value = "/theme")
     public String getTheme(HttpServletRequest request,
                              @RequestParam(value = "pageNow", defaultValue = "1") Integer pageNow,
-                             @RequestParam(value = "size", defaultValue = "10") Integer size,
+                             @RequestParam(value = "size", defaultValue = "30") Integer size,
                              @RequestParam(value = "kw", defaultValue = "") String keyword,
                              Model model) throws Exception {
 
@@ -158,11 +158,11 @@ public class AdminCtrl {
         model.addAttribute("menuId", "theme");
 
         keyword = "%" + keyword + "%";
-        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Sort sort = new Sort(Sort.Direction.ASC, "weekNum");
         Pageable pageable = new PageRequest(pageNow - 1, size, sort);
         Theme theme = new Theme();
         Page<Theme> themePages = themeDao.findAllBySearchLike(keyword, pageable);
-        log.info(String.valueOf(themePages.getTotalElements()));
+        //log.info(String.valueOf(themePages.getTotalElements()));
 
         model.addAttribute("page", themePages);
 
@@ -305,13 +305,15 @@ public class AdminCtrl {
         log.info(course);
         String course_id = request.getParameter("course_id");
         String weekNum = request.getParameter("weekNum");
-        String videoSrc = "/files/video/" + course_id + "_" + weekNum + ".mp4";
+        String videoSrc = request.getParameter("videoSrc");;
+        String name = request.getParameter("name");
         String dtBegin = request.getParameter("dtBegin");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date = sdf.parse(dtBegin);
         Theme theme = new Theme();
         theme.setIsShow(true);
         theme.setCourse(course);
+        theme.setName(name);
         theme.setBeginDate(date);
         theme.setWeekNum(Integer.parseInt(weekNum));
         theme.setVideoSrc(videoSrc);

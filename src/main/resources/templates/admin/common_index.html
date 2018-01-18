@@ -252,8 +252,9 @@
                 <tr class="positive" >
                     <th><div class="ui ribbon label">主题课程</div></th>
                     <th>学期开始日期</th>
-                    <th>第几周</th>
+                    <th>学期第几周</th>
                     <th>视频名称</th>
+                    <th>视频URL</th>
                     <th>是否启用</th>
                     <th>删除</th>
                 </tr></thead>
@@ -262,6 +263,7 @@
                     <td th:text="${theme.course}"></td>
                     <td id="dt" th:text="${#calendars.format(theme.beginDate,'yyyy-MM-dd')}"></td>
                     <td class="tip"  data-position="top left" th:text="${theme.weekNum}"></td>
+                    <td th:text="${theme.name}"></td>
                     <td th:text="${theme.videoSrc}"></td>
                     <td>
                         <div  class="ui toggle checkbox">
@@ -321,7 +323,7 @@
     </div>
     <div class="content">
         <form class="ui form segment">
-            <div class="one fields">
+            <div class="fields">
                 <div class="field">
                     <label>主题课程</label>
                     <input name="course_id" type="hidden" value="funnyBug"/>
@@ -332,8 +334,18 @@
                     <input name="dtBegin" type="text" placeholder="学期开始日期" value=""/>
                 </div>
                 <div class="field">
-                    <label>第几周</label>
+                    <label>学期第几周</label>
                     <input name="weekNum" type="text" placeholder="输入数字" value=""/>
+                </div>
+            </div>
+            <div class="fields">
+                <div class="field">
+                    <label>视频名称</label>
+                    <input name="name" type="text" placeholder="输入数字" value=""/>
+                </div>
+                <div class="eight wide field">
+                    <label>视频URL</label>
+                    <input name="videoSrc" type="text" placeholder="输入数字" value=""/>
                 </div>
             </div>
             <div class="ui blue submit button">Submit</div>
@@ -361,6 +373,7 @@
 
 <script th:inline="JavaScript">
     /*<![CDATA[*/
+
     $(".tip").each(function () {
         var weekNum = parseInt($(this).text());
         dtFirst = ($(this).parent().find("#dt").text())
