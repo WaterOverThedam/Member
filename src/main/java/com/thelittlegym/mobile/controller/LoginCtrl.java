@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.BlackListDao;
+import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
@@ -48,6 +49,8 @@ public class LoginCtrl {
     private OasisService oasisService;
     @Autowired
     private BlackListDao blackListDao;
+    @Autowired
+    private UserDao userDao;
 
 
     @PostMapping("/login")
@@ -84,18 +87,18 @@ public class LoginCtrl {
         Map valNumMap = new HashMap();
 
         //验证码校验
-//        if (session.getAttribute("valNumMap") != null) {
-//            valNumMap = (HashMap) session.getAttribute("valNumMap");
-//            if (valNumMap.get("valNum").equals(valnum) == false) {
-//                throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//            }
-//            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-//            if (minsPass > 30) {
-//                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
-//            }
-//        } else {
-//            throw new MyException(ResultEnum.CHECKSUM_WRONG);
-//        }
+        if (session.getAttribute("valNumMap") != null) {
+            valNumMap = (HashMap) session.getAttribute("valNumMap");
+            if (valNumMap.get("valNum").equals(valnum) == false) {
+                throw new MyException(ResultEnum.CHECKSUM_WRONG);
+            }
+            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+            if (minsPass > 30) {
+                throw new MyException(ResultEnum.CHECKSUM_OVERDUE);
+            }
+        } else {
+            throw new MyException(ResultEnum.CHECKSUM_WRONG);
+        }
 
 
         String sql = "select top 1 isnull(crmzdy_81802271,'')kids,jt.crm_surname familyName,jt.crmzdy_81802271 childname,jt.crmzdy_80620120 tel,jt.id,jt.crmzdy_81486429 addr,zx.gym,zx.gymcode,jt.crmzdy_81486367 +'|'+zx.city city,zx.idzx from crm_sj_238592_view jt cross apply(select top 1 crmzdy_80620116 gymcode,crmzdy_81620171 gym,zx.id idzx,gym.crmzdy_81744959 city from crm_zdytable_238592_25111_238592_view zx,crm_zdytable_238592_23594_238592_view gym where gym.id=zx.crmzdy_81620171_id  and isnull(zx.crmzdy_81802303,'')<>'' and zx.crmzdy_81611091_id=jt.id)zx where charindex('username',jt.crmzdy_81767199)>0";
@@ -123,45 +126,42 @@ public class LoginCtrl {
 
     @RequestMapping(value = "/updatePass", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> updatePass(HttpServletRequest request, String tel, String newPass, String valNum) {
-        Map<String, Object> returnMap = new HashMap<String, Object>();
+    public Result updatePass(HttpServletRequest request, String tel, String newPass, String valNum) {
         HttpSession session = request.getSession();
-        Map<String,Object> valNumMap = new HashMap<String,Object>();
+        /*
+        Map<String, Object> valNumMap = new HashMap<String, Object>();
         //验证码校验
-        if (session.getAttribute("valNumMap") != null) {
-            valNumMap = (HashMap) session.getAttribute("valNumMap");
-            if (valNumMap.get("valNum").equals(valNum) == false) {
-                returnMap.put("message", "验证码错误！");
-                returnMap.put("success", false);
-                return returnMap;
-            }
-            long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
-            if (minsPass > 30) {
-                returnMap.put("message", "验证码已过期！");
-                returnMap.put("success", false);
-                return returnMap;
-            }
-            try {
-                //修改密码
-                User u = userService.getByTel(tel);
-//                newPass = getHash(newPass,"MD5");
+        if (session.getAttribute("valNumMap") == null) {
+            return ResultUtil.error(ResultEnum.CHECKSUM_WRONG);
+        }
+
+        valNumMap = (HashMap) session.getAttribute("valNumMap");
+        if (!valNumMap.get("valNum").equals(valNum)) {
+            return ResultUtil.error(ResultEnum.CHECKSUM_WRONG);
+        }
+
+        long minsPass = getDateDiffMins((Date) valNumMap.get("valTimeStamp"), new Date());
+        if (minsPass > 30) {
+            return ResultUtil.error(ResultEnum.CHECKSUM_OVERDUE);
+        }
+*/
+        try {
+            //修改密码
+            session.setAttribute("valNumMap", null);
+            User u = userDao.findOneByUsername(tel);
+            if (u == null) {
+                return ResultUtil.error(ResultEnum.LOGIN_USER_NO_EXIST);
+            } else {
+                //前台已处理newPass = getHash(newPass, "MD5");
                 u.setPassword(newPass);
-                userService.updateUser(u);
-                returnMap.put("message", "修改成功！");
-                returnMap.put("success", true);
-                session.setAttribute("valNumMap",null);
-                return returnMap;
-            } catch (Exception e) {
-                returnMap.put("message", "异常错误！");
-                returnMap.put("success", false);
-                return returnMap;
+                return userService.updateUser(u);
             }
 
-        } else {
-            returnMap.put("message", "验证码错误!");
-            returnMap.put("success", false);
-            return returnMap;
+        } catch (Exception e) {
+            return ResultUtil.error("异常错误！");
         }
+
+
     }
 
 
@@ -243,7 +243,6 @@ public class LoginCtrl {
     @ResponseBody
     public Result exist(@RequestParam(name = "telephone") String username) {
 
-
         try {
             if (userService.isReged(username) ){
                 throw new MyException(ResultEnum.REGISTER_USER_EXIST);
@@ -264,13 +263,14 @@ public class LoginCtrl {
         }
 
     }
+
     //修改密码权限判断
     @RequestMapping(value = "/exist_reged", method = RequestMethod.POST)
     @ResponseBody
     public Result exist_reged(String telephone) {
 
         try {
-            User u = userService.getByTel(telephone);
+            User u = userDao.findOneByUsername(telephone);
             if ( null != u){
                 return ResultUtil.success(ResultEnum.IS_REGISTERED);
             }else{
@@ -298,7 +298,6 @@ public class LoginCtrl {
             if( null == name || "".equals(name)){
                 throw new MyException(ResultEnum.VALIDATE_NAME);
             }
-
             feedback.setFranchisee(Franchisee);
             feedback.setCreateTime(new Date());
             feedback.setHandled(false);

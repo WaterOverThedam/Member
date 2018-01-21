@@ -8,6 +8,7 @@ import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.Setting;
 import com.thelittlegym.mobile.entity.User;
 
+import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.SettingMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
 import com.thelittlegym.mobile.service.IUserService;
@@ -86,8 +87,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updateUser(User user)  {
-        userDao.save(user);
+    public Result updateUser(User user)  {
+        User u = userDao.save(user);
+        if (u!=null){
+            return ResultUtil.success(ResultEnum.SUCCESS);
+        }else{
+            return ResultUtil.success(ResultEnum.FAILURE);
+        }
     }
 
     @Override

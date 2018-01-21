@@ -33,7 +33,7 @@ public enum ResultEnum {
     UPLOAD_SUCCESS(-304,"  上传成功"),
     UPLOAD_TRY_LATER(-304,"  请重新登录后再试"),
     IS_REGISTERED(0,"已注册"),
-    IS_NOT_REGISTERED(0,"用户未注册,无法修改密码"),
+    IS_NOT_REGISTERED(-70,"用户未注册,无法修改密码"),
     CHECKSUM_SUCCESS(0,"验证通过"),
     CHECKSUM_WRONG(-81,"验证码错误"),
     CHECKSUM_OVERDUE(-82,"验证码已过期"),

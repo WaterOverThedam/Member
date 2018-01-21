@@ -256,6 +256,7 @@ function regsister_ajax(username, valnum, password, email) {
         success: function (data) {
             //console.log(data);
             if(data){
+                alert(data)
                 msg(data.msg);
                 if (!data.code) {
                     mySwiper.unlockSwipes();
@@ -366,7 +367,7 @@ function updatePass_ajax(tel,valNum,newPass) {
         dataType: "json",
         async: false,
         success: function (data) {
-            if (data.success == true){
+            if (!data.code){
                 layer.open({
                     content: '修改成功，正在跳转……'
                     , skin: 'msg'
@@ -377,7 +378,7 @@ function updatePass_ajax(tel,valNum,newPass) {
                 },1000);
             }else{
                 layer.open({
-                    content: data.message
+                    content: data.msg
                     , skin: 'msg'
                     , time: 2 //2秒后自动关闭
                 });

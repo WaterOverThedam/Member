@@ -26,7 +26,7 @@ public interface IUserService {
 
     public User getUserById(Integer id) ;
 
-    public void updateUser(User user) ;
+    public Result updateUser(User user) ;
 
     public Long getTotal();
 
