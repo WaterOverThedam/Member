@@ -256,7 +256,7 @@ function regsister_ajax(username, valnum, password, email) {
         success: function (data) {
             //console.log(data);
             if(data){
-                alert(data)
+                //alert(data)
                 msg(data.msg);
                 if (!data.code) {
                     mySwiper.unlockSwipes();
