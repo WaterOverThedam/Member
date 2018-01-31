@@ -2,9 +2,14 @@ package com.thelittlegym.mobile.dao;
 
 import com.thelittlegym.mobile.entity.Activity;
 import com.thelittlegym.mobile.entity.Theme;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Date;
 
 /**
  * Created by TONY on 2017/8/26.
@@ -12,5 +17,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ThemeDao extends JpaRepository<Theme,Integer> {
     Page<Theme> findAllBySearchLike(String keyword, Pageable pageable);
     Theme findFirstByCourseAndWeekNum(String course,Integer WeekNum);
-    Theme findFirstByCourseAndWeekNumAndIsShow(String course,Integer weekNum,Boolean isShow);
+    //Theme findFirstByCourseAndWeekNumAndIsShow(String course,Integer weekNum,Boolean isShow);
 }

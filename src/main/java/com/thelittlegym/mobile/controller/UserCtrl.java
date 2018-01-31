@@ -10,7 +10,7 @@ import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
-import com.thelittlegym.mobile.mapper.UserMapper;
+import com.thelittlegym.mobile.mapper.ThemeMapper;
 import com.thelittlegym.mobile.service.IUserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.test.InTesting;
@@ -19,8 +19,10 @@ import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,7 +50,16 @@ public class UserCtrl {
     @Value("${filePath}")
     private String filePath;
     @Autowired
-    private ThemeDao themeDao;
+    private ThemeMapper themeMapper;
+
+    //日期参数转化
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+    }
+
 
     @RequestMapping("/profile")
     @ResponseBody
@@ -169,9 +180,10 @@ public class UserCtrl {
 
     @GetMapping(value = "/topic")
     @ResponseBody
-    public Result topic(String course,Integer weekNum) throws Exception {
+    public Result topic(String course,Date dt) throws Exception {
         //log.info("{}-{}",course,weekNum);
-        Theme theme = themeDao.findFirstByCourseAndWeekNumAndIsShow(course,weekNum,true);
+        System.out.println(dt);
+        Theme theme = themeMapper.findFirstByCourseAndWeekNumAndIsShow(course,dt,true);
         if(theme!=null){
             return ResultUtil.success(ResultEnum.SUCCESS,theme.getVideoSrc());
         }else{

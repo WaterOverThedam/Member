@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.entity;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ public class Theme {
     @GeneratedValue
     private Integer id;
     private Date createTime;
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date beginDate;
     private String course;
     private String name;
