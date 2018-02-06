@@ -125,7 +125,8 @@ public class UserServiceImpl implements IUserService {
 //            String beginDateStr = "2017-08-17 08:00:00";
 //            String endDateStr = "2017-09-10 23:59:59";
             Date beginDate = param.getDate("dtBegin");
-            Date endDate = param.getDate("dtEnd");
+            //Date endDate = param.getDate("dtEnd");//
+            Date endDate = param.getDate("useend");
 
             Calendar c = Calendar.getInstance();
             c.setTime(endDate);
