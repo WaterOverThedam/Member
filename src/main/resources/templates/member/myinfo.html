@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/css/sm.min.css"/>
     <link rel="stylesheet" href="/css/gym.css"/>
     <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+
     <style>
         /* 阿里巴巴 矢量图引用*/
         @font-face {
@@ -96,9 +97,9 @@
                               <label  id="c_regDate" th:text="${listContract[0]['报名日期']}"></label>
                               <div>报名日期</div>
                            </div>
-                           <div class="col-33 c">
-                              <label id="c_validity" th:text="${listContract[0]['有效期']}"></label>
-                              <div>有效期</div>
+                           <div class="col-33 c" data-toggle="tooltip" title="注：课程截止日指中心同意会员上课的最后日期，您的实际合约有效期以您和中心签署的《会员协议》中注明的“有效期终止日”为准，过了合约有效期不能退款以及转中心。">
+                               <label id="c_validity" th:text="${listContract[0]['有效期']}"></label>
+                              <div><i class="fa fa-question-circle help" ></i>有效期</div>
                            </div>
                            <div class="col-33">
                               <label id="c_give" th:text="${listContract[0]['赠课']}?:'无'">
@@ -299,6 +300,7 @@
 
 <script type='text/javascript' src='/js/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='/js/sm.min.js' charset='utf-8'></script>
+
 
 <script th:inline="javascript">
     /*<![CDATA[*/
