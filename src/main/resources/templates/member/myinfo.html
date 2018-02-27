@@ -98,7 +98,9 @@
                            </div>
                            <div class="col-33 c">
                               <label id="c_validity" th:text="${listContract[0]['有效期']}"></label>
-                              <div>有效期</div>
+                              <div class="notice"><span
+                                      class="fa fa-question-circle coupon-rule open-popup" data-value="2"
+                                      data-popup=".popup-coupon2-rule">&nbsp;有效期</span></div>
                            </div>
                            <div class="col-33">
                               <label id="c_give" th:text="${listContract[0]['赠课']}?:'无'">
@@ -316,6 +318,23 @@
 
     $(".exit").click(function () {
         window.location.href = "/exit";
+    })
+
+    $(".notice").click(function () {
+        var alertText = "";
+        alertText = '<div class="content-block"><p class="coupon-rule-detail">注：课程截止日指中心同意会员上课的最后日期，您的实际合约有效期以您和中心签署的《会员协议》中注明的“有效期终止日”为准，过了合约有效期不能退款以及转中心。</p></div>';
+        if (alertText != "") {
+            $.modal({
+                title: '<h1 class="title">有效期说明</h1>',
+                text: alertText,
+                buttons: [
+                    {
+                        text: '我知道了',
+                    }
+                ]
+            })
+        }
+
     })
 
 
