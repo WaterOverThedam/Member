@@ -49,6 +49,8 @@ public enum ResultEnum {
     COUPON_USED(-73,"返回结果为空"),
     COUPON_WRONG_NUMBER(-74,"核销码错误"),
 
+    WECHAT_MP_ERROR(20, "微信公众账号方面错误"),
+    WXPAY_NOTIFY_MONEY_VERIFY_ERROR(21, "微信支付异步通知金额校验不通过"),
 
 
 

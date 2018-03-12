@@ -15,6 +15,10 @@ public class MyException extends RuntimeException {
         super(msg);
         this.code=-1;
     }
+    public MyException(Integer code,String msg) {
+        super(msg);
+        this.code=code;
+    }
 
     public Integer getCode() {
         return code;
