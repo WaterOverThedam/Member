@@ -69,7 +69,7 @@ wechat:
     orderStatus: e-Cqq67QxD6YNI41iRiqawEYdFavW_7pc7LyEMb-yeQ
 
 projectUrl:
-  wechatMpAuthorize: http://bridge.natapp1.cc
+  wechatMpAuthorize: http://bridge.natapp1.cc/wechat/userInfo
   wechatOpenAuthorize: http://bridge.natapp1.cc
   sell: http://bridge.natapp1.cc
 

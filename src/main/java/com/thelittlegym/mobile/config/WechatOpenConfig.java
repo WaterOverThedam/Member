@@ -21,7 +21,7 @@ public class WechatOpenConfig {
     @Bean
     public WxMpService wxOpenService() {
         WxMpService wxOpenService = new WxMpServiceImpl();
-        //wxOpenService.setWxMpConfigStorage(wxOpenConfigStorage());
+        wxOpenService.setWxMpConfigStorage(wxOpenConfigStorage());
         return wxOpenService;
     }
 
