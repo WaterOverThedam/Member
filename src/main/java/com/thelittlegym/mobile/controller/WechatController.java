@@ -23,14 +23,14 @@ import java.net.URLEncoder;
  * Created by 廖师兄
  * 2017-07-03 01:20
  */
-@RestController
+@Controller
 @RequestMapping("/wechat")
 @Slf4j
 public class WechatController {
 
-    //@Autowired
-    //private WxMpService wxMpService;
-    private  WxMpService wxMpService = new WxMpServiceImpl();
+    @Autowired
+    private WxMpService wxMpService;
+
 
    // @Autowired
    // private WxMpService wxOpenService;
@@ -41,18 +41,20 @@ public class WechatController {
 
     @GetMapping("/authorize")
     public String authorize(@RequestParam("returnUrl") String returnUrl) {
-        System.out.println(accountConfig);
+        //System.out.println(accountConfig);
         //1. 配置
-//        //2. 调用方法
-//        String url = /*projectUrlConfig.getWechatMpAuthorize() + */"http://bridge.natapp1.cc/wechat/userInfo";
-//        String redirectUrl = wxMpService.oauth2buildAuthorizationUrl(url, WxConsts.OAUTH2_SCOPE_BASE, URLEncoder.encode(returnUrl));
-//        return "redirect:" + redirectUrl;
-        return "sss";
+       //2. 调用方法
+       String url = projectUrlConfig.getWechatMpAuthorize();
+       String redirectUrl = wxMpService.oauth2buildAuthorizationUrl(url,WxConsts.OAUTH2_SCOPE_BASE,URLEncoder.encode(returnUrl));
+       log.info("result:{}",redirectUrl);
+       return "redirect:" + redirectUrl;
+
     }
 
     @GetMapping("/userInfo")
     public String userInfo(@RequestParam("code") String code,
                            @RequestParam("state") String returnUrl) {
+
         WxMpOAuth2AccessToken wxMpOAuth2AccessToken = new WxMpOAuth2AccessToken();
         try {
             wxMpOAuth2AccessToken = wxMpService.oauth2getAccessToken(code);
@@ -62,7 +64,7 @@ public class WechatController {
         }
 
         String openId = wxMpOAuth2AccessToken.getOpenId();
-
+        log.info("url:{}","redirect:" + returnUrl + "?openid=" + openId);
         return "redirect:" + returnUrl + "?openid=" + openId;
     }
 
