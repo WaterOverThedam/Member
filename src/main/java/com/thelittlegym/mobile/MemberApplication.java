@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 
 
+
 @SpringBootApplication
 @MapperScan(basePackages = {"com.thelittlegym.mobile.mapper"}) //MyBaitis持久化类
 public class MemberApplication extends SpringBootServletInitializer {
