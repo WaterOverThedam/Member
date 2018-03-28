@@ -62,6 +62,7 @@ public class LoginServiceImpl implements ILoginService {
             user.setIdzx(family.getIdzx());
             user.setCreateTime(new Date());
             user.setIsDelete(false);
+            user.setOpenId("");
             User value = userDao.save(user);
             if (value==null){
                 throw new MyException(ResultEnum.REGISTER_EXCEPTION);

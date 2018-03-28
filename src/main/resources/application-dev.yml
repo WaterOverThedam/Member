@@ -13,13 +13,13 @@ spring:
     restart:
       enabled: true
 logging:
-  path: /opt/idea-IU-173.4301.25/log
+  path: F:\log
   level: trace
   config: classpath:logback-spring-dev.xml
 server:
   port: 8888
 
-filePath: /opt/idea-IU-173.4301.25/files
+filePath: F:\log\files
 
 test:
       name : jerry

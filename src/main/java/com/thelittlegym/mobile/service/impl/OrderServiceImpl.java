@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
     public Order finish(Order order) {
 
         //推送微信模版消息
-        pushMessageService.orderStatus(order);
+        pushMessageService.orderStatus(order,"Is-sAuw0gZGlDXxFrGlVRZsLXY3nq8wtxe0rXZQ3pjY");
 
         return order;
     }

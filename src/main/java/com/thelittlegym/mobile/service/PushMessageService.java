@@ -12,6 +12,6 @@ import com.thelittlegym.mobile.entity.Order;
 public interface PushMessageService {
 
 
-    void notice(OasisMSG oasisMSG);
-    void orderStatus(Order order);
+    void notice(OasisMSG oasisMSG,String tpl);
+    void orderStatus(Order order,String tpl);
 }

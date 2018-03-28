@@ -12,7 +12,13 @@ import java.util.Date;
 @Data
 public class OasisMSG {
     @Id
-    private Integer id;
+    private String id;
     private String  openId;
+    private String  hao;
+    private String  sheng;
+    private String  hz;
+    private String  date;
+    private String  first;
+    private String  remark;
 
 }

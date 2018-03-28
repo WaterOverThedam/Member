@@ -1,9 +1,13 @@
 package com.thelittlegym.mobile.controller;
 
+import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.config.ProjectUrlConfig;
 import com.thelittlegym.mobile.config.WechatAccountConfig;
+import com.thelittlegym.mobile.dao.UserDao;
+import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
@@ -12,10 +16,7 @@ import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 
@@ -31,7 +32,8 @@ public class WechatController {
     @Autowired
     private WxMpService wxMpService;
 
-
+    @Autowired
+    private UserDao userDao;
    // @Autowired
    // private WxMpService wxOpenService;
    @Autowired
@@ -53,7 +55,8 @@ public class WechatController {
 
     @GetMapping("/userInfo")
     public String userInfo(@RequestParam("code") String code,
-                           @RequestParam("state") String returnUrl) {
+                           @RequestParam("state") String returnUrl,
+                           @SessionAttribute(WebSecurityConfig.SESSION_KEY) User user) {
 
         WxMpOAuth2AccessToken wxMpOAuth2AccessToken = new WxMpOAuth2AccessToken();
         try {
@@ -65,6 +68,9 @@ public class WechatController {
 
         String openId = wxMpOAuth2AccessToken.getOpenId();
         log.info("url:{}","redirect:" + returnUrl + "?openid=" + openId);
+        log.info(user.toString());
+        user.setOpenId(openId);
+        userDao.save(user);
         return "redirect:" + returnUrl + "?openid=" + openId;
     }
 

@@ -29,18 +29,18 @@ public class PushMessageServiceImpl implements PushMessageService {
     private WechatAccountConfig accountConfig;
 
     @Override
-    public void notice(OasisMSG oasisMSG) {
+    public void notice(OasisMSG oasisMSG,String tpl) {
         WxMpTemplateMessage templateMessage = new WxMpTemplateMessage();
-        templateMessage.setTemplateId("Is-sAuw0gZGlDXxFrGlVRZsLXY3nq8wtxe0rXZQ3pjY");
-        templateMessage.setToUser("o2KB1jt6YK_GVlFTl7DfE53wRphg");
+        templateMessage.setTemplateId(tpl);
+        templateMessage.setToUser(oasisMSG.getOpenId());
 
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first", "您已经完成本次课程"),
-                new WxMpTemplateData("keyword1", "张三"),
-                new WxMpTemplateData("keyword2", "2016年07月18日17:20 ~ 18:20"),
-                new WxMpTemplateData("keyword3", "2课时"),
-                new WxMpTemplateData("keyword4", "72课时"),
-                new WxMpTemplateData("remark", "如有疑问请及时联系教务老师，客服热线：xxxxxxxx。")
+                new WxMpTemplateData("first",oasisMSG.getFirst()),
+                new WxMpTemplateData("keyword1",oasisMSG.getHz()),
+                new WxMpTemplateData("keyword2",oasisMSG.getDate()),
+                new WxMpTemplateData("keyword3",oasisMSG.getHao()),
+                new WxMpTemplateData("keyword4",oasisMSG.getSheng()),
+                new WxMpTemplateData("remark",oasisMSG.getRemark())
         );
         templateMessage.setData(data);
         try {
@@ -50,7 +50,7 @@ public class PushMessageServiceImpl implements PushMessageService {
         }
     }
     @Override
-    public void orderStatus(Order order){
+    public void orderStatus(Order order,String tpl){
         WxMpTemplateMessage templateMessage = new WxMpTemplateMessage();
         templateMessage.setTemplateId("Is-sAuw0gZGlDXxFrGlVRZsLXY3nq8wtxe0rXZQ3pjY");
         templateMessage.setToUser("o2KB1jt6YK_GVlFTl7DfE53wRphg");

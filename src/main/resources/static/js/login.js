@@ -231,11 +231,15 @@ function login_ajax(telephone, password) {
         data: {"username": this.username, "password": this.password},
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
-        success: function (data) {
-            if (!data.code) {
-                window.location.href = "/index";
+        success: function (res) {
+            if (!res.code) {
+                if(res.data.openId==""){
+                    window.location.href = "/wechat/authorize?returnUrl=/index";
+                }else{
+                    window.location.href = "/index";
+                }
             } else {
-                 var  content = data.msg?data.msg:"登陆异常，请重试";
+                 var  content = res.msg?res.msg:"登陆异常，请重试";
                  msg(content)
             }
         },

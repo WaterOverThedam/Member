@@ -38,5 +38,6 @@ public class User {
     private String idzx;
     private String city;
     private String addr;
+    private String openId ="";
 
 }

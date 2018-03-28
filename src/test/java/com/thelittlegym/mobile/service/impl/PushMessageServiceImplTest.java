@@ -16,6 +16,6 @@ public class PushMessageServiceImplTest {
     @Test
     public void noticeTest() {
         OasisMSG oasisMSG = new OasisMSG();
-        pushMessageService.notice(oasisMSG);
+        pushMessageService.notice(oasisMSG,"Is-sAuw0gZGlDXxFrGlVRZsLXY3nq8wtxe0rXZQ3pjY");
     }
 }
