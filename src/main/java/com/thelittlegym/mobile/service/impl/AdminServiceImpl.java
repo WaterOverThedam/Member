@@ -4,20 +4,16 @@ import com.thelittlegym.mobile.entity.Admin;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.AdminMapper;
-import com.thelittlegym.mobile.service.IAdminService;
+import com.thelittlegym.mobile.service.AdminService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hibernate on 2017/5/19.
  */
 @Service
-public class AdminServiceImpl implements IAdminService {
+public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminMapper adminMapper;
 

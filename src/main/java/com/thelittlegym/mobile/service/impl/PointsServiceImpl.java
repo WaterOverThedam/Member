@@ -1,15 +1,12 @@
 package com.thelittlegym.mobile.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.thelittlegym.mobile.common.H5Service;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.PointsDao;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.Points;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
-import com.thelittlegym.mobile.service.IPointsService;
+import com.thelittlegym.mobile.service.PointsService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
-public class PointsServiceImpl implements IPointsService {
+public class PointsServiceImpl implements PointsService {
 
     @Autowired
     private PointsDao pointsDao;

@@ -1,7 +1,5 @@
 package com.thelittlegym.mobile.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.BlackListDao;
@@ -9,9 +7,9 @@ import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
-import com.thelittlegym.mobile.service.IFeedbackService;
-import com.thelittlegym.mobile.service.ILoginService;
-import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.service.FeedbackService;
+import com.thelittlegym.mobile.service.LoginService;
+import com.thelittlegym.mobile.service.UserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.msg.config.AppConfig;
 import com.thelittlegym.mobile.utils.msg.lib.MESSAGEXsend;
@@ -40,11 +38,11 @@ import java.util.Map;
 public class LoginCtrl {
     private static AppConfig config = ConfigLoader.load(ConfigLoader.ConfigType.Message);
     @Autowired
-    private ILoginService loginService;
+    private LoginService loginService;
     @Autowired
-    private IUserService userService;
+    private UserService userService;
     @Autowired
-    private IFeedbackService feedbackService;
+    private FeedbackService feedbackService;
     @Autowired
     private OasisService oasisService;
     @Autowired

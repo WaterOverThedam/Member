@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by hibernate on 2017/3/21.
  */
-public interface ILoginService {
+public interface LoginService {
     //登录
     public Result login(String username, String password);
 

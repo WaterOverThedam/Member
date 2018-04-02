@@ -2,7 +2,7 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.entity.Activity;
-import com.thelittlegym.mobile.service.IActivityService;
+import com.thelittlegym.mobile.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * Created by TONY on 2017/8/27.
  */
 @Service
-public class ActivityServiceImpl implements IActivityService {
+public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private ActivityDao activityDao;
 

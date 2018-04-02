@@ -2,7 +2,7 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.FeedbackDao;
 import com.thelittlegym.mobile.entity.Feedback;
-import com.thelittlegym.mobile.service.IFeedbackService;
+import com.thelittlegym.mobile.service.FeedbackService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import java.util.Date;
  */
 @Service
 @Slf4j
-public class FeedbackServiceImpl implements IFeedbackService {
+public class FeedbackServiceImpl implements FeedbackService {
     @Autowired
     private FeedbackDao feedBackDao;
 

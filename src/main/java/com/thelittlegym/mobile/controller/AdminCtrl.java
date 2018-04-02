@@ -1,28 +1,25 @@
 package com.thelittlegym.mobile.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.thelittlegym.mobile.Convertor.DateConvert;
-import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.JsonService;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.dao.ActivityDao;
 import com.thelittlegym.mobile.dao.PageLogDao;
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
-import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.mapper.PageLogMapper;
 import com.thelittlegym.mobile.mapper.SettingMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
-import com.thelittlegym.mobile.service.IAdminService;
-import com.thelittlegym.mobile.service.IFeedbackService;
-import com.thelittlegym.mobile.service.ILoginService;
-import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.service.AdminService;
+import com.thelittlegym.mobile.service.FeedbackService;
+import com.thelittlegym.mobile.service.LoginService;
+import com.thelittlegym.mobile.service.UserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -58,13 +55,13 @@ public class AdminCtrl {
     @Autowired
     private ThemeDao themeDao;
     @Autowired
-    private IAdminService adminService;
+    private AdminService adminService;
     @Autowired
-    private ILoginService loginService;
+    private LoginService loginService;
     @Autowired
-    private IFeedbackService feedbackService;
+    private FeedbackService feedbackService;
     @Autowired
-    private IUserService userService;
+    private UserService userService;
     @Autowired
     private PageLogDao pageLogDao;
     @Autowired

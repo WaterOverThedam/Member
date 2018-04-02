@@ -7,7 +7,7 @@ import com.thelittlegym.mobile.entity.Result;
 /**
  * Created by hibernate on 2017/5/19.
  */
-public interface IAdminService {
+public interface AdminService {
     //登录
     public Result login(String username, String password) ;
 }

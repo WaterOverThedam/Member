@@ -6,12 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.thelittlegym.mobile.WebSecurityConfig;
 import com.thelittlegym.mobile.common.OasisService;
 import com.thelittlegym.mobile.common.WeixinService;
-import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.mapper.ThemeMapper;
-import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.service.UserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import com.thelittlegym.mobile.utils.test.InTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,7 @@ import static com.alibaba.fastjson.JSON.parseObject;
 @RequestMapping("/index")
 public class UserCtrl {
     @Autowired
-    private IUserService userService;
+    private UserService userService;
     @Autowired
     private OasisService oasisService;
     @Autowired

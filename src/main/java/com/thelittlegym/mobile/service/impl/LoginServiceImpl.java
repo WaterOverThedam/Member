@@ -6,22 +6,20 @@ import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
-import com.thelittlegym.mobile.service.ILoginService;
+import com.thelittlegym.mobile.service.LoginService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hibernate on 2017/3/21.
  */
 @Service
 @Slf4j
-public class LoginServiceImpl implements ILoginService {
+public class LoginServiceImpl implements LoginService {
     @Autowired
     private UserDao userDao;
 

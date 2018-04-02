@@ -2,7 +2,7 @@ package com.thelittlegym.mobile.service.impl;
 
 import com.thelittlegym.mobile.dao.ThemeDao;
 import com.thelittlegym.mobile.entity.Theme;
-import com.thelittlegym.mobile.service.IThemeService;
+import com.thelittlegym.mobile.service.ThemeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class ThemeServiceImpl implements IThemeService {
+public class ThemeServiceImpl implements ThemeService {
     private ThemeDao themeDao;
     @Override
     public void save(Theme theme) {

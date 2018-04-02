@@ -1,31 +1,25 @@
 package com.thelittlegym.mobile.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.thelittlegym.mobile.common.H5Service;
 import com.thelittlegym.mobile.config.CouponConfig;
 import com.thelittlegym.mobile.dao.CouponDao;
 import com.thelittlegym.mobile.entity.Coupon;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.PrizeMapper;
-import com.thelittlegym.mobile.service.ICouponService;
+import com.thelittlegym.mobile.service.CouponService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hibernate on 2017/6/16.
  */
 @Service
 @Slf4j
-public class CouponServiceImpl implements ICouponService {
+public class CouponServiceImpl implements CouponService {
 
     @Autowired
     private CouponDao couponDao;

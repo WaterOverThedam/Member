@@ -12,7 +12,7 @@ import com.thelittlegym.mobile.entity.Order;
 public interface PayService {
 
     PayResponse create(Order order);
-
     PayResponse notify(String notifyData);
+    RefundResponse refund(Order order);
 
 }

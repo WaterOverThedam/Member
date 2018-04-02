@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("/weixin")
 @Slf4j
-public class WeixinController {
+public class WeixinCtrl {
 
     @GetMapping("/auth")
     public void auth(@RequestParam(value = "code",defaultValue = "111") String code) {

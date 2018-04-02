@@ -7,17 +7,14 @@ import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
 import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
-import com.thelittlegym.mobile.service.IParticipatorService;
+import com.thelittlegym.mobile.service.ParticipatorService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +22,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class ParticipatorServiceImpl implements IParticipatorService {
+public class ParticipatorServiceImpl implements ParticipatorService {
     @Autowired
     private ParticipatorDao participatorDao;
     @Autowired

@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 public enum ResultEnum {
     SUCCESS(0,"操作成功"),
+    PARAM_ERROR(-1, "参数不正确"),
     FAILURE(-101,"操作失败"),
     TIMEOUT(-102,"操作超时"),
     SAVE_FAILURE(-103,"保存失败"),
@@ -57,7 +58,8 @@ public enum ResultEnum {
     ORDER_UPDATE_FAIL(15, "订单更新失败"),
     ORDER_DETAIL_EMPTY(16, "订单详情为空"),
     ORDER_PAY_STATUS_ERROR(17, "订单支付状态不正确"),
-
+    ORDER_PAY_REPEAT(18, "订单已经完成支付"),
+    ORDER_CANCEL_SUCCESS(0, "取消成功"),
 
     ;
 

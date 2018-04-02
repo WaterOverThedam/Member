@@ -1,16 +1,14 @@
 package com.thelittlegym.mobile.controller;
 
 import com.thelittlegym.mobile.WebSecurityConfig;
-import com.thelittlegym.mobile.dao.ActivityEnrollmentDao;
 import com.thelittlegym.mobile.dao.ParticipatorDao;
 import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
-import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.ActivityEnrollmentMapper;
 import com.thelittlegym.mobile.mapper.ParticipatorMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
-import com.thelittlegym.mobile.service.IActivityService;
-import com.thelittlegym.mobile.service.IParticipatorService;
+import com.thelittlegym.mobile.service.ActivityService;
+import com.thelittlegym.mobile.service.ParticipatorService;
 
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +33,9 @@ import java.util.List;
 public class ActivityCtrl {
 
     @Autowired
-    private IActivityService activityService;
+    private ActivityService activityService;
     @Autowired
-    private IParticipatorService participatorService;
+    private ParticipatorService participatorService;
     @Autowired
     private ParticipatorDao participatorDao;
     @Autowired

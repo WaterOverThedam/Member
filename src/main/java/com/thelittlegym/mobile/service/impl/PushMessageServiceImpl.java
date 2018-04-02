@@ -52,17 +52,17 @@ public class PushMessageServiceImpl implements PushMessageService {
     @Override
     public void orderStatus(Order order,String tpl){
         WxMpTemplateMessage templateMessage = new WxMpTemplateMessage();
-        templateMessage.setTemplateId("Is-sAuw0gZGlDXxFrGlVRZsLXY3nq8wtxe0rXZQ3pjY");
+        templateMessage.setTemplateId(tpl);
         templateMessage.setToUser("o2KB1jt6YK_GVlFTl7DfE53wRphg");
 
         List<WxMpTemplateData> data = Arrays.asList(
-                new WxMpTemplateData("first", "您已经完成本次课程"),
-                new WxMpTemplateData("keyword1", "张三"),
-                new WxMpTemplateData("keyword2", "2016年07月18日17:20 ~ 18:20"),
-                new WxMpTemplateData("keyword3", "2课时"),
-                new WxMpTemplateData("keyword4", "72课时"),
-                new WxMpTemplateData("remark", "如有疑问请及时联系教务老师，客服热线：xxxxxxxx。")
-        );
+                new WxMpTemplateData("first", "亲，请记得收货。"),
+                new WxMpTemplateData("keyword1", "微信点餐"),
+                new WxMpTemplateData("keyword2", "18868812345"),
+                new WxMpTemplateData("keyword3", order.getOrderId()),
+                new WxMpTemplateData("keyword4", order.getOrderStatusEnum().getMessage()),
+                new WxMpTemplateData("keyword5", "￥" + order.getOrderAmount()),
+                new WxMpTemplateData("remark", "欢迎再次光临！"));
         templateMessage.setData(data);
         try {
             wxMpService.getTemplateMsgService().sendTemplateMsg(templateMessage);

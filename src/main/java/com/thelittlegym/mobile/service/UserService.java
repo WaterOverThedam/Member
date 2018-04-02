@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by hibernate on 2017/3/21.
  */
-public interface IUserService {
+public interface UserService {
     public List<User> getUserList();
     //获取用户分页列表
     public Page<User> getUserPageList(Pageable pageable);

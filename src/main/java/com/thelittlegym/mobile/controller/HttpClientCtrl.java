@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * on 2017/2/6.
  */
 @RestController
-public class HttpClientController {
+public class HttpClientCtrl {
 
     @Resource
     private HttpAPIService httpAPIService;

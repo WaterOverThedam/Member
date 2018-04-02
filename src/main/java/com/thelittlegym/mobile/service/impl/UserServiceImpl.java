@@ -11,7 +11,7 @@ import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.mapper.SettingMapper;
 import com.thelittlegym.mobile.mapper.UserMapper;
-import com.thelittlegym.mobile.service.IUserService;
+import com.thelittlegym.mobile.service.UserService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;
     @Autowired

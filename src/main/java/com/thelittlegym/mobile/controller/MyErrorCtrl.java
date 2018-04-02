@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @Controller
 @RequestMapping("/error")
-public class MyErrorController implements ErrorController {
+public class MyErrorCtrl implements ErrorController {
 
     @Override
     public String getErrorPath() {

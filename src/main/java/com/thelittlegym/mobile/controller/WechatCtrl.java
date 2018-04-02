@@ -7,12 +7,10 @@ import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
-import com.thelittlegym.mobile.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,7 +25,7 @@ import java.net.URLEncoder;
 @Controller
 @RequestMapping("/wechat")
 @Slf4j
-public class WechatController {
+public class WechatCtrl {
 
     @Autowired
     private WxMpService wxMpService;
@@ -69,8 +67,10 @@ public class WechatController {
         String openId = wxMpOAuth2AccessToken.getOpenId();
         log.info("url:{}","redirect:" + returnUrl + "?openid=" + openId);
         log.info(user.toString());
-        user.setOpenId(openId);
-        userDao.save(user);
+        if(user.getOpenId().equals("")||user.getOpenId()==null) {
+            user.setOpenId(openId);
+            userDao.save(user);
+        }
         return "redirect:" + returnUrl + "?openid=" + openId;
     }
 

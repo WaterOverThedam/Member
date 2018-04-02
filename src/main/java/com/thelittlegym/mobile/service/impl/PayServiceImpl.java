@@ -1,5 +1,7 @@
 package com.thelittlegym.mobile.service.impl;
 
+import com.lly835.bestpay.model.RefundRequest;
+import com.lly835.bestpay.model.RefundResponse;
 import com.thelittlegym.mobile.entity.Order;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
@@ -80,5 +82,22 @@ public class PayServiceImpl implements PayService {
         return payResponse;
     }
 
+    /**
+     * 退款
+     * @param order
+     */
+    @Override
+    public RefundResponse refund(Order order) {
+        RefundRequest refundRequest = new RefundRequest();
+        refundRequest.setOrderId(order.getOrderId());
+        refundRequest.setOrderAmount(order.getOrderAmount().doubleValue());
+        refundRequest.setPayTypeEnum(BestPayTypeEnum.WXPAY_H5);
+        log.info("【微信退款】request={}", JsonUtil.toJson(refundRequest));
+
+        RefundResponse refundResponse = bestPayService.refund(refundRequest);
+        log.info("【微信退款】response={}", JsonUtil.toJson(refundResponse));
+
+        return refundResponse;
+    }
 
 }

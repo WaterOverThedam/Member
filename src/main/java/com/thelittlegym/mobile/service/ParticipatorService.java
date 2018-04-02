@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by hibernate on 2017/5/26.
  */
-public interface IParticipatorService {
+public interface ParticipatorService {
     //参与活动
     public Result addPar(String tel, String name, Integer actid,User user,String familyTitle);
     public Result enroll(Integer actId,User user);

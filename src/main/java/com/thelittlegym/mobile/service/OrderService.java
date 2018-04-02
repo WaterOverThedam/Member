@@ -1,6 +1,7 @@
 package com.thelittlegym.mobile.service;
 
 import com.thelittlegym.mobile.entity.Order;
+import com.thelittlegym.mobile.entity.OrderForm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 public interface OrderService {
 
     /** 创建订单. */
-    Order create(Order order);
+    Order create(OrderForm orderForm) ;
 
     /** 查询单个订单. */
     Order findOne(String orderId);
@@ -22,12 +23,14 @@ public interface OrderService {
     Page<Order> findList(Pageable pageable);
 
     /** 取消订单. */
-    Order cancel(Order order);
+    Order cancel(String orderId);
 
     /** 完结订单. */
-    Order finish(Order order);
+    Order finish(String orderId);
 
     /** 支付订单. */
+    Order paid(String orderId);
+
     Order paid(Order order);
 
 

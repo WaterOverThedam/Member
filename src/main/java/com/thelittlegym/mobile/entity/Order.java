@@ -1,16 +1,24 @@
 package com.thelittlegym.mobile.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.thelittlegym.mobile.enums.OrderStatusEnum;
+import com.thelittlegym.mobile.enums.PayStatusEnum;
+import com.thelittlegym.mobile.utils.EnumUtil;
 import com.thelittlegym.mobile.utils.serializer.Date2LongSerializer;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@Entity
+@Table(name="enrolorder")
 public class Order {
 
     /** 订单id. */
+    @Id
     private String orderId;
 
     /** 买家名字. */
@@ -38,9 +46,20 @@ public class Order {
 
     /** 创建时间. */
     @JsonSerialize(using = Date2LongSerializer.class)
-    private Date createTime;
+    private Date createTime = new Date();
 
     /** 更新时间. */
     @JsonSerialize(using = Date2LongSerializer.class)
-    private Date updateTime;
+    private Date updateTime = new Date();
+
+    @Transient
+    @JsonIgnore
+    public OrderStatusEnum getOrderStatusEnum() {
+        return EnumUtil.getByCode(orderStatus, OrderStatusEnum.class);
+    }
+    @Transient
+    @JsonIgnore
+    public PayStatusEnum getPayStatusEnum() {
+        return EnumUtil.getByCode(payStatus, PayStatusEnum.class);
+    }
 }

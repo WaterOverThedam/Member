@@ -7,8 +7,8 @@ import com.thelittlegym.mobile.entity.Prize;
 import com.thelittlegym.mobile.entity.Result;
 import com.thelittlegym.mobile.entity.User;
 import com.thelittlegym.mobile.mapper.PrizeMapper;
-import com.thelittlegym.mobile.service.ICouponService;
-import com.thelittlegym.mobile.service.IPointsService;
+import com.thelittlegym.mobile.service.CouponService;
+import com.thelittlegym.mobile.service.PointsService;
 import com.thelittlegym.mobile.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/coupon")
 public class CouponCtrl {
     @Autowired
-    private ICouponService couponService;
+    private CouponService couponService;
     @Autowired
-    private IPointsService pointsService;
+    private PointsService pointsService;
     @Autowired
     private H5Service h5Service;
     @Autowired
