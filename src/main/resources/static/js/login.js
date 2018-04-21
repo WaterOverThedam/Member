@@ -166,7 +166,7 @@ function msg(msg) {
     layer.open({
         content: msg
         ,skin: 'msg'
-        ,time: 2 //2秒后自动关闭
+        ,time: 4 //2秒后自动关闭
     });
 
 }
@@ -239,8 +239,9 @@ function login_ajax(telephone, password) {
                     window.location.href = "/index";
                 }
             } else {
-                 var  content = res.msg?res.msg:"登陆异常，请重试";
-                 msg(content)
+                 //alert(res.msg)
+                 var content = res.msg?res.msg:"登陆异常，请重试";
+                 msg(content);
             }
         },
     });

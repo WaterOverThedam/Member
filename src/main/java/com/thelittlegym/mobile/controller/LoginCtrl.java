@@ -7,6 +7,7 @@ import com.thelittlegym.mobile.dao.UserDao;
 import com.thelittlegym.mobile.entity.*;
 import com.thelittlegym.mobile.enums.ResultEnum;
 import com.thelittlegym.mobile.exception.MyException;
+import com.thelittlegym.mobile.mapper.GymDisabledMapper;
 import com.thelittlegym.mobile.service.FeedbackService;
 import com.thelittlegym.mobile.service.LoginService;
 import com.thelittlegym.mobile.service.UserService;
@@ -49,6 +50,8 @@ public class LoginCtrl {
     private BlackListDao blackListDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private GymDisabledMapper gymDisabledMapper;
 
 
     @PostMapping("/login")
@@ -57,9 +60,16 @@ public class LoginCtrl {
 
         Result res = loginService.login(username, password);
 
+
         if (res != null) {
             //获取user实体
             User user = (User) res.getData();
+            //满足个别gym要求，信息不能访问
+            String msg = gymDisabledMapper.isInDisabledGym(user.getGymcode());
+            if (msg != null && !msg.equals("")) {
+                throw new MyException(msg);
+            }
+
             HttpSession session = request.getSession(true);
             Object objSession = session.getAttribute("user");
             //重复登录清空之前session所有attr
@@ -112,6 +122,11 @@ public class LoginCtrl {
             //满足个别会员要求，信息不能访问
             BlackList black = blackListDao.findOne(username);
             if (black != null) {
+                throw new MyException(ResultEnum.REGISTER_FORBIDDEN);
+            }
+            //满足个别gym要求，信息不能访问
+            String msg = gymDisabledMapper.isInDisabledGym(jsonObject.getString("gymcode"));
+            if (msg != null && !msg.equals("")) {
                 throw new MyException(ResultEnum.REGISTER_FORBIDDEN);
             }
         }
