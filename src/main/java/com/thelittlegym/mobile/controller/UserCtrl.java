@@ -182,7 +182,7 @@ public class UserCtrl {
     public Result topic(String course,Date dt) throws Exception {
         //log.info("{}-{}",course,weekNum);
         System.out.println(dt);
-        Theme theme = themeMapper.findFirstByCourseAndWeekNumAndIsShow(course,dt,true);
+        Theme theme = themeMapper.findFirstByCourseAndDtAndIsShow(dt,course,true);
         if(theme!=null){
             return ResultUtil.success(ResultEnum.SUCCESS,theme.getVideoSrc());
         }else{

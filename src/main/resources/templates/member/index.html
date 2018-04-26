@@ -384,7 +384,7 @@
                             divGymClass += "<span class='col-20  state'>";
                         }
                         divGymClass += content.kq + "</span>";
-                        divGymClass += "<a href='#' onclick='toTopic(\""+content.course+"\",\""+content.weekNum+"\")'><span class='col-20 details'>家庭作业</span></a>";
+                        divGymClass += "<a href='#' onclick='toTopic(\""+content.course+"\",\""+content.date+"\")'><span class='col-20 details'>家庭作业</span></a>";
                         divGymClass += "</li>";
                     });
                 } else {
@@ -451,12 +451,12 @@
     }
 
     var content='';
-    function toTopic(course,weeknum) {
+    function toTopic(course,dt) {
         $.ajax({
             type: 'GET',
             url: '/index/topic',
             // data to be added to query string:
-            data: { course: course, weekNum :weeknum},
+            data: { course: course, dt :dt},
             // type of data we are expecting in return:
             dataType: 'json',
             timeout: 300,

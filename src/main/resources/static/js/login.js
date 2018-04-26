@@ -233,11 +233,11 @@ function login_ajax(telephone, password) {
         dataType: "json",
         success: function (res) {
             if (!res.code) {
-                if(res.data.openId==""){
-                    window.location.href = "/wechat/authorize?returnUrl=/index";
-                }else{
+                // if(res.data.openId==""){
+                //     window.location.href = "/wechat/authorize?returnUrl=/index";
+                // }else{
                     window.location.href = "/index";
-                }
+                // }
             } else {
                  var  content = res.msg?res.msg:"登陆异常，请重试";
                  msg(content)

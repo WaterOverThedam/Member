@@ -12,6 +12,6 @@ import java.util.Date;
 public interface ThemeMapper {
     //使用相同的weakOfYear判断
     @Select("select id,beginDate,createTime,isShow,name,videoSrc,weekNum,course,search from theme where YEARWEEK(DATE_ADD(DATE_ADD(beginDate,INTERVAL -1 day),INTERVAL weekNum-1 week))=YEARWEEK(DATE_ADD(#{dt},INTERVAL -1 day)) and course=#{course} and isShow=#{isShow} limit 1")
-    public Theme findFirstByCourseAndWeekNumAndIsShow(@Param("course") String course,@Param("dt") Date dt, @Param("isShow") Boolean isShow);
+    public Theme findFirstByCourseAndDtAndIsShow(@Param("dt") Date dt, @Param("course") String course,@Param("isShow") Boolean isShow);
 
 }
