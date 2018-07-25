@@ -41,10 +41,10 @@ public class CouponCtrl {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(HttpServletRequest request, @SessionAttribute(WebSecurityConfig.SESSION_KEY) User user,Integer pointed, Model model) throws Exception {
-        String tel = user.getTel();
+        String tel = user.getUsername();
         Map<String, Object> res = h5Service.getAll(tel);
         Result pointMap = ResultUtil.error();
-        //System.out.println(res);
+        System.out.println("res"+res);
         if(res!=null) {
             if (res.get("coupon") != null) {
                 Integer num = Integer.parseInt((String) res.get("coupon"));
