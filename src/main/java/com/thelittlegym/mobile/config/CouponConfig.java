@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @ConfigurationProperties(prefix="coupon")
-@PropertySource( "classpath:application-dev.yml")
+@PropertySource( "classpath:application.yml")
 @Data
 public class CouponConfig {
   private String useCode;
