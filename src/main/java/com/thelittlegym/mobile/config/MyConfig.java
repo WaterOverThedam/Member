@@ -16,7 +16,5 @@ import org.springframework.context.annotation.PropertySource;
 public class MyConfig {
   private String name;
   private Integer age;
-
-
 }
 

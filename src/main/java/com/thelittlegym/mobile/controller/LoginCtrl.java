@@ -61,7 +61,7 @@ public class LoginCtrl {
         Result res = loginService.login(username, password);
 
 
-        if (res != null) {
+        if (res != null && res.getCode()==0) {
             //获取user实体
             User user = (User) res.getData();
             //满足个别gym要求，信息不能访问
